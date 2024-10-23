@@ -1,7 +1,7 @@
 from fastapi import HTTPException
-from auth_service import app
-from auth_service.services import Account
-from auth_service.JWT import Authentication
+from main import app
+from services import Account
+from JWT import Authentication
 import asyncpg  
 
 # Đăng nhập
