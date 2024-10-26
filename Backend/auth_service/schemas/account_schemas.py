@@ -13,18 +13,17 @@ class Account(BaseModel):
     email: str = None
     OTP: str = None
 
-    def checkAccount(self, cursor) -> bool:
-        query = "SELECT password FROM account WHERE username = %s"
-        cursor.execute(query, (self.username,))
-        account = cursor.fetchone()
-        if account is None or account[0] != compute_hash(self.password):
+    def checkAccount(self) -> bool:
+        db=Postgresql()
+        result=db.select('account', '*', f"username = '{self.username}' and password = '{compute_hash(self.password)}'")
+        db.close()
+        if result is None:
             return False
         return True
 
-    def getInfoAccount(self, cursor) -> dict:
-        query = "SELECT id, email, username FROM account WHERE username = %s"
-        cursor.execute(query, (self.username,))
-        info = cursor.fetchone()
+    def getInfoAccount(self) -> dict:
+        db=Postgresql()
+        info = db.select('account', 'id, email, username', f"username = '{self.username}'")
         return {"id": info[0], "email": info[1], "username": info[2]} if info else {}
 
 
