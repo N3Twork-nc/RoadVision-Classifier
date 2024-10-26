@@ -1,7 +1,11 @@
 import icon_fb from "../../../assets/img/icon_fb.png";
 import icon_gg from "../../../assets/img/icon_gg.png";
 
-export default function LoginBlock() {
+interface LoginBlockProps {
+  handleAuth: () => void;
+}
+
+const LoginBlock: React.FC<LoginBlockProps> = ({handleAuth}) => {
   return (
     <div className="px-6 py-12 md:p-24 flex flex-col items-center md:items-start">
       <h2 className="font-bold text-[#23038C] text-4xl md:text-5xl">LOGIN</h2>
@@ -50,7 +54,7 @@ export default function LoginBlock() {
           <label className="inline-flex items-center">
             Don't have an account?{" "}
           </label>
-          <a href="#" className="text-sm font-bold ml-1">
+          <a onClick={handleAuth} className="text-sm cursor-pointer font-bold ml-1">
             Sign up
           </a>
         </div>
@@ -77,3 +81,4 @@ export default function LoginBlock() {
     </div>
   );
 }
+export default LoginBlock;

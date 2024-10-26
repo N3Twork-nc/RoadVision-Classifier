@@ -1,7 +1,12 @@
 import gg from "../../../assets/img/gg.png";
 import fb from "../../../assets/img/fb.png";
+import React from "react";
 
-export default function SignupBlock() {
+interface SignupBlockProps {
+  handleAuth: () => void;
+}
+
+const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth }) => {  
   return (
     <div className="p-4 sm:p-10 flex flex-col gap-2 items-center justify-center">
     <div className="Header w-full md:text-4xl text-3xl text-[#23038C] font-bold text-left">
@@ -39,7 +44,7 @@ export default function SignupBlock() {
         className="w-full h-11 p-4 rounded-md border-[1px] border-[#2F3D4C] text-sm sm:text-base"
       />
     </div>
-    <a href="#" className="Login underline w-full text-right text-xs sm:text-sm">
+    <a onClick={handleAuth} className="Login cursor-pointer underline w-full text-right text-xs sm:text-sm">
       Already have an account? Login
     </a>
     <button className="w-full h-12 bg-[#024296] rounded-lg text-white font-semibold text-sm sm:text-base flex justify-center items-center">
@@ -59,3 +64,4 @@ export default function SignupBlock() {
   </div>
   )
 }
+export default SignupBlock;
