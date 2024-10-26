@@ -10,7 +10,7 @@ API này được sử dụng để xác thực người dùng bằng cách ki�
 ### 1.2 Endpoint
 
 ```
-POST /APIsignin
+POST api/signin
 ```
 
 #### 1.2.1 Định dạng dữ liệu yêu cầu (Request)
@@ -122,3 +122,46 @@ API sẽ trả về một JSON object với định dạng như sau:
   "message": "User not found"
 }
 ```
+
+## 2 API Đăng ký
+### 2.1 Mục đích
+Dùng để tạo một tài khoản người dùng mới
+### 2.2 Enpoint
+```
+POST /api/signup
+```
+
+#### 1.2.1 Định dạng dữ liệu yêu cầu (Request)
+
+Để thực hiện yêu cầu đăng nhập, gửi một JSON object với định dạng sau:
+
+```json
+{
+    "username": "string",
+    "password": "string",
+    "email": "string",
+}
+```
+
+**Các trường:**
+- `username`: Tên người dùng của tài khoản (bắt buộc).
+- `password`: Mật khẩu của tài khoản (bắt buộc).
+- `email`: Địa chỉ email của tài khoản (bắt buộc).
+#### 2.2.2. Định dạng dữ liệu phản hồi (Response)
+
+API sẽ trả về một JSON object với định dạng như sau:
+
+##### 2.2.2.1 Đăng ký thành công
+
+```json
+{
+  "status": "Success",
+  "data": null,
+  "message": "Enter OTP sent to your email to verify your account"
+}
+```
+
+
+***Trong đó:***
+- `status`: Trạng thái của yêu cầu.
+- `message`: Thông điệp mô tả kết quả của yêu cầu.
