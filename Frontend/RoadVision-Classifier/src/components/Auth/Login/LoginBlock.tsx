@@ -1,7 +1,11 @@
 import fb from "../../../assets/img/fb.png";
 import gg from "../../../assets/img/gg.png";
 
-export default function LoginBlock() {
+interface LoginBlockProps {
+  handleAuth: () => void;
+}
+
+const LoginBlock: React.FC<LoginBlockProps> = ({handleAuth}) => {
   return (
     <div className="p-2 sm:p-4 md:p-10 flex flex-col gap-1 sm:gap-2 items-center justify-center max-w-full">
       <div className="Header w-full md:text-4xl text-3xl text-[#23038C] font-bold text-left">
@@ -70,7 +74,36 @@ export default function LoginBlock() {
         <button className="w-20 h-10 sm:w-15 sm:h-15 rounded-lg border-[2px] border-[#a5b3ff] flex justify-center items-center">
           <img src={gg} alt="Google" className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>
+        {/* Don't have account */}
+        <div className="flex items-center justify-center mt-4">
+          <label className="inline-flex items-center">
+            Don't have an account?{" "}
+          </label>
+          <a onClick={handleAuth} className="text-sm cursor-pointer font-bold ml-1">
+            Sign up
+          </a>
+        </div>
+
+        {/* Or login with */}
+        <div className="flex items-center justify-center mt-4">
+          <span className="text-[#2d2c2c]">________</span>
+          <label className="inline-flex items-center text-[#2d2c2c] mx-2 text-sm">
+            OR LOGIN WITH
+          </label>
+          <span className="text-[#2d2c2c]">________</span>
+        </div>
+
+        {/* Login with Google and Facebook */}
+        <div className="flex items-center justify-center gap-4 mt-4">
+          <button className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-10 py-2">
+            <img src={icon_gg} alt="Google icon" className="w-5 h-5" />
+          </button>
+          <button className="flex items-center gap-2 bg-white border border-gray-300 rounded-lg px-10 py-2">
+            <img src={icon_fb} alt="Facebook icon" className="w-5 h-5" />
+          </button>
+        </div>
       </div>
     </div>
   );
 }
+export default LoginBlock;
