@@ -1,7 +1,7 @@
 # Introduction
 The PostgreSQL is run by Docker Compose. It consists of two components: a PostgreSQL database server and a PgBouncer connection pooler. The PostgreSQL database server stores the database, while PgBouncer optimizes performance and resource usage by pooling database connections.
 # How to set up
-## Reparing 1 file .env follow format bellow:
+## Repairing 1 file .env follow format below:
 ``` 
 POSTGRES_USER=<user_admin>
 POSTGRES_PASSWORD=<password_user_admin>
