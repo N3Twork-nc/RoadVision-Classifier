@@ -1,7 +1,7 @@
 import fb from "../../../assets/img/fb.png";
 import gg from "../../../assets/img/gg.png";
 import { z } from "zod";
-import { axiosRequest } from "../../../config/axios.config"; // Đảm bảo bạn đã cấu hình axios đúng
+import { axiosRequest } from "../../../config/axios.config"; 
 import { useState } from "react";
 
 interface LoginBlockProps {
@@ -17,7 +17,7 @@ type FormData = z.infer<typeof loginSchema>;
 
 const LoginBlock: React.FC<LoginBlockProps> = ({ handleAuth }) => {
 
-  //thiết lập formData và Error
+  // thiết lập formData và Error
   const [formData, setFormData] = useState<FormData>({
     username: "",
     password: "",
@@ -69,7 +69,7 @@ const LoginBlock: React.FC<LoginBlockProps> = ({ handleAuth }) => {
           />
         </div>
         {/* Input password */}
-        <div className="Password w-full">
+        <div className="Password w-full mt-2">
           <label className="text-[#2F3D4C] font-semibold text-base">
             Password
           </label>
@@ -98,7 +98,7 @@ const LoginBlock: React.FC<LoginBlockProps> = ({ handleAuth }) => {
         <button 
           type="button"
           onClick={handleLoginClick}
-          className="w-full mt-2 h-12 bg-[#024296] rounded-lg text-white font-semibold text-sm sm:text-base flex justify-center items-center"
+          className="w-full mt-6 h-12 bg-[#024296] rounded-lg text-white font-semibold text-sm sm:text-base flex justify-center items-center"
         >
           Login
         </button>
