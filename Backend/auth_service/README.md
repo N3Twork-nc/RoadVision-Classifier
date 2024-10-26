@@ -125,15 +125,15 @@ API sẽ trả về một JSON object với định dạng như sau:
 
 ## 2 API Đăng ký
 ### 2.1 Mục đích
-Dùng để tạo một tài khoản người dùng mới
-### 2.2 Enpoint
+Dùng để tạo một tài khoản người dùng mới, nếu đăng ký thành công cần xác thực email để kích hoạt tài khoản
+### 2.2 Endpoint
 ```
 POST /api/signup
 ```
 
-#### 1.2.1 Định dạng dữ liệu yêu cầu (Request)
+#### 2.2.1 Định dạng dữ liệu yêu cầu (Request)
 
-Để thực hiện yêu cầu đăng nhập, gửi một JSON object với định dạng sau:
+Để thực hiện yêu cầu đăng ký, gửi một JSON object với định dạng sau:
 
 ```json
 {
@@ -159,9 +159,71 @@ API sẽ trả về một JSON object với định dạng như sau:
   "data": null,
   "message": "Enter OTP sent to your email to verify your account"
 }
+
+```
+##### 2.2.2.2 Username đã tồn tại
+```json
+{
+  "status": "Error",
+  "data": null,
+  "message": "Username already exists"
+}
+```
+##### 2.2.2.2 Email đã tồn tại
+```json
+{
+  "status": "Error",
+  "data": null,
+  "message": "Email already exists"
+}
 ```
 
 
+***Trong đó:***
+- `status`: Trạng thái của yêu cầu.
+- `message`: Thông điệp mô tả kết quả của yêu cầu.
+
+## 3 API xác thực email
+### 3.1 Mục đích
+Xác thực email đã đăng ký tài khoản trước đó bằng cách gửi OTP đã được gửi qua 
+Email.
+### Endpoint
+#### 2.2.1 Định dạng dữ liệu yêu cầu (Request)
+
+Để thực hiện xác thực email, gửi một JSON object với định dạng sau:
+
+```json
+{
+    "username": "string",
+    "password": "string",
+    "email": "string",
+    "OTP":"string"
+}
+```
+**Các trường:**
+- `username`: Tên người dùng của tài khoản (bắt buộc).
+- `password`: Mật khẩu của tài khoản (bắt buộc).
+- `email`: Địa chỉ email của tài khoản (bắt buộc).
+- `OTP`: Mã OTP (bắt buộc).
+
+
+#### 3.2.2. Định dạng dữ liệu phản hồi (Response)
+##### 3.2.2.1 xác thực thành công
+```json
+{
+  "status": "Success",
+  "data": null,
+  "message": "Email verified successfully"
+}
+```
+##### 3.2.2.2 xác thực không thành công (sai OTP)
+```json
+{
+  "status": "Error",
+  "data": null,
+  "message": "Email verification failed"
+}
+```
 ***Trong đó:***
 - `status`: Trạng thái của yêu cầu.
 - `message`: Thông điệp mô tả kết quả của yêu cầu.
