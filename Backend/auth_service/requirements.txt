@@ -2,3 +2,4 @@ asyncpg
 python-dotenv
 fastapi
 psycopg2
+PyJWT
