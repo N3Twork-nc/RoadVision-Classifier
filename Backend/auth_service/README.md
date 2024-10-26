@@ -1,19 +1,19 @@
 
-# DOCUMENT API ĐĂNG NHẬP
+# DOCUMENT AUTHENTICATION SERVICE
 
-## 1. Mục đích
+## 1. API đăng nhập
+
+### 1.1 Mục đích
 
 API này được sử dụng để xác thực người dùng bằng cách kiểm tra thông tin đăng nhập (tên người dùng và mật khẩu). Nếu thông tin đăng nhập hợp lệ, API sẽ trả về thông tin người dùng và mã thông báo JWT (token) để sử dụng cho các yêu cầu bảo mật sau này.
 
-## 2. Endpoint
+### 1.2 Endpoint
 
 ```
 POST /APIsignin
 ```
 
-## 3. Định dạng Dữ liệu
-
-### 3.1. Yêu cầu (Request)
+#### 1.2.1 Định dạng dữ liệu yêu cầu (Request)
 
 Để thực hiện yêu cầu đăng nhập, gửi một JSON object với định dạng sau:
 
@@ -32,11 +32,11 @@ POST /APIsignin
 - `email`: Địa chỉ email của tài khoản (không bắt buộc).
 - `OTP`: Mã OTP nếu có (không bắt buộc).
 
-### 3.2. Phản hồi (Response)
+#### 1.2.2. Định dạng dữ liệu phản hồi (Response)
 
 API sẽ trả về một JSON object với định dạng như sau:
 
-#### 3.2.1. Thành công
+##### 1.2.2.1 Thành công
 
 ```json
 {
@@ -53,14 +53,14 @@ API sẽ trả về một JSON object với định dạng như sau:
 }
 ```
 
-**Giải thích:**
-- `status`: Trạng thái của request (yêu cầu)
-- `data`: Dữ liệu trả về từ request (yêu cầu). Bao gồm:
+***Trong đó:***
+- `status`: Trạng thái của yêu cầu.
+- `data`: Dữ liệu trả về từ yêu cầu. Bao gồm:
     - `info`: Thông tin chi tiết về tài khoản người dùng (ID, email, username).
     - `token`: Mã thông báo JWT dùng để xác thực các yêu cầu tiếp theo.
-- `message`: Thông điệp mô tả kết quả của yêu cầu (thành công hoặc lỗi).
+- `message`: Thông điệp mô tả kết quả của yêu cầu.
 
-#### 3.2.2. Thất bại
+##### 1.2.2.2 Thất bại
 
 ```json
 {
@@ -70,7 +70,7 @@ API sẽ trả về một JSON object với định dạng như sau:
 }
 ```
 
-## 4. Mô tả Chi tiết
+### 1.3 Mô tả chi tiết
 
 - **`signin_service(account: Account)`**:
   - Hàm này nhận một đối tượng `Account`, kết nối đến cơ sở dữ liệu và kiểm tra thông tin đăng nhập của người dùng.
@@ -83,9 +83,9 @@ API sẽ trả về một JSON object với định dạng như sau:
 - **`getInfoAccount(self, cursor)`**:
   - Lấy thông tin chi tiết của người dùng từ cơ sở dữ liệu nếu tài khoản hợp lệ.
 
-## 5. Ví dụ
+### 1.4 Ví dụ
 
-### Yêu cầu
+#### Yêu cầu
 
 ```json
 {
@@ -96,7 +96,7 @@ API sẽ trả về một JSON object với định dạng như sau:
 }
 ```
 
-### Phản hồi
+#### Phản hồi (nếu tồn tại user)
 
 ```json
 {
@@ -110,5 +110,15 @@ API sẽ trả về một JSON object với định dạng như sau:
         "token": "yegwudbwi13244ej..."
     },
     "message": "Login successful"
+}
+```
+
+#### Phản hồi (nếu không tồn tại user)
+
+```json
+{
+  "status": "error",
+  "data": null,
+  "message": "User not found"
 }
 ```
