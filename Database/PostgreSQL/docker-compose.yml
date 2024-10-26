@@ -19,7 +19,7 @@ services:
       POSTGRES_INITDB_ARGS: --auth=md5  # Initialize DB with MD5 auth
       ALLOW_EMPTY_PASSWORD: yes
     volumes:
-      - /var/lib/postgres-data:/var/lib/postgresql/data  # Persist data in a local folder
+      - ./postgres-data:/var/lib/postgresql/data   # Persist data in a local folder
       - ./init_db/:/docker-entrypoint-initdb.d/
 
   # PgBouncer service for connection pooling

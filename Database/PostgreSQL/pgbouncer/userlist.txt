@@ -1,1 +1,2 @@
-"dev" "md5ea85d1d0f93a9cab4fe7ebd5067b61f7"
+"devops_ro" "md5ac4f88a4412c67156e4c1b9dd0a604f7"
+"admin" "md5e423a8582bec440882c98526ea09aa1f"
