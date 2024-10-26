@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 import hashlib
+from Database import Postgresql
 
 def compute_hash(data: str) -> str:
     hash_object = hashlib.sha256()
@@ -26,42 +27,32 @@ class Account(BaseModel):
         info = cursor.fetchone()
         return {"id": info[0], "email": info[1], "username": info[2]} if info else {}
 
-    # def insertAccount(self, cursor):
-    #     hashed_password = compute_hash(self.password)
-    #     query = """
-    #         INSERT INTO account (username, email, password) 
-    #         VALUES (%s, %s, %s)
-    #     """
-    #     cursor.execute(query, (self.username, self.email, hashed_password))
 
-    # def insertOTP(self, cursor, OTP: str):
-    #     query = """
-    #         INSERT INTO otp (username, otp, email) 
-    #         VALUES (%s, %s, %s)
-    #     """
-    #     cursor.execute(query, (self.username, OTP, self.email))
+    def insertAccount(self, OTP: str):
+        db=Postgresql()
+        result=db.insert('account', 'username, password ,email,verified', f"'{self.username}', '{compute_hash(self.password)}','{self.email}', {OTP}")
+        db.commit()
+        db.close()
+        return result
 
-    # def verifyEmail(self, cursor) -> bool:
-    #     try:
-    #         query = "SELECT otp FROM otp WHERE username = %s"
-    #         cursor.execute(query, (self.username,))
-    #         otp_record = cursor.fetchone()
-    #         if otp_record and otp_record[0] == self.OTP:
-    #             delete_query = "DELETE FROM otp WHERE username = %s"
-    #             cursor.execute(delete_query, (self.username,))
-    #             return True
-    #     except:
-    #         return False
-    #     return False
+    def verifyEmail(self) -> bool:
+        db=Postgresql()
+        result=db.select('account', '1', f"email = '{self.email}' and verified = '{self.OTP}'")
+        if result is None:
+            return False
+        db.update('account', f"active = true", f"email = '{self.email}'")
+        db.commit()
+        db.close()
+        return True
 
-    # def existenceUsername(self, cursor) -> bool:
-    #     query = "SELECT 1 FROM account WHERE username = %s"
-    #     cursor.execute(query, (self.username,))
-    #     result = cursor.fetchone()
-    #     return result is not None
+    def existenceUsername(self) -> bool:
+        db=Postgresql()
+        result=db.select('account', 'username', f"username = '{self.username}'")
+        db.close()
+        return result is not None
 
-    # def existenceEmail(self, cursor) -> bool:
-    #     query = "SELECT 1 FROM account WHERE email = %s"
-    #     cursor.execute(query, (self.email,))
-    #     result = cursor.fetchone()
-    #     return result is not None
+    def existenceEmail(self) -> bool:
+        db=Postgresql()
+        result=db.select('account', 'email', f"email = '{self.email}'")
+        db.close()
+        return result is not None
