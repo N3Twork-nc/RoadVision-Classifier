@@ -2,7 +2,7 @@ import road from "../../assets/img/road.png";
 import LoginBlock from "./Login/LoginBlock";
 export default function AuthComponent() {
   return (
-    <div className="flex flex-col md:flex-row w-[60%] h-[70%] rounded-2xl bg-white shadow-2xl">
+    <div className="flex flex-col md:flex-row w-full md:w-[60%] h-auto md:h-[80%] rounded-2xl bg-white shadow-2xl overflow-hidden">
       
       <div className="md:w-1/2 w-full rounded-l-3xl">
         <LoginBlock/>
