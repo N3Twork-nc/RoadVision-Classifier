@@ -2,6 +2,7 @@ import os
 import psycopg2
 from dotenv import load_dotenv
 from schemas.account_schemas import Account
+from .format_response import format_response 
 from JWT import Authentication
 from fastapi import HTTPException
 
@@ -17,15 +18,21 @@ DB_CONFIG = {
 }
 
 def signin_service(account: Account):
-    try:
-        with psycopg2.connect(**DB_CONFIG) as conn, conn.cursor() as cursor:
-            if account.checkAccount(cursor):
-                token = Authentication().generate_token(account.username)
-                info = account.getInfoAccount(cursor)
-                info.pop('password', None)
-                
-                return {'info': info, 'token': token}
-            else:
-                raise HTTPException(status_code=404, detail="User not found")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    with psycopg2.connect(**DB_CONFIG) as conn, conn.cursor() as cursor:
+        if account.checkAccount(cursor):
+            token = Authentication().generate_token(account.username)
+            info = account.getInfoAccount(cursor)
+            info.pop('password', None)
+            
+            return format_response(
+                status="success",
+                data={"info": info, "token": token},
+                message="Login successful"
+            )
+        else:
+            return format_response(
+                status="error",
+                data=None,
+                message="User not found",
+                status_code=404
+            )
