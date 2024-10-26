@@ -27,7 +27,8 @@ def signin_service(account: Account):
             return format_response(
                 status="success",
                 data={"info": info, "token": token},
-                message="Login successful"
+                message="Login successful",
+                status_code=200
             )
         else:
             return format_response(
