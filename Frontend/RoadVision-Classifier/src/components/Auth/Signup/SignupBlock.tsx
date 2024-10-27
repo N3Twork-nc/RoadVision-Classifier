@@ -55,28 +55,28 @@ const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth }) => {
         />
       </div>
       {/* Already have account */}
-      <div className="flex items-center justify-center mt-4">
+      <div className="flex items-center justify-center">
         <label className="inline-flex items-center">
           Already have an account?{" "}
         </label>
-        <a onClick={handleAuth} className="cursor-pointer text-sm font-bold ml-1">
+        <a onClick={handleAuth} className="cursor-pointer hover:text-blue-800 text-sm font-bold ml-1">
           Login
         </a>
       </div>
       {/* Create account */}
-      <button className="w-full h-12 bg-[#024296] rounded-lg text-white font-semibold text-sm sm:text-base flex justify-center items-center">
+      <button className="w-full h-12 bg-[#024296]  hover:bg-[#284773] rounded-lg text-white font-semibold text-sm sm:text-base flex justify-center items-center">
         Create Account
       </button>
 
       {/* Or signup with */}
-      <div className="flex items-center justify-center mt-4">
+      <div className="flex items-center justify-center">
         <span className="text-[#2d2c2c]">________</span>
         <label className="inline-flex items-center text-[#2d2c2c] mx-2 text-sm">
           OR SIGNUP WITH
         </label>
         <span className="text-[#2d2c2c]">________</span>
       </div>
-      <div className="flex flex-row justify-center gap-2 mt-4">
+      <div className="flex flex-row justify-center gap-2">
         <button className="w-20 h-10 sm:w-15 sm:h-15 rounded-lg border-[2px] border-[#a5b3ff] flex justify-center items-center">
           <img src={fb} alt="Facebook" className="w-5 h-5 sm:w-6 sm:h-6" />
         </button>

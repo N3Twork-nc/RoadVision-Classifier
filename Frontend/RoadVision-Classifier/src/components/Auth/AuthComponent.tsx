@@ -1,20 +1,23 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import road from "../../assets/img/road.png";
 import LoginBlock from "./Login/LoginBlock";
 import SignupBlock from "./Signup/SignupBlock";
-
 export default function AuthComponent() {
   const [isLogin, setIsLogin] = useState<boolean>(true);
-
+  const navigate = useNavigate();
   const handleAuth = () => {
     setIsLogin(!isLogin);
   };
+  const handleForgotPass = () => {
+    navigate("./forgot-pass");
+  }
 
   return (
     <div className="flex flex-col md:flex-row w-[60%] lg:h-[80%] h-fit rounded-2xl bg-white shadow-2xl">
       {/* left container */}
       <div className="lg:w-1/2 p-5 w-full rounded-l-3xl overflow-auto flex justify-center items-center ">
-        {isLogin ? <LoginBlock handleAuth={handleAuth} /> : <SignupBlock handleAuth={handleAuth} />}
+        {isLogin ? <LoginBlock handleAuth={handleAuth} handleForgotPass={handleForgotPass} /> : <SignupBlock handleAuth={handleAuth} />}
       </div>
       {/* right container */}
       <div className="lg:w-1/2 hidden lg:block rounded-r-2xl bg-opacity-40 relative">

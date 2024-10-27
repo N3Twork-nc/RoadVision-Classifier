@@ -1,33 +1,29 @@
 import EnterEmail from "../../../components/ForgotPass/EnterEmail";
 import SendSuccess from "../../../components/ForgotPass/SendSucess";
 import { Carousel } from "antd";
-import { useRef, } from "react";
+import { useRef, useState } from "react";
 
-const contentStyle: React.CSSProperties = {
-    margin: 0,
-    minHeight: "300px", 
-    color: "#fff",
-    lineHeight: "160px",
-    textAlign: "center",
-    background: "#364d79",
-  };
   
   export default function ForgotPass() {
-  //  const [checkEmail, setCheckEmail] = useState(false);
+
     const carouselRef = useRef<any>(null);
+    const [isSendSuccessVisible, setSendSuccessVisible] = useState(false);
 
     const handleNextSlide = () => {
+      setSendSuccessVisible(true);
       carouselRef.current?.next();
     };
   
     return (
       <Carousel ref={carouselRef} arrows={false} draggable={false} swipeToSlide={false}>
-        <div style={contentStyle}>
+        <div>
           <EnterEmail onContinue={handleNextSlide}/> 
         </div>
-        <div style={contentStyle}>
+        {isSendSuccessVisible && (
+        <div>
           <SendSuccess />
         </div>
+      )}
       </Carousel>
     );
   }
