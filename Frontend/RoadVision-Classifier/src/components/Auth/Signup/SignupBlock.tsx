@@ -10,17 +10,19 @@ interface SignupBlockProps {
 }
 
 // đặt type cho formData
-const loginSchema = z.object({
+const signupSchema = z.object({
   username: z.string(),
   password: z.string(),
+  email: z.string(),
 });
-type FormData = z.infer<typeof loginSchema>;
+type FormData = z.infer<typeof signupSchema>;
 
 const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth }) => {
   // thiết lập formData và Error
   const [formData, setFormData] = useState<FormData>({
     username: "",
     password: "",
+    email: "",
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -34,22 +36,22 @@ const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth }) => {
 
   const handleSignupClick = async () => {
     setError(null);
-    // Gọi API login
+    // Gọi API signup
     try {
       const response = await axiosRequest.post("api/signup", formData);
-      console.log("Login successful:", response.data);
+      console.log("Signup successful:", response.data);
     } catch (err) {
-      setError("Login failed. Please check your information!");
+      setError("Signup failed. Please check your information!");
       console.error(err);
     }
   };
-  
 
   return (
     <div className="p-4 sm:p-10 flex flex-col gap-2 items-center justify-center">
       <div className="Header w-full md:text-4xl text-3xl text-[#23038C] font-bold text-left">
         SIGN UP
       </div>
+      <form className="w-full" onSubmit={(e) => e.preventDefault()}> {/* Ngăn chặn submit mặc định */}
       {/* Input username */}
       <div className="Username w-full">
         <label className="text-[#2F3D4C] font-semibold text-base">
@@ -57,7 +59,10 @@ const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth }) => {
         </label>
         <input
           type="text"
+          name="username"
           placeholder="Enter the username"
+          value={formData.username}
+          onChange={handleChange}
           className="w-full h-11 p-4 rounded-md border-[1px] border-[#2F3D4C] text-sm sm:text-base"
         />
       </div>
@@ -66,7 +71,10 @@ const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth }) => {
         <label className="text-[#2F3D4C] font-semibold text-base">Email</label>
         <input
           type="email"
+          name="email"
           placeholder="Enter the email"
+          value={formData.email}
+          onChange={handleChange}
           className="w-full h-11 p-4 rounded-md border-[1px] border-[#2F3D4C] text-sm sm:text-base"
         />
       </div>
@@ -77,7 +85,10 @@ const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth }) => {
         </label>
         <input
           type="password"
+          name="password"
           placeholder="Enter the password"
+          value={formData.password}
+          onChange={handleChange}
           className="w-full h-11 p-4 rounded-md border-[1px] border-[#2F3D4C] text-sm sm:text-base"
         />
       </div>
@@ -92,6 +103,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth }) => {
           className="w-full h-11 p-4 rounded-md border-[1px] border-[#2F3D4C] text-sm sm:text-base"
         />
       </div>
+      </form>
       {/* Already have account */}
       <div className="flex items-center justify-center mt-4">
         <label className="inline-flex items-center">
@@ -105,7 +117,10 @@ const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth }) => {
         </a>
       </div>
       {/* Create account */}
-      <button className="w-full h-12 bg-[#024296] rounded-lg text-white font-semibold text-sm sm:text-base flex justify-center items-center">
+      <button
+        onClick={handleSignupClick}
+        className="w-full h-12 bg-[#024296] rounded-lg text-white font-semibold text-sm sm:text-base flex justify-center items-center hover:bg-[#27558f]"
+      >
         Create Account
       </button>
 

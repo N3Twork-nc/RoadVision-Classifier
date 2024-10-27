@@ -36,7 +36,7 @@ const LoginBlock: React.FC<LoginBlockProps> = ({ handleAuth }) => {
     setError(null);
     // Gọi API login
     try {
-      const response = await axiosRequest.post('/APIsignin', formData);
+      const response = await axiosRequest.post('api/signin', formData);
       console.log('Login successful:', response.data);
     } catch (err) {
       setError('Login failed. Please check your information!'); 
@@ -98,7 +98,7 @@ const LoginBlock: React.FC<LoginBlockProps> = ({ handleAuth }) => {
         <button 
           type="button"
           onClick={handleLoginClick}
-          className="w-full mt-6 h-12 bg-[#024296] rounded-lg text-white font-semibold text-sm sm:text-base flex justify-center items-center"
+          className="w-full mt-6 h-12 bg-[#024296] rounded-lg text-white font-semibold text-sm sm:text-base flex justify-center items-center hover:bg-[#012f68]"
         >
           Login
         </button>
