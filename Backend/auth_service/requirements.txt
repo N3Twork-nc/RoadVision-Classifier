@@ -1,4 +1,3 @@
-asyncpg
 python-dotenv
 fastapi
 psycopg2
