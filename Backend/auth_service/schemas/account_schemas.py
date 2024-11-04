@@ -8,8 +8,8 @@ def compute_hash(data: str) -> str:
     return hash_object.hexdigest()
 
 class Account(BaseModel):
-    username: str
-    password: str
+    username: str = None
+    password: str = None
     email: str = None
     OTP: str = None
 
