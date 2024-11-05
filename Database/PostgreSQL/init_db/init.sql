@@ -60,3 +60,4 @@ ALTER TABLE "Road" ADD CONSTRAINT "Road_fk1" FOREIGN KEY ("user_id") REFERENCES 
 ALTER TABLE "AccessRoad" ADD CONSTRAINT "AccessRoad_fk0" FOREIGN KEY ("id_user") REFERENCES "user"("user_id");
 
 ALTER TABLE "AccessRoad" ADD CONSTRAINT "AccessRoad_fk1" FOREIGN KEY ("id_road") REFERENCES "Road"("id");
+

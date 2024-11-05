@@ -5,7 +5,7 @@ version: '3.8'  # Specify the Docker Compose version
 services:
   # PostgreSQL database service
   postgredb:
-    image: caothi/postgresql:latest
+    image: caothi/postgresql:1.0.9
     container_name: postgredb
     environment:
       # Environment variables are loaded from the .env file
@@ -21,8 +21,7 @@ services:
     volumes:
       - /var/lib/postgres-data/:/var/lib/postgresql/data   # Persist data in a local folder
       - ./init_db/:/docker-entrypoint-initdb.d/
-    command: postgres -c shared_preload_libraries=pg_cron -c cron.database_name=$POSTGRES_DB
-
+    
   # PgBouncer service for connection pooling
   pgbouncer:
     image: edoburu/pgbouncer
