@@ -1,13 +1,12 @@
--- CREATE USER '${POSTGRES_USER_DEV}' WITH PASSWORD '${POSTGRES_PASSWORD_DEV}';
--- GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER ON '${POSTGRES_DB}' TO '${POSTGRES_USER_DEV}';
-
 CREATE TABLE IF NOT EXISTS "account" (
 	"id" serial NOT NULL,
 	"email" varchar(255) NOT NULL UNIQUE,
 	"password" varchar(255) NOT NULL,
 	"verified" bigint,
-	"phone" varchar(255) NOT NULL UNIQUE,
+	"phone" varchar(255) UNIQUE,
 	"username" varchar(255) NOT NULL UNIQUE,
+	"active" boolean NOT NULL DEFAULT false,
+	"created" timestamp with time zone NOT NULL DEFAULT 'NOW()',
 	PRIMARY KEY ("id")
 );
 
