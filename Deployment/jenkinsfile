@@ -1,0 +1,48 @@
+pipeline {
+    agent { label 'server' }
+    environment {
+        REPO_GIT="https://github.com/N3Twork-nc/RoadVision-Classifier.git"
+    }
+    triggers {
+        pollSCM('* * * * *')  // Kiểm tra thay đổi mỗi phút (thay đổi tần suất nếu cần)
+    }
+    stages {
+        stage('Setup environment variable') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'POSTGRES_USER', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                   script {
+                        env.POSTGRES_USER = USERNAME
+                        env.POSTGRES_PASSWORD = PASSWORD
+                    }
+                }
+                withCredentials([usernamePassword(credentialsId: 'POSTGRES_USER_DEV', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    script {
+                       env.POSTGRES_USER_DEV=USERNAME
+                       env.POSTGRES_PASSWORD_DEV=PASSWORD
+                    }
+                }
+            }
+        }
+        stage('Clone Git Repository') {
+            steps {
+                // Clone the Git repository with authentication
+                git url: "${REPO_GIT}", 
+                    branch: 'deployment', 
+                    credentialsId: 'github'
+            }
+        }
+       stage('Run Docker Compose') {
+            steps {
+                dir('Database/PostgreSQL') {
+                    sh 'docker compose up -d'
+                    sh 'docker compose restart'
+                }
+            }
+       }
+        stage("Deploy") {
+            steps {
+                echo "Deploying the app..."
+            }
+        }
+    }
+}
