@@ -83,7 +83,7 @@ pipeline {
                     }
                 }
                 dir('Database/PostgreSQL') {
-                    sh 'docker-compose down'
+                    sh 'docker compose down'
                     sh 'docker compose up -d'
                 }
             }
