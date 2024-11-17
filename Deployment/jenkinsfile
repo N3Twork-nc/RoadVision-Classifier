@@ -60,7 +60,7 @@ pipeline {
                 }
                 // Deploy the Docker compose
                 dir('Deployment/auth_service') {
-                    sh 'docker-compose down'
+                    sh 'docker compose down'
                     sh 'docker compose up -d'
                 }
             }
