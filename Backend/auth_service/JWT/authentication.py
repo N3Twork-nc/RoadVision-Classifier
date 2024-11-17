@@ -19,6 +19,7 @@ class Authentication:
         expire = datetime.utcnow() + timedelta(
             seconds=60 * 60 * 24 * 1  # Expired after 1 days
         )
+        #endcoding the token
         to_encode = {
             "exp": expire, "username": username
         }
