@@ -18,7 +18,7 @@ type FormData = z.infer<typeof loginSchema>;
 
 const LoginBlock: React.FC<LoginBlockProps> = ({ handleAuth, handleForgotPass }) => {
 
-  //thiết lập formData và Error
+  // thiết lập formData và Error
   const [formData, setFormData] = useState<FormData>({
     username: "",
     password: "",
@@ -69,7 +69,7 @@ const LoginBlock: React.FC<LoginBlockProps> = ({ handleAuth, handleForgotPass })
           />
         </div>
         {/* Input password */}
-        <div className="Password w-full">
+        <div className="Password w-full mt-2">
           <label className="text-[#2F3D4C] font-semibold text-base">
             Password
           </label>
@@ -98,7 +98,7 @@ const LoginBlock: React.FC<LoginBlockProps> = ({ handleAuth, handleForgotPass })
         <button 
           type="button"
           onClick={handleLoginClick}
-          className="w-full mt-2 h-12 bg-[#024296] hover:bg-[#284773] rounded-lg text-white font-semibold text-sm sm:text-base flex justify-center items-center"
+          className="w-full mt-6 h-12 bg-[#024296] rounded-lg text-white font-semibold text-sm sm:text-base flex justify-center items-center hover:bg-[#012f68]"
         >
           Login
         </button>
