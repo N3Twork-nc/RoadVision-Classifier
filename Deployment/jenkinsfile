@@ -20,6 +20,7 @@ pipeline {
                     
                     // Lọc ra các thư mục thay đổi
                     def changedDirsOnly = changedDirs.findAll { it.contains('/') }.collect { it.split('/')[0] }.unique()
+                    echo "changedDirsOnly: ${changedDirsOnly}"
 
                     // Gán giá trị biến môi trường cho các thư mục thay đổi
                     env.FRONTEND_CHANGED = changedDirsOnly.contains('Frontend') ? 'true' : 'false'
