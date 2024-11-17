@@ -10,6 +10,7 @@ pipeline {
         stage('Clone Git Repository') {
             steps {
                 // Clone the Git repository with authentication
+                git = tool name: 'Git', type: 'ToolType'
                 git url: "${REPO_GIT}", 
                     branch: 'deployment', 
                     credentialsId: 'github'
