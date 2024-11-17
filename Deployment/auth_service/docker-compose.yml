@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  auth_service:
+    image: caothi/auth_service:latest
+    container_name: auth_service
+    ports:
+      - "8080"
+    environment:
+      - DATABASE_URL="192.168.1.14"
+      - SECURITY_ALGORITHM="HS256"
+    restart: always

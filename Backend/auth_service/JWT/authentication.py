@@ -17,7 +17,7 @@ class Authentication:
     #create JWT    
     def generate_token(self,username: Union[str, Any]) -> str:
         expire = datetime.utcnow() + timedelta(
-            seconds=60 * 60 * 24 * 3  # Expired after 3 days
+            seconds=60 * 60 * 24 * 1  # Expired after 1 days
         )
         to_encode = {
             "exp": expire, "username": username
