@@ -20,9 +20,9 @@ pipeline {
                     echo "changedDirs: ${changedDirs}"
 
                     // Gán giá trị biến môi trường cho các thư mục thay đổi
-                    env.FRONTEND_CHANGED = changedDirs.contains('Frontend') ? 'true' : 'false'
-                    env.AUTHEN_SERVICE_CHANGED = changedDirs.contains('Backend/auth_service') ? 'true' : 'false'
-                    env.POSTGRES_CHANGED = changedDirs.contains('Database/PostgreSQL') ? 'true' : 'false'
+                    env.FRONTEND_CHANGED = changeDirs.any { it.startsWith('Frontend') } ? 'true' : 'false'
+                    env.AUTHEN_SERVICE_CHANGED = changedDirs.any { it.startsWith('Backend/auth_service') } ? 'true' : 'false'
+                    env.POSTGRES_CHANGED = changedDirs.any { it.startsWith('Database/PostgreSQL') } ? 'true' : 'false'
                 }
             }
         }
