@@ -17,6 +17,7 @@ pipeline {
                     echo "checkout directory changed"
                     // Lấy danh sách các thư mục đã thay đổi
                     def changedDirs = sh(script: 'git diff --name-only HEAD~1 HEAD', returnStdout: true).trim().split('\n')
+                    echo "changedDirs: ${changedDirs}"
 
                     // Gán giá trị biến môi trường cho các thư mục thay đổi
                     env.FRONTEND_CHANGED = changedDirs.contains('Frontend') ? 'true' : 'false'
