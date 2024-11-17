@@ -1,11 +1,12 @@
 import fb from "../../../assets/img/fb.png";
 import gg from "../../../assets/img/gg.png";
 import { z } from "zod";
-import { axiosRequest } from "../../../config/axios.config"; 
+import { axiosRequest } from "../../../config/axios.config";
 import { useState } from "react";
 
 interface LoginBlockProps {
   handleAuth: () => void;
+  handleForgotPass: () => void;
 }
 
 // đặt type cho formData
@@ -15,7 +16,7 @@ const loginSchema = z.object({
 });
 type FormData = z.infer<typeof loginSchema>;
 
-const LoginBlock: React.FC<LoginBlockProps> = ({ handleAuth }) => {
+const LoginBlock: React.FC<LoginBlockProps> = ({ handleAuth, handleForgotPass }) => {
 
   // thiết lập formData và Error
   const [formData, setFormData] = useState<FormData>({
@@ -36,7 +37,7 @@ const LoginBlock: React.FC<LoginBlockProps> = ({ handleAuth }) => {
     setError(null);
     // Gọi API login
     try {
-      const response = await axiosRequest.post('api/signin', formData);
+      const response = await axiosRequest.post('/api/signin', formData);
       console.log('Login successful:', response.data);
     } catch (err) {
       setError('Login failed. Please check your information!'); 
@@ -52,7 +53,6 @@ const LoginBlock: React.FC<LoginBlockProps> = ({ handleAuth }) => {
       <span className="font-normal text-[#153C71] text-center md:text-left mt-2">
         Welcome back, please login to your account!
       </span>
-      <form className="w-full" onSubmit={(e) => e.preventDefault()}> {/* Ngăn chặn submit mặc định */}
         {/* Input username */}
         <div className="Username w-full mt-4">
           <label className="text-[#2F3D4C] font-semibold text-base">
@@ -83,14 +83,14 @@ const LoginBlock: React.FC<LoginBlockProps> = ({ handleAuth }) => {
             required 
           />
         </div>
-        {error && <span className="text-red-500">{error}</span>} {/* Hiển thị thông báo lỗi nếu có */}
+        {error && <span className="text-red-500">{error}</span>}
         {/* Forgot password*/}
         <div className="flex items-center justify-center mt-4">
           <label className="inline-flex items-center">
             <input type="checkbox" className="form-checkbox h-4 w-4" />
             <span className="ml-2">Remember me</span>
           </label>
-          <a href="#" className="hover:text-blue-800 text-sm underline ml-16">
+          <a onClick={handleForgotPass} className="hover:text-blue-800 cursor-pointer text-sm underline ml-16">
             Forgot password?
           </a>
         </div>
@@ -107,11 +107,10 @@ const LoginBlock: React.FC<LoginBlockProps> = ({ handleAuth }) => {
           <label className="inline-flex items-center">
             Don't have an account?{" "}
           </label>
-          <a onClick={handleAuth} className="cursor-pointer text-sm font-bold ml-1">
+          <a onClick={handleAuth} className="cursor-pointer hover:text-blue-800 text-sm font-bold ml-1">
             Sign up
           </a>
         </div>
-      </form>
       {/* Or login with */}
       <div className="flex items-center justify-center mt-4">
         <span className="text-[#2d2c2c]">________</span>

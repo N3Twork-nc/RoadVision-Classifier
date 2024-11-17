@@ -125,7 +125,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth, onSignUpSuccess }
         <label className="inline-flex items-center">
           Already have an account?{" "}
         </label>
-        <a onClick={handleAuth} className="cursor-pointer text-sm font-bold ml-1">
+        <a onClick={handleAuth} className="cursor-pointer hover:text-blue-800 text-sm font-bold ml-1">
           Login
         </a>
       </div>

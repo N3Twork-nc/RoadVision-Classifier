@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import road from "../../assets/img/road.png";
 import LoginBlock from "./Login/LoginBlock";
 import SignupBlock from "./Signup/SignupBlock";
+
 import VerifyBlock from "./Verify/VerifyBlock";
 
 export default function AuthComponent() {
@@ -11,6 +13,9 @@ export default function AuthComponent() {
   const handleAuth = () => {
     setIsLogin(!isLogin);
   };
+  const handleForgotPass = () => {
+    navigate("./forgot-pass");
+  }
 
   const handleSignUpSuccess = () => {
     setIsSignedUp(true); 
