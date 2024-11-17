@@ -9,7 +9,7 @@ from fastapi import Depends, HTTPException
 
 reusable_oauth2 = HTTPBearer(scheme_name='Authorization')
 
-#Authentication class####
+#Authentication class
 class Authentication:
     def __init__(self):
         self.SECRET_KEY=os.environ["SECRET_KEY"]
