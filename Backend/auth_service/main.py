@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-app = FastAPI()
+app = FastAPI( root_path="/auth")
 from APIs import *
 import dotenv
 app.add_middleware(
