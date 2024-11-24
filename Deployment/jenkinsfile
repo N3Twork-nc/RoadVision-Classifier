@@ -59,9 +59,9 @@ pipeline {
                     sh 'docker push caothi/auth_service:latest'
                 }
                 // Deploy the Docker compose
-                dir('Deployment/auth_service') {
-                    sh 'docker compose down'
-                    sh 'docker compose up -d'
+                dir('Deployment') {
+                    sh 'docker compose -f auth-service.yml up -d'
+                    sh 'docker compose restart'
                 }
             }
         }
