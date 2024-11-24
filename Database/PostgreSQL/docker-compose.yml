@@ -21,6 +21,8 @@ services:
     volumes:
       - /var/lib/postgres-data/:/var/lib/postgresql/data   # Persist data in a local folder
       - ./init_db/:/docker-entrypoint-initdb.d/
+    networks:
+      - app_network
     
   # PgBouncer service for connection pooling
   pgbouncer:
@@ -33,6 +35,8 @@ services:
       - ./pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
     depends_on:
       - postgredb
+    networks:
+      - app_network
   # Adminer service for database management
   adminer:
     image: adminer:latest  # Use the latest Adminer image
@@ -44,5 +48,11 @@ services:
       ADMINER_DEFAULT_SYSTEM: pgsql  # Set PostgreSQL as the default system
     depends_on:
       - pgbouncer  # Ensure PgBouncer starts before Adminer
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    external: true
 
 
