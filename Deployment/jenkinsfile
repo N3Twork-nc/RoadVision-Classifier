@@ -60,8 +60,8 @@ pipeline {
                 }
                 // Deploy the Docker compose
                 dir('Deployment') {
+                    sh 'docker compose  -f auth-service.yml down'
                     sh 'docker compose -f auth-service.yml up -d'
-                    sh 'docker compose restart'
                 }
             }
         }
