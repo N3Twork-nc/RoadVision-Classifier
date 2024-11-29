@@ -3,31 +3,38 @@ import fb from "../../../assets/img/fb.png";
 import React, { useState } from "react";
 import { z } from "zod";
 import { axiosRequest } from "../../../config/axios.config";
-import { useDispatch } from "react-redux";
-import { setEmail } from "../authSlice";
+import { useRecoilState } from "recoil";
+import { verifyEmailState } from "../../../atoms/authState";
+import authService from "../../../services/auth.service";
 
 interface SignupBlockProps {
   handleAuth: () => void;
   onSignUpSuccess: () => void;
 }
 
-// Đặt schema cho formData, ràng buộc input 
+// Input rules 
 const signupSchema = z.object({
   username: z.string().min(6, "Username must be at least 6 characters long"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
   email: z.string().email("Invalid email format"),
 });
 
-type FormData = z.infer<typeof signupSchema>;
+type FormData = z.infer<typeof signupSchema> & { reEnterPassword: string };
 
-const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth, onSignUpSuccess }) => {
-  const dispatch = useDispatch();
+const SignupBlock: React.FC<SignupBlockProps> = ({
+  handleAuth,
+  onSignUpSuccess,
+}) => {
+  const [verifyEmailRecoidState, setVerifyEmailRecoidState] =
+    useRecoilState(verifyEmailState);
 
   const [formData, setFormData] = useState<FormData>({
     username: "",
     password: "",
     email: "",
+    reEnterPassword: "",
   });
+
   const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,10 +56,23 @@ const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth, onSignUpSuccess }
       return;
     }
 
+    // Check password
+    if (formData.password !== formData.reEnterPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
     try {
-      const response = await axiosRequest.post("api/signup", formData);
+      // Gửi API đăng ký
+      const response = await authService.signUp(formData);
       console.log("Signup successful:", response.data);
-      dispatch(setEmail(formData.email)); // Lưu email vào Redux
+
+      setVerifyEmailRecoidState({
+        email: formData.email,
+        password: formData.password,
+        username: formData.username,
+      });
+
       onSignUpSuccess();
     } catch (err) {
       setError("Signup failed. Please check your information!");
@@ -79,9 +99,11 @@ const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth, onSignUpSuccess }
             className="w-full h-11 p-4 rounded-md border-[1px] border-[#2F3D4C] text-sm sm:text-base"
           />
         </div>
-        
+
         <div className="Email w-full">
-          <label className="text-[#2F3D4C] font-semibold text-base">Email</label>
+          <label className="text-[#2F3D4C] font-semibold text-base">
+            Email
+          </label>
           <input
             type="email"
             name="email"
@@ -91,7 +113,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth, onSignUpSuccess }
             className="w-full h-11 p-4 rounded-md border-[1px] border-[#2F3D4C] text-sm sm:text-base"
           />
         </div>
-        
+
         <div className="Password w-full">
           <label className="text-[#2F3D4C] font-semibold text-base">
             Password
@@ -112,7 +134,10 @@ const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth, onSignUpSuccess }
           </label>
           <input
             type="password"
+            name="reEnterPassword"
             placeholder="Re-enter the password"
+            value={formData.reEnterPassword}
+            onChange={handleChange}
             className="w-full h-11 p-4 rounded-md border-[1px] border-[#2F3D4C] text-sm sm:text-base"
           />
         </div>
@@ -125,7 +150,10 @@ const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth, onSignUpSuccess }
         <label className="inline-flex items-center">
           Already have an account?{" "}
         </label>
-        <a onClick={handleAuth} className="cursor-pointer hover:text-blue-800 text-sm font-bold ml-1">
+        <a
+          onClick={handleAuth}
+          className="cursor-pointer hover:text-blue-800 text-sm font-bold ml-1"
+        >
           Login
         </a>
       </div>
@@ -144,7 +172,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({ handleAuth, onSignUpSuccess }
         </label>
         <span className="text-[#2d2c2c]">________</span>
       </div>
-      
+
       <div className="flex flex-row justify-center gap-2 mt-4">
         <button className="w-20 h-10 sm:w-15 sm:h-15 rounded-lg border-[2px] border-[#a5b3ff] flex justify-center items-center">
           <img src={fb} alt="Facebook" className="w-5 h-5 sm:w-6 sm:h-6" />

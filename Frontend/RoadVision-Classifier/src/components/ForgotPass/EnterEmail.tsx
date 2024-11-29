@@ -27,7 +27,7 @@ const EnterEmail: React.FC<EnterEmailProps> = ({ onContinue }) => {
     setError(null);
     try {
       console.log(formData);
-      const response = await axiosRequest.post("/api/forgotPassword", formData);
+      const response = await axiosRequest.post("/auth/api/forgotPassword", formData);
       if (response.status === 200) {
         console.log("Email sent:", response.data);
         onContinue();

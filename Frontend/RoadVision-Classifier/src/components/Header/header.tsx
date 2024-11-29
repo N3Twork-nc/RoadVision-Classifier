@@ -4,6 +4,8 @@ import type { MenuProps } from "antd";
 import { Dropdown, Space } from "antd";
 import search from "../../assets/img/search.png";
 import notification from "../../assets/img/notification.png";
+import { useRecoilValue } from "recoil";
+import { userState } from "../../atoms/authState";
 
 const items: MenuProps["items"] = [
   {
@@ -17,6 +19,7 @@ const items: MenuProps["items"] = [
 ];
 
 const Header: React.FC = () => {
+  const userRecoilStateValue = useRecoilValue(userState)
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-[#F9F9F9]">
       <div className="flex items-center space-x-4 w-96 px-4 py-2 bg-slate-100 border rounded-3xl focus-within:ring focus-within:ring-blue-300">
@@ -51,7 +54,7 @@ const Header: React.FC = () => {
                   className="w-9 h-9 mr-1 rounded-full"
                 />
                 <span className="flex font-medium text-center">
-                  Nguyen Tra Bao Ngan
+                  {userRecoilStateValue.username}
                 </span>
                 <DownOutlined />
               </Space>
