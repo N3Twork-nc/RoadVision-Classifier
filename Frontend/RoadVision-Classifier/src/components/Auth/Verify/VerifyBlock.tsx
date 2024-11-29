@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 import { axiosRequest } from "../../../config/axios.config";
 import { z } from "zod";
 import { useSelector } from "react-redux";
-import { RootState } from "../store";
+import { useRecoilValue } from "recoil";
+import { verifyEmailState } from "../../../atoms/authState";
 
 // Định nghĩa schema cho dữ liệu form
 const verifySchema = z.object({
@@ -19,18 +20,19 @@ interface VerifyBlockProps {
   onSignUpSuccess: () => void;
 }
 
-const VerifyBlock: React.FC<VerifyBlockProps> = ({ handleAuth, onSignUpSuccess }) => {
+const VerifyBlock: React.FC<VerifyBlockProps> = ({
+  handleAuth,
+  onSignUpSuccess,
+}) => {
   const [otp, setOtp] = useState<string[]>(Array(5).fill(""));
   const [error, setError] = useState<string | null>(null);
-
-  // Lấy email từ Redux
-  const email = useSelector((state: RootState) => state.auth.email);
+  const verifyEmailRecoidValue = useRecoilValue(verifyEmailState);
 
   // Khởi tạo dữ liệu form
   const [formData, setFormData] = useState<FormData>({
-    username: "", 
-    password: "", 
-    email: email,
+    username: "",
+    password: "",
+    email: "",
     OTP: "",
   });
 
@@ -63,7 +65,7 @@ const VerifyBlock: React.FC<VerifyBlockProps> = ({ handleAuth, onSignUpSuccess }
     console.log("OTP to be sent:", formData.OTP);
 
     try {
-      const response = await axiosRequest.post("/api/verifyEmail", {
+      const response = await axiosRequest.post("/auth/api/verifyEmail", {
         username: formData.username,
         password: formData.password,
         email: formData.email,
@@ -76,6 +78,15 @@ const VerifyBlock: React.FC<VerifyBlockProps> = ({ handleAuth, onSignUpSuccess }
       setError("Failed to verify OTP. Please try again.");
     }
   };
+
+  useEffect(() => {
+    setFormData({
+      ...formData,
+      email: verifyEmailRecoidValue.email,
+      password: verifyEmailRecoidValue.password,
+      username: verifyEmailRecoidValue.username,
+    });
+  }, [verifyEmailRecoidValue]);
 
   return (
     <div className="flex flex-col p-5 sm:p-10 justify-center items-center rounded-2xl bg-white mx-auto mt-2">

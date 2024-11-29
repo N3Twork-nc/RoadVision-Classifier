@@ -14,19 +14,18 @@ const Map: React.FC = () => {
   const [startLocation, setStartLocation] = useState('');
   const [endLocation, setEndLocation] = useState('');
   const [routingControl, setRoutingControl] = useState<L.Routing.Control | null>(null);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
 
   useEffect(() => {
     if (!mapRef.current) return;
 
     const map = L.map(mapRef.current, {
-      center: [10.762622, 106.660172], // Tọa độ mặc định (TP.HCM)
+      center: [10.762622, 106.660172],
       zoom: 14,
     });
 
-    // Lưu tham chiếu bản đồ
     leafletMap.current = map;
 
-    // Thêm lớp bản đồ TileLayer
     const key = '9CPtNtP8hRSOoBHJXppf';
     L.tileLayer(
       `https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}`,
@@ -40,7 +39,6 @@ const Map: React.FC = () => {
       }
     ).addTo(map);
 
-    // Tự động định vị vị trí hiện tại khi khởi động
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
@@ -51,24 +49,34 @@ const Map: React.FC = () => {
     }
 
     return () => {
-      map.remove(); // Xóa bản đồ khi component unmount
+      map.remove();
     };
   }, []);
 
-  const searchForLocation = () => {
-    if (!searchLocation) return;
-
+  const searchForLocation = (location: string) => {
     const geocoder = L.Control.Geocoder.nominatim();
-    geocoder.geocode(searchLocation, (results: any) => {
+    geocoder.geocode(location, (results: any) => {
       if (results.length > 0) {
         const { center } = results[0];
         if (leafletMap.current) {
           leafletMap.current.setView(center, 14);
-          L.marker(center).addTo(leafletMap.current!).bindPopup(searchLocation).openPopup();
+          L.marker(center).addTo(leafletMap.current!).bindPopup(location).openPopup();
         }
       } else {
         alert('Không tìm thấy vị trí.');
       }
+    });
+  };
+
+  const fetchSuggestions = (query: string) => {
+    if (!query) {
+      setSuggestions([]);
+      return;
+    }
+
+    const geocoder = L.Control.Geocoder.nominatim();
+    geocoder.geocode(query, (results: any[]) => {
+      setSuggestions(results);
     });
   };
 
@@ -102,58 +110,162 @@ const Map: React.FC = () => {
   };
 
   return (
-    <div className="map-container" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <div className="controls" style={{ padding: '10px', background: '#fff', zIndex: 1000 }}>
+    <div style={styles.container}>
+      <div style={styles.sidebar}>
+        <h2 style={styles.header}>Tìm kiếm địa điểm</h2>
         {!isRouteInputVisible ? (
           <>
-            <div className="input-container" style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+            <div style={styles.inputGroup}>
               <input
                 type="text"
                 value={searchLocation}
-                onChange={(e) => setSearchLocation(e.target.value)}
-                placeholder="Tìm kiếm địa điểm"
-                style={{ flex: 1, padding: '8px' }}
+                onChange={(e) => {
+                  setSearchLocation(e.target.value);
+                  fetchSuggestions(e.target.value);
+                }}
+                placeholder="Nhập vị trí cần tìm"
+                style={styles.input}
               />
-              <button onClick={searchForLocation} style={{ padding: '8px 12px' }}>
+              <ul style={styles.suggestions}>
+                {suggestions.map((suggestion, index) => (
+                  <li
+                    key={index}
+                    onClick={() => {
+                      setSearchLocation(suggestion.name);
+                      setSuggestions([]);
+                      searchForLocation(suggestion.name);
+                    }}
+                    style={styles.suggestionItem}
+                  >
+                    {suggestion.name}
+                  </li>
+                ))}
+              </ul>
+              <button onClick={() => searchForLocation(searchLocation)} style={styles.button}>
                 Tìm kiếm
               </button>
             </div>
-            <button onClick={() => setIsRouteInputVisible(true)} style={{ padding: '8px 12px' }}>
-              Hiển thị nhập điểm
+            <button onClick={() => setIsRouteInputVisible(true)} style={styles.secondaryButton}>
+              Nhập điểm bắt đầu/kết thúc
             </button>
           </>
         ) : (
           <>
-            <div className="input-container" style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '10px' }}>
+            <div style={styles.inputGroup}>
               <input
                 type="text"
                 value={startLocation}
                 onChange={(e) => setStartLocation(e.target.value)}
-                placeholder="Nhập điểm đầu"
-                style={{ padding: '8px' }}
+                placeholder="Điểm bắt đầu"
+                style={styles.input}
               />
               <input
                 type="text"
                 value={endLocation}
                 onChange={(e) => setEndLocation(e.target.value)}
-                placeholder="Nhập điểm cuối"
-                style={{ padding: '8px' }}
+                placeholder="Điểm kết thúc"
+                style={styles.input}
               />
-            </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={findRoute} style={{ padding: '8px 12px' }}>
-                Tìm đường
-              </button>
-              <button onClick={() => setIsRouteInputVisible(false)} style={{ padding: '8px 12px' }}>
-                Quay lại tìm kiếm
+              <button onClick={findRoute} style={styles.button}>
+                Tìm đường đi
               </button>
             </div>
+            <button
+              onClick={() => {
+                setIsRouteInputVisible(false);
+                setStartLocation('');
+                setEndLocation('');
+                if (routingControl) {
+                  routingControl.remove();
+                  setRoutingControl(null);
+                }
+              }}
+              style={styles.secondaryButton}
+            >
+              Quay lại
+            </button>
           </>
         )}
       </div>
-      <div ref={mapRef} style={{ flex: 1 }} />
+      <div ref={mapRef} style={styles.map} />
     </div>
   );
 };
 
 export default Map;
+
+
+
+const styles: { [key: string]: React.CSSProperties } = {
+  container: {
+    display: 'flex',
+    height: '100vh',
+  },
+  sidebar: {
+    width: '30%',
+    padding: '20px',
+    background: '#f8f9fa',
+    boxShadow: '2px 0 8px rgba(0,0,0,0.1)',
+    overflowY: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+  },
+  header: {
+    fontSize: '18px',
+    fontWeight: 'bold',
+    color: '#343a40',
+    marginBottom: '10px',
+    borderBottom: '2px solid #dee2e6',
+    paddingBottom: '5px',
+  },
+  inputGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
+  },
+  input: {
+    padding: '10px',
+    border: '1px solid #ced4da',
+    borderRadius: '5px',
+    fontSize: '16px',
+  },
+  button: {
+    padding: '10px',
+    background: '#007bff',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    fontSize: '16px',
+    cursor: 'pointer',
+    transition: 'background 0.3s',
+  },
+  secondaryButton: {
+    padding: '10px',
+    background: '#6c757d',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '5px',
+    fontSize: '16px',
+    cursor: 'pointer',
+    transition: 'background 0.3s',
+  },
+  map: {
+    flex: 1,
+  },
+  suggestions: {
+    listStyle: 'none',
+    padding: 0,
+    margin: 0,
+    border: '1px solid #ced4da',
+    borderRadius: '5px',
+    backgroundColor: '#fff',
+    maxHeight: '150px',
+    overflowY: 'auto',
+  },
+  suggestionItem: {
+    padding: '10px',
+    cursor: 'pointer',
+    borderBottom: '1px solid #dee2e6',
+  },
+};
