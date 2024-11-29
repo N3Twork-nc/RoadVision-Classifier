@@ -1,5 +1,6 @@
 import HomeComponent from "../../../components/Home/HomeComponent";
 import AboutUsComponent from "../../../components/Home/AboutUsComponent";
+import AppLayout from "../../../components/Common/AppLayout";
 import { useState } from "react";
 export default function Home() {
   const [currentComponent, setCurrentComponent] = useState("home");
@@ -7,12 +8,14 @@ export default function Home() {
     setCurrentComponent("aboutUs");
   };
   return (
-    <div>
-     {currentComponent === "home" ? (
-        <HomeComponent onAboutUsClick={handleAboutUs} />
-      ) : (
-        <AboutUsComponent />
-      )}
-    </div>
+    <AppLayout>
+      <div>
+        {currentComponent === "home" ? (
+          <HomeComponent onAboutUsClick={handleAboutUs} />
+        ) : (
+          <AboutUsComponent />
+        )}
+      </div>
+    </AppLayout>
   );
 }
