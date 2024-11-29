@@ -1,32 +1,27 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import Sider from "./components/Sider/Sider";
 import Home from "./pages/User/Home/Home";
-import Header from "./components/Header/Header";
 import PublicMap from "./pages/User/PublicMap/PublicMap";
 import MapManagement from "./pages/User/MapManagement/MapManagement";
 import MyLibrary from "./pages/User/MyLibrary/MyLibrary";
+import Auth from "./pages/User/Auth/Auth";
+import EnterEmail from "./components/ForgotPass/EnterEmail";
+// import ReactQuery from "./components/ReactQuery";
+
 const App: React.FC = () => {
-  return (
+
+  const onContinue = () => {}
+  return ( 
     <Router>
-      <div className="flex h-screen">
-        <Sider />
-        <div className="flex-1 flex flex-col">
-          {/* header */}
-          <div className="sticky top-0 z-10">
-            <Header />
-          </div>
-          {/* component */}
-          <div className="flex-1 overflow-y-auto">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/public-map" element={<PublicMap />} />
-              <Route path="/map-management" element={<MapManagement />} />
-              <Route path="/library" element={<MyLibrary />} />
-            </Routes>
-          </div>
-        </div>
-      </div>
+      <Routes>
+        <Route path="/login" element={<Auth />} />
+        <Route path="/sign-up" element={<Auth />} />
+        <Route path="/forgot-password" element={<EnterEmail onContinue={onContinue} />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/public-map" element={<PublicMap />} />
+        <Route path="/map-management" element={<MapManagement />} />
+        <Route path="/library" element={<MyLibrary />} />
+      </Routes>
     </Router>
   );
 };
