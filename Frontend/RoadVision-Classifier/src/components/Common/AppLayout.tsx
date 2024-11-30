@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import Sider from "../Sider/Sider";
 import Header from "../Header/header";
 
