@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom"; 
 import { DownOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Dropdown, Space } from "antd";
@@ -7,19 +8,22 @@ import notification from "../../assets/img/notification.png";
 import { useRecoilValue } from "recoil";
 import { userState } from "../../atoms/authState";
 
-const items: MenuProps["items"] = [
-  {
-    label: <a className="text-base p-1" href="">Profile</a>,
-    key: "0",
-  },
-  {
-    label: <a className="text-base p-1" href="">Log out</a>,
-    key: "1",
-  },
-];
+
 
 const Header: React.FC = () => {
   const userRecoilStateValue = useRecoilValue(userState)
+  const navigate = useNavigate();
+  const items: MenuProps["items"] = [
+    {
+      label: <a className="text-base p-1"  onClick={() => navigate("/profile")} href="/profile">Profile</a>,
+      key: "0",
+    },
+    {
+      label: <a className="text-base p-1" href="">Log out</a>,
+      key: "1",
+    },
+  ];
+
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-[#F9F9F9]">
       <div className="flex items-center space-x-4 w-96 px-4 py-2 bg-slate-100 border rounded-3xl focus-within:ring focus-within:ring-blue-300">
