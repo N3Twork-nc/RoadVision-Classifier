@@ -4,8 +4,11 @@ import Slider from "./Slider";
 
 interface HomeComponentProps {
   onAboutUsClick: () => void;
+  onLearnMoreClick: () => void;
 }
-const HomeComponent: React.FC<HomeComponentProps> = ({onAboutUsClick}) => {
+const HomeComponent: React.FC<HomeComponentProps> = (
+  { onAboutUsClick , onLearnMoreClick }
+) => {
   return (
     <div className="w-full min-h-screen bg-[#F9F9F9] flex flex-col gap-5 justify-start items-center overflow-y-auto">
       {/* HEADER */}
@@ -26,13 +29,20 @@ const HomeComponent: React.FC<HomeComponentProps> = ({onAboutUsClick}) => {
                 Upload an image to classify the road condition
               </p>
             </div>
-
-            <button
-              onClick={onAboutUsClick}
-              className="w-32 bg-white text-[#3749A6] font-bold p-3 rounded-full hover:ring-3 hover:ring-blue-950"
-            >
-              About us
-            </button>
+            <div className="flex flex-row gap-4">
+              <button
+                onClick={onAboutUsClick}
+                className="w-32 bg-white text-[#3749A6] font-bold p-3 rounded-full hover:ring-3 hover:ring-blue-950"
+              >
+                About us
+              </button>
+              <button
+                onClick={onLearnMoreClick}
+                className="cursor-pointer w-fit text-white font-semibold p-3 rounded-full hover:ring-3 hover:ring-blue-950"
+              >
+                Learn more
+              </button>
+            </div>
           </div>
           {/* image */}
           <img
@@ -79,5 +89,5 @@ const HomeComponent: React.FC<HomeComponentProps> = ({onAboutUsClick}) => {
       </div>
     </div>
   );
-}
+};
 export default HomeComponent;
