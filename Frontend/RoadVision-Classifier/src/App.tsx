@@ -6,6 +6,7 @@ import MapManagement from "./pages/User/MapManagement/MapManagement";
 import MyLibrary from "./pages/User/MyLibrary/MyLibrary";
 import Auth from "./pages/User/Auth/Auth";
 import EnterEmail from "./components/ForgotPass/EnterEmail";
+import Profile from "./pages/User/Profile/Profile";
 // import ReactQuery from "./components/ReactQuery";
 
 const App: React.FC = () => {
@@ -18,6 +19,7 @@ const App: React.FC = () => {
         <Route path="/sign-up" element={<Auth />} />
         <Route path="/forgot-password" element={<EnterEmail onContinue={onContinue} />} />
         <Route path="/" element={<Home />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/public-map" element={<PublicMap />} />
         <Route path="/map-management" element={<MapManagement />} />
         <Route path="/library" element={<MyLibrary />} />
