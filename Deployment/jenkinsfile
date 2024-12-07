@@ -46,6 +46,8 @@ pipeline {
                     script {
                        env.POSTGRES_USER=USERNAME
                        env.POSTGRES_PASSWORD=PASSWORD
+                       env.POSTGRESQL_HOST="192.168.1.14"
+                       env.POSTGRESQL_PORT="5432"
                     }
                 }
                 withCredentials([string(credentialsId: 'secretjwt', variable: 'SECRET_TOKEN')]) {
