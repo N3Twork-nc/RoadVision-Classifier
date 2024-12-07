@@ -66,6 +66,7 @@ pipeline {
                 }
                 // Deploy the Docker compose
                 dir('Deployment') {
+                    echo $POSTGRES_USER
                     sh 'docker compose  -f auth-service.yml down'
                     sh 'docker compose -f auth-service.yml up -d'
                 }
