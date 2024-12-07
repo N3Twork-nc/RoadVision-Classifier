@@ -51,6 +51,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'secretjwt', variable: 'SECRET_TOKEN')]) {
                     script {
                         env.SECRET_KEY = SECRET_TOKEN
+                        env.SECURITY_ALGORITHM='HS256'
                     }
                 }
                 // Build and push the Docker image
