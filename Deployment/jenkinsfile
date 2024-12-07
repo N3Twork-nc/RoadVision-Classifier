@@ -1,5 +1,8 @@
 pipeline {
     agent { label 'server' }
+    parameters {
+        string(name: 'RUN_STAGE', defaultValue: '', description: 'Stage to run (e.g., Build, Test, Deploy)')
+    }
     environment {
         REPO_GIT="https://github.com/N3Twork-nc/RoadVision-Classifier.git"
     }
