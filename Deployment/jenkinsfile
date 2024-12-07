@@ -5,6 +5,7 @@ pipeline {
     }
     environment {
         REPO_GIT="https://github.com/N3Twork-nc/RoadVision-Classifier.git"
+        POSTGRESQL_DB='roadvision_classifier'
     }
     triggers {
         pollSCM('* * * * *')  // Kiểm tra thay đổi mỗi phút (thay đổi tần suất nếu cần)
