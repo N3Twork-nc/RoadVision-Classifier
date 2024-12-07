@@ -7,8 +7,13 @@ services:
     ports:
       - "8080"
     environment:
-      - DATABASE_URL="192.168.1.14"
-      - SECURITY_ALGORITHM="HS256"
+      - POSTGRESQL_HOST=$POSTGRESQL_HOST
+      - POSTGRESQL_DB=$POSTGRESQL_DB
+      - POSTGRESQL_USER=$POSTGRESQL_USER
+      - POSTGRESQL_PASSWORD=$POSTGRESQL_PASSWORD
+      - POSTGRESQL_PORT=$POSTGRESQL_PORT
+      - SECRET_KEY=$SECRET_KEY
+      - SECURITY_ALGORITHM=$SECURITY_ALGORITHM
     restart: always
     networks:
       - app_network
