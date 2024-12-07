@@ -1,7 +1,24 @@
 pipeline {
     agent { label 'server' }
     parameters {
-        string(name: 'RUN_STAGE', defaultValue: '', description: 'Stage to run (e.g., Build, Test, Deploy)')
+        string(name: 'RUN_STAGE', defaultValue: '', description: '')
+        script {
+                    switch (params.STAGE_TO_RUN) {
+                        case 'Authen':
+                            env.AUTHEN_SERVICE_CHANGED=true
+                            break
+                        case 'Test':
+                            echo 'Running Test Stage...'
+                            // Thực hiện logic cho Test
+                            sh 'make test'
+                            break
+                        case 'Deploy':
+                            echo 'Running Deploy Stage...'
+                            // Thực hiện logic cho Deploy
+                            sh 'make deploy'
+                            break
+                    }
+        }
     }
     environment {
         REPO_GIT="https://github.com/N3Twork-nc/RoadVision-Classifier.git"
