@@ -14,11 +14,11 @@ class PasswordService:
         return format_response("Success", message="New password sent to your email")
 
     @staticmethod
-    def change_password(request: ChangePassword):
-        account = Account(username=request.username, password=request.current_password)
+    def change_password(request: ChangePassword, username: str):
+        account = Account(username=username, password=request.current_password)
         if not account.checkAccount():
             return format_response("Error", message="Current password is incorrect", status_code=400)
         if request.new_password != request.confirm_password:
             return format_response("Error", message="New passwords do not match", status_code=400)
-        request.changePassword(request.new_password)
+        request.changePassword(username, request.new_password)
         return format_response("Success", message="Password updated successfully")

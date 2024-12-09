@@ -43,15 +43,18 @@ class User(BaseModel):
                 'username, fullname, avatar, birthday, gender, phonenumber, location, state',
                 f"username = '{self.username}'"
             )
-            return {
-                "username": result[0][0],
-                "fullname": result[0][1],
-                "avatar": result[0][2],
-                "birthday": result[0][3],
-                "gender": result[0][4],
-                "phonenumber": result[0][5],
-                "location": result[0][6],
-                "state": result[0][7],
-            } if result else {}
+            if result:
+                return {
+                    "username": result[0][0],
+                    "fullname": result[0][1],
+                    "avatar": result[0][2],
+                    "birthday": result[0][3],
+                    "gender": result[0][4],
+                    "phonenumber": result[0][5],
+                    "location": result[0][6],
+                    "state": result[0][7],
+                }
+            return {} 
         finally:
-            db.close()  
+            db.close()
+

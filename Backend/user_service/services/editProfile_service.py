@@ -31,15 +31,7 @@ class ProfileService:
         )
 
     @staticmethod
-    def get_profile(token: str):
-        username = Authentication().validate_token(token)
-        if not username:
-            return format_response(
-                status="Error",
-                message="Invalid token or unauthorized",
-                status_code=401
-            )
-
+    def get_profile(username: str):
         user = User(username=username)
         info = user.get_profile()
         if not info:
