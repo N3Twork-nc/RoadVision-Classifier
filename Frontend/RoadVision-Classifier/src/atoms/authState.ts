@@ -15,5 +15,6 @@ export const userState = atom({
   key: "userState", 
   default: {
     username: "",
+    password: "",
   }, // default value
 });

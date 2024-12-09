@@ -2,7 +2,6 @@ import gg from "../../../assets/img/gg.png";
 import fb from "../../../assets/img/fb.png";
 import React, { useState } from "react";
 import { z } from "zod";
-import { axiosRequest } from "../../../config/axios.config";
 import { useRecoilState } from "recoil";
 import { verifyEmailState } from "../../../atoms/authState";
 import authService from "../../../services/auth.service";
@@ -12,7 +11,7 @@ interface SignupBlockProps {
   onSignUpSuccess: () => void;
 }
 
-// Input rules
+// Input validation rules
 const signupSchema = z.object({
   username: z.string().min(6, "Username must be at least 6 characters long"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
@@ -25,8 +24,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
   handleAuth,
   onSignUpSuccess,
 }) => {
-  const [verifyEmailRecoidState, setVerifyEmailRecoidState] =
-    useRecoilState(verifyEmailState);
+  const [verifyEmailRecoidState, setVerifyEmailRecoidState] = useRecoilState(verifyEmailState);
 
   const [formData, setFormData] = useState<FormData>({
     username: "",
@@ -48,7 +46,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
   const handleSignupClick = async () => {
     setError(null);
 
-    // Kiểm tra tính hợp lệ của form data
+    // Check Validate form data
     const parseResult = signupSchema.safeParse(formData);
     if (!parseResult.success) {
       const errorMessage = parseResult.error.errors[0].message;
@@ -63,7 +61,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
     }
 
     try {
-      // Gửi API đăng ký
+      // Call signup API
       const response = await authService.signUp(formData);
       console.log("Signup successful:", response.data);
 
@@ -75,7 +73,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
 
       onSignUpSuccess();
     } catch (err) {
-      setError("Signup failed. Please check your information!");
+      setError("Signup failed.");
       console.error(err);
     }
   };
@@ -101,9 +99,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
         </div>
 
         <div className="Email w-full">
-          <label className="text-[#2F3D4C] font-semibold text-base">
-            Email
-          </label>
+          <label className="text-[#2F3D4C] font-semibold text-base">Email</label>
           <input
             type="email"
             name="email"
@@ -143,7 +139,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
         </div>
       </form>
 
-      {/* Hiển thị lỗi nếu có */}
+      {/* Display error message */}
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
       <div className="flex items-center justify-center mt-4">

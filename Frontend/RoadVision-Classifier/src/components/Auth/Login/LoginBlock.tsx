@@ -1,38 +1,34 @@
 import fb from "../../../assets/img/fb.png";
 import gg from "../../../assets/img/gg.png";
 import { z } from "zod";
-import { axiosRequest } from "../../../config/axios.config";
 import { useState } from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
 import { userState, verifyEmailState } from "../../../atoms/authState";
 import authService from "../../../services/auth.service";
-import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
-interface LoginBlockProps {
+interface SignInBlockProps {
   handleAuth: () => void;
   handleForgotPass: () => void;
 }
 
-// đặt type cho formData
-const loginSchema = z.object({
-  username: z.string(),
-  password: z.string(),
+// Input validation schema
+const signInSchema = z.object({
+  username: z.string().min(6, "Username must be at least 6 characters long"),
+  password: z.string().min(6, "Password must be at least 6 characters long"),
 });
-type FormData = z.infer<typeof loginSchema>;
 
-const LoginBlock: React.FC<LoginBlockProps> = ({
-  handleAuth,
-  handleForgotPass,
-}) => {
-  const verifyEmailRecoidValue = useRecoilValue(verifyEmailState);
+type SignInData = z.infer<typeof signInSchema>;
 
-  const [userRecoilState, setUserRecoilState] = useRecoilState(userState);
-
-  // thiết lập formData và Error
-  const [formData, setFormData] = useState<FormData>({
+const SignInBlock: React.FC<SignInBlockProps> = ({ handleAuth, handleForgotPass }) => {
+  const [formData, setFormData] = useState<SignInData>({
     username: "",
     password: "",
   });
+
+  const [error, setError] = useState<string | null>(null);
+  const [, setUserState] = useRecoilState(userState);
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -42,36 +38,35 @@ const LoginBlock: React.FC<LoginBlockProps> = ({
     }));
   };
 
-  const loginMutation = useMutation({
-    // mutationKey: ["handleLoginClick"],
-    // mutationFn: () => authService.signIn(formData),
-    // onSuccess: (data) => {
-    //   console.log(data);
-    //   setUserRecoilState({
-    //     username: data.username,
-    //   });
-    // },
-    // onError: (error) => {
-    //   console.log(error);
-    // },
-  });
-  const isLoading = loginMutation?.isPending;
-  const handleLoginClick = async () => {
-    loginMutation.mutate();
+  const handleSignInClick = async () => {
+    setError(null);
+
+    // Validate input data
+    const parseResult = signInSchema.safeParse(formData);
+    if (!parseResult.success) {
+      const errorMessage = parseResult.error.errors[0].message;
+      setError(errorMessage);
+      return;
+    }
+
+    try {
+      // Call API SignIn
+      const response = await authService.signIn(formData);
+      console.log("Sign-in successful:", response.data);
+
+      setUserState({
+        username: formData.username,
+        password: formData.password,
+      });
+
+      // Chuyển hướng đến trang home
+      navigate("/home");
+      // onSignInSuccess();
+    } catch (err) {
+      setError("Please check your username/password again!");
+      console.error(err);
+    }
   };
-
-  // const mutation = useMutation(handleLoginClick, {
-  //   onSuccess: (data: any) => {
-  //     if(data){
-  //       setUserRecoilState({
-  //         username: "thainhatthu"
-  //       })
-  //     }
-  //   },
-
-  // });
-
-  const error = "";
 
   return (
     <div className="p-4 sm:p-10 flex flex-col gap-1 sm:gap-2 items-center justify-center max-w-full">
@@ -128,7 +123,7 @@ const LoginBlock: React.FC<LoginBlockProps> = ({
       {/* Login button */}
       <button
         type="button"
-        onClick={handleLoginClick}
+        onClick={handleSignInClick}
         className="w-full mt-6 h-12 bg-[#024296] rounded-lg text-white font-semibold text-sm sm:text-base flex justify-center items-center hover:bg-[#012f68]"
       >
         Login
@@ -167,4 +162,4 @@ const LoginBlock: React.FC<LoginBlockProps> = ({
   );
 };
 
-export default LoginBlock;
+export default SignInBlock;

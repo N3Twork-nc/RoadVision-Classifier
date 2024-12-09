@@ -18,7 +18,7 @@ const App: React.FC = () => {
         <Route path="/login" element={<Auth />} />
         <Route path="/sign-up" element={<Auth />} />
         <Route path="/forgot-password" element={<EnterEmail onContinue={onContinue} />} />
-        <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/public-map" element={<PublicMap />} />
         <Route path="/map-management" element={<MapManagement />} />
