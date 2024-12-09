@@ -6,19 +6,22 @@ import Account from "../../../components/Profile/Account";
 import EditProfile from "../../../components/Profile/EditProfile";
 import History from "../../../components/Profile/History";
 import ChangePassword from "../../../components/Profile/ChangePassword";
-// Các component nội dung
+import { useRecoilValue } from "recoil";
+import { userState, verifyEmailState } from "../../../atoms/authState";
 
 export default function Profile() {
-  const [activeTab, setActiveTab] = useState(0); // Tab đang được chọn
+  const userRecoilStateValue = useRecoilValue(userState)
+  const userRecoilVerifyEmail= useRecoilValue(verifyEmailState)
+  const [activeTab, setActiveTab] = useState(0); // Current tabs
 
-  // Mảng các tab và component tương ứng
+  // All Tabs
   const tabs = [
     { label: "Account", component: <Account /> },
     { label: "Edit Profile", component: <EditProfile /> },
     { label: "Change Password", component: <ChangePassword /> },
     { label: "History", component: <History /> },
   ];
-
+  
   return (
     <AppLayout>
       <div className="w-full min-h-screen bg-[#F9F9F9] flex flex-col gap-5 justify-start items-center overflow-y-auto">
@@ -40,10 +43,10 @@ export default function Profile() {
         {/* User Info */}
         <div className="flex flex-col mt-12">
           <h1 className="text-center text-lg font-semibold">
-            Nguyễn Trà Bảo Ngân
+            {userRecoilStateValue.username}
           </h1>
           <h2 className="text-center text-gray-600 text-sm font-semibold">
-            nguyentrabaongan@gmail.com
+            {userRecoilVerifyEmail.email}
           </h2>
         </div>
 

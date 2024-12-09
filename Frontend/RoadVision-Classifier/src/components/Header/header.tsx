@@ -19,7 +19,7 @@ const Header: React.FC = () => {
       key: "0",
     },
     {
-      label: <a className="text-base p-1" href="">Log out</a>,
+      label: <a className="text-base p-1"  onClick={() => navigate("/login")} href="/login">Log out</a>,
       key: "1",
     },
   ];

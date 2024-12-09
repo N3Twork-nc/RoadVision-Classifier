@@ -5,6 +5,7 @@ import SignupBlock from "./Signup/SignupBlock";
 
 import VerifyBlock from "./Verify/VerifyBlock";
 import { useNavigate, useLocation } from "react-router-dom";
+import SignInBlock from "./Login/LoginBlock";
 
 export default function AuthComponent() {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ export default function AuthComponent() {
             onSignUpSuccess={handleSignUpSuccess}
           />
         ) : isLogin ? (
-          <LoginBlock
+          <SignInBlock
             handleAuth={handleAuth}
             handleForgotPass={handleForgotPass}
           />

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import React from "react";
 import { axiosRequest } from "../../../config/axios.config";
 import { z } from "zod";
-import { useSelector } from "react-redux";
 import { useRecoilValue } from "recoil";
 import { verifyEmailState } from "../../../atoms/authState";
 
