@@ -8,8 +8,8 @@ def compute_hash(data: str) -> str:
     return hash_object.hexdigest()
 
 class Account(BaseModel):
-    username: str
-    password: str
+    username: str = None
+    password: str = None
     email: str = None
     OTP: str = None
 
@@ -31,12 +31,20 @@ class Account(BaseModel):
         db.close()
         return result
 
+    def checkActive(self) -> bool:
+        db = Postgresql()
+        result = db.select('account', 'active', f"username = '{self.username}'")
+        db.close()
+        return result[0]
+
     def verifyEmail(self) -> bool:
         db = Postgresql()
-        result = db.select('account', '1', f"email = '{self.email}' and verified = '{self.OTP}'")
-        if result is None:
+        id = db.select('account', 'id', f"username = '{self.username}' and verified = '{self.OTP}'")[0]
+        print(id)
+        if id is None:
             return False
-        db.update('account', f"active = true", f"email = '{self.email}'")
+        db.update('account', f"active = true", f"username='{self.username}'")
+        db.insert('"user"', 'user_id', id)
         db.commit()
         db.close()
         return True
@@ -56,6 +64,11 @@ class Account(BaseModel):
     def updatePassword(self, new_password: str):
         db = Postgresql()
         db.update('account', f"password = '{compute_hash(new_password)}'", f"email = '{self.email}'")
+        db.commit()
+        db.close()
+    def deleteAccount(self):
+        db = Postgresql()
+        db.delete('account', f"username='{self.username}'")
         db.commit()
         db.close()
 
