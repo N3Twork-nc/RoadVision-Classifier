@@ -3,6 +3,7 @@ from JWT import Authentication
 from fastapi import Depends
 from schemas import Account, ChangePassword
 from services import PasswordService
+from pydantic import EmailStr
 
 @app.post('/api/forgotPassword')
 def forgotPassword(request: Account):
