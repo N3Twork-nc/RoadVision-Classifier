@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+from Crontab import classifier_image
 app = FastAPI()
 from APIs import *
 import dotenv
