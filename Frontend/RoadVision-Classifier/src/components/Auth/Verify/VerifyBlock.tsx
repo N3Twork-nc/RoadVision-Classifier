@@ -20,7 +20,7 @@ interface VerifyBlockProps {
 }
 
 const VerifyBlock: React.FC<VerifyBlockProps> = ({
-  handleAuth,
+  // handleAuth,
   onSignUpSuccess,
 }) => {
   const [otp, setOtp] = useState<string[]>(Array(5).fill(""));

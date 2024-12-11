@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import road from "../../assets/img/road.png";
-import LoginBlock from "./Login/LoginBlock";
 import SignupBlock from "./Signup/SignupBlock";
 
 import VerifyBlock from "./Verify/VerifyBlock";
