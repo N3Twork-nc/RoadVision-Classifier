@@ -1,10 +1,5 @@
-import numpy as np
-import cv2
-import os
-from fastapi import HTTPException
 from schemas import User
 from .format_response import format_response
-from JWT import Authentication
 
 class ProfileService:
     @staticmethod
@@ -32,7 +27,7 @@ class ProfileService:
 
     @staticmethod
     def get_profile(username: str):
-        user = User(username=username)
+        user = User(username=username) 
         info = user.get_profile()
         if not info:
             return format_response(
