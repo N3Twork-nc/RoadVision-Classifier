@@ -1,1 +1,1 @@
-from .uploadImage import *
+from .uploadImage_api import *

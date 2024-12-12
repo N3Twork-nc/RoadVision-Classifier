@@ -1,6 +1,7 @@
 from main import app
 from fastapi import File, UploadFile,Form
 from schemas import ImageSchema
+from kafka import KafkaProducer
 
 @app.post("/api/uploadImage")
 async def upload_image(file: UploadFile = File(...), latitude: float = Form(...),longitude: float=Form(...)):
@@ -12,4 +13,6 @@ async def upload_image(file: UploadFile = File(...), latitude: float = Form(...)
         longitude=longitude
     )
     img.insertImage()
+    producer = KafkaProducer(bootstrap_servers=['192.168.120.26:9092'])
+    producer.send('image', value=img.dict())          
     return {"status": "success"}
