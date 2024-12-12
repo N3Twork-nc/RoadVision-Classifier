@@ -71,6 +71,10 @@ class Account(BaseModel):
         db.delete('account', f"username='{self.username}'")
         db.commit()
         db.close()
+    @staticmethod
+    def authorization(token: str):
+        db = Postgresql()
+        result = db.select('account', 'username', f"token = '{token}'")
 
 class ChangePassword(BaseModel):
     username: str
