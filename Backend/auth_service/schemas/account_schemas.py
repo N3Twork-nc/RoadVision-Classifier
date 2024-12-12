@@ -77,13 +77,16 @@ class Account(BaseModel):
         result = db.select('account', 'username', f"token = '{token}'")
 
 class ChangePassword(BaseModel):
-    username: str
     current_password: str
     new_password: str
     confirm_password: str
 
-    def changePassword(self, new_password: str):
+    def changePassword(self, username: str, new_password: str):
         db = Postgresql()
-        db.update('account', f"password = '{compute_hash(new_password)}'", f"username = '{self.username}'")
+        db.update(
+            'account',
+            f"password = '{compute_hash(new_password)}'",
+            f"username = '{username}'"
+        )
         db.commit()
         db.close()

@@ -1,16 +1,19 @@
 from pydantic import BaseModel, Field
-from datetime import datetime
 from Database import Postgresql
+from fastapi import UploadFile
+import shutil
+import torch
 
 class ImageSchema(BaseModel):
-    id:int = Field(..., description="Id of image")
     user_id: int =Field(..., description="User own imgae")
-    filepath: str = Field(..., description="Path of the uploaded file")
+    file: UploadFile = Field(..., description="File uploaded")
+    filepath: str = Field(None, description="Path of the uploaded file")
     latitude: float = Field(..., description="Latitude of the location")
     longitude: float = Field(..., description="Longitude of the location")
-    type: bool = Field(...,description="Bad or Good")
+    level: str = Field(None, description="Level of road")
+    
 
-    def insertImgae():
-        db=Postgresql()
-        db.insert()
-        return 
+    def insertImage(self):
+        with open("test.jpg", "wb") as buffer:
+            shutil.copyfileobj(self.file.file, buffer) 
+        return None
