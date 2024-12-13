@@ -69,7 +69,7 @@ pipeline {
                     sh 'docker push caothi/auth_service:latest'
                 }
                 // Deploy the Docker compose
-                dir('Deployment/auth-serviceservice') {
+                dir('Deployment/auth_service') {
                     sh 'docker compose  down'
                     sh 'docker compose up -d'
                 }
