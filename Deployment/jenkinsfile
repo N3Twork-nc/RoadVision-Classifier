@@ -28,7 +28,7 @@ pipeline {
                     echo "changedDirs: ${changedDirs}"
 
                     // Gán giá trị biến môi trường cho các thư mục thay đổi
-                    env.FRONTEND_CHANGED = changedDirs.any { it.startsWith('Frontend') } ? 'true' : 'false'
+                    env.FRONTEND_CHANGED = changedDirs.any { it.startsWith('Frontend/RoadVision-Classifier') } ? 'true' : 'false'
                     env.AUTHEN_SERVICE_CHANGED = changedDirs.any { it.startsWith('Backend/auth_service') } ? 'true' : 'false'
                     env.POSTGRES_CHANGED = changedDirs.any { it.startsWith('Database/PostgreSQL') } ? 'true' : 'false'
                 }
@@ -70,10 +70,9 @@ pipeline {
                     sh 'docker push caothi/auth_service:latest'
                 }
                 // Deploy the Docker compose
-                dir('Deployment') {
-                    sh 'echo $POSTGRES_USER'
-                    sh 'docker compose  -f auth-service.yml down'
-                    sh 'docker compose -f auth-service.yml up -d'
+                dir('Deployment/auth-serviceservice') {
+                    sh 'docker compose  down'
+                    sh 'docker compose up -d'
                 }
             }
         }
@@ -111,10 +110,9 @@ pipeline {
                     sh 'docker push caothi/frontend_roadvision_classifier:latest'
                 }
                 // Deploy the Docker compose
-                dir('Deployment') {
-                    sh 'echo $POSTGRES_USER'
-                    sh 'docker compose  -f frontend.yml down'
-                    sh 'docker compose -f frontend.yml up -d'
+                dir('Deployment/frontend') {
+                    sh 'docker compose  down'
+                    sh 'docker compose up -d'
                 }
             }
         }
