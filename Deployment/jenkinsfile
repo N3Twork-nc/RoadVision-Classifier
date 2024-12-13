@@ -1,7 +1,11 @@
 pipeline {
     agent { label 'server' }
     parameters {
-        string(name: 'RUN_STAGE', defaultValue: '', description: '')
+        choice(
+        name: 'RUN_STAGE',
+        choices: ['Authen', 'Frontend'], // Thay các giá trị tùy chọn bằng các giá trị bạn muốn
+        description: 'Chọn một giai đoạn để chạy'
+    )
     }
     environment {
         REPO_GIT="https://github.com/N3Twork-nc/RoadVision-Classifier.git"
