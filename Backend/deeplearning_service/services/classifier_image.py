@@ -1,10 +1,13 @@
 from torchvision import transforms
 import schedule
-import time
 import torch
-import threading
 import logging
 import torch.utils.data as data
+from kafka import KafkaConsumer
+import json
+from PIL import Image
+from io import BytesIO
+import base64
 
 # Cấu hình logging
 logging.basicConfig(filename='app.log',  # Tên file log
@@ -68,22 +71,30 @@ def make_datapath_list():
         path_list.append(path)
     return path_list
 
-# def classifier_road():
-#     logging.info(f"Start classify road")
-#     model = torch.load("ResEViT_multiclass_model.pth")
-#     model.eval()
-#     road_list = make_datapath_list()
-#     road_image = MyDataset(road_list, transform=ImageTransform(224))
-#     rood_dataloader = torch.utils.data.DataLoader(road_image, 32, shuffle=True)
-#     predicts=[]
-#     for inputs in rood_dataloader:
-#         inputs=inputs.to(self.device)
-#         output = self.model(inputs)
-#         output = output.cpu()
-#         max_id = np.argmax(output.detach().numpy(),axis=1)
-#         predicts=np.concatenate((predicts,max_id))
-#     logging.info(f"Start classify road")
 def classifier_road(img):
     img=ImageTransform(224)(img)
-    model = torch.load("ResEViT_multiclass_model.pth")
+    model = torch.load("./ResEViT_multiclass_model.pth",map_location=torch.device('cpu'))
+    model.eval()
     return model(img)
+
+
+consumer=consumer = KafkaConsumer(
+    'image',
+    bootstrap_servers='192.168.120.26:9092',
+    auto_offset_reset='earliest',
+    enable_auto_commit=True,
+    value_deserializer=lambda v: json.loads(v.decode('utf-8'))  # Deserialize JSON từ bytes
+)
+for message in consumer:
+    try:
+        json_data = message.value
+        image_data = base64.b64decode(json_data['file'])
+        print(json_data)
+        image = Image.open(BytesIO(image_data))
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+        classifier_road(image)
+        print(json_data)
+    except Exception as e:
+        print(e)
+        continue

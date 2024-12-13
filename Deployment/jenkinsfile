@@ -96,5 +96,23 @@ pipeline {
                 }
             }
         }
+        stage('Deploy frontend') {
+            when {
+                expression { return  env.FRONTEND_CHANGED  == 'true' || params.RUN_STAGE == 'Frontend'}
+            }
+            steps {
+                // Build and push the Docker image
+                dir('Frontend/RoadVision-Classifier') {
+                    sh 'docker build -t caothi/frontend_roadvision_classifier:latest .'
+                    sh 'docker push caothi/frontend_roadvision_classifier:latest'
+                }
+                // Deploy the Docker compose
+                dir('Deployment') {
+                    sh 'echo $POSTGRES_USER'
+                    sh 'docker compose  -f frontend.yml down'
+                    sh 'docker compose -f frontend.yml up -d'
+                }
+            }
+        }
     }
 }
