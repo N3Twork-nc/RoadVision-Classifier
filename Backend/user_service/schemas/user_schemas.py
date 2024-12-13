@@ -17,7 +17,6 @@ class User(BaseModel):
         try:
             fields = {
                 "fullname": self.fullname,
-                "avatar": self.avatar,
                 "birthday": self.birthday,
                 "gender": self.gender,
                 "phonenumber": self.phonenumber,

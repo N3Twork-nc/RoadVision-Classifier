@@ -27,7 +27,7 @@ class ProfileService:
 
     @staticmethod
     def get_profile(username: str):
-        user = User(username=username) 
+        user = User(username=username)
         info = user.get_profile()
         if not info:
             return format_response(
