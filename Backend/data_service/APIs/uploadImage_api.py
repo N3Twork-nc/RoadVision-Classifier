@@ -1,18 +1,20 @@
 from main import app
 from fastapi import File, UploadFile,Form
 from schemas import ImageSchema
-from kafka import KafkaProducer
+from services import uploadImageService
 
 @app.post("/api/uploadImage")
 async def upload_image(file: UploadFile = File(...), latitude: float = Form(...),longitude: float=Form(...)):
     #Xử lý lưu ảnh hoặc thực hiện các hành động khác nếu cần
     img = ImageSchema(
-        user_id=1,
-        file=file,
+        user_id=9,
+        file=await file.read(),
         latitude=latitude,
         longitude=longitude
     )
-    img.insertImage()
-    producer = KafkaProducer(bootstrap_servers=['192.168.120.26:9092'])
-    producer.send('image', value=img.dict())          
-    return {"status": "success"}
+    await uploadImageService(img)
+    response={
+        "status": "success",
+        "message": "Image uploaded successfully"
+    }
+    return response

@@ -1,3 +1,4 @@
+from datetime import date
 from Database import Postgresql
 from pydantic import BaseModel
 
@@ -14,20 +15,28 @@ class User(BaseModel):
     def update_user_info(self) -> bool:
         db = Postgresql()
         try:
+            fields = {
+                "fullname": self.fullname,
+                "birthday": self.birthday,
+                "gender": self.gender,
+                "phonenumber": self.phonenumber,
+                "location": self.location,
+                "state": self.state,
+            }
+            set_clauses = [f"{key} = '{value}'" for key, value in fields.items() if value is not None]
+
+            if not set_clauses:
+                print("No fields to update.")
+                return False
+
+            set_clause = ", ".join(set_clauses)
+
             db.update(
                 '"user"',
-                f"""
-                fullname = '{self.fullname}',
-                avatar = '{self.avatar}',
-                birthday = '{self.birthday}',
-                gender = '{self.gender}',
-                phonenumber = '{self.phonenumber}',
-                location = '{self.location}',
-                state = '{self.state}'
-                """,
-                f"username = '{self.username}'"
+                set_clause,
+                f"user_id = (SELECT id FROM account WHERE username = '{self.username}')"
             )
-            db.commit() 
+            db.commit()
             return True
         except Exception as e:
             print(f"Error updating user info: {e}")
@@ -39,22 +48,28 @@ class User(BaseModel):
         db = Postgresql()
         try:
             result = db.select(
-                '"user"', 
-                'username, fullname, avatar, birthday, gender, phonenumber, location, state',
-                f"username = '{self.username}'"
+                '"user"',
+                'user_id, fullname, avatar, birthday, gender, phonenumber, location, state',
+                f"user_id = (SELECT id FROM account WHERE username = '{self.username}')"
             )
+
             if result:
+                birthday = result[3].strftime('%Y-%m-%d') if isinstance(result[3], date) else result[3]
+
                 return {
-                    "username": result[0][0],
-                    "fullname": result[0][1],
-                    "avatar": result[0][2],
-                    "birthday": result[0][3],
-                    "gender": result[0][4],
-                    "phonenumber": result[0][5],
-                    "location": result[0][6],
-                    "state": result[0][7],
+                    "user_id": result[0],
+                    "fullname": result[1],
+                    "avatar": result[2],
+                    "birthday": birthday,
+                    "gender": result[4],
+                    "phonenumber": result[5],
+                    "location": result[6],
+                    "state": result[7],
                 }
-            return {} 
+            return {}
+
+        except Exception as e:
+            print(f"Error getting profile: {e}")
+            return {}
         finally:
             db.close()
-

@@ -1,10 +1,5 @@
-import numpy as np
-import cv2
-import os
-from fastapi import HTTPException
 from schemas import User
 from .format_response import format_response
-from JWT import Authentication
 
 class ProfileService:
     @staticmethod
