@@ -6,7 +6,7 @@ import { CookieKeyEnum } from "../defination/enums/key.enum";
 export const saveAccessToken = (accessToken: string) => {
   Cookies.set(CookieKeyEnum.ACCESS_TOKEN, accessToken, {
     expires: 30,
-    path: "",
+    path: "/",
     secure: true,
     sameSite: "Strict",
   });
