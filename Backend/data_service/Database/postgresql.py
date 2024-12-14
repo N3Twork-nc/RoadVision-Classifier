@@ -20,9 +20,9 @@ class Postgresql:
             query += f" WHERE {where}"
         return self.execute(query)
     
-    def insert(self, table, columns, values):
-        query = f"INSERT INTO {table} ({columns}) VALUES ({values})"
-        return self.execute(query,'false')
+    def insert(self, table, columns, values,fetch='False',returning=''):
+        query = f"INSERT INTO {table} ({columns}) VALUES ({values}) {returning}"
+        return self.execute(query,fetch)
     
     def update(self, table, set, where):
         query = f"UPDATE {table} SET {set} WHERE {where}"
