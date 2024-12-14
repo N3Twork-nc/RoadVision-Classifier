@@ -3,11 +3,12 @@ import road from "../../assets/img/road.png";
 import SignupBlock from "./Signup/SignupBlock";
 
 import VerifyBlock from "./Verify/VerifyBlock";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import SignInBlock from "./Login/LoginBlock";
+import useNavigateTo from "../../hooks/useNavigateTo";
 
 export default function AuthComponent() {
-  const navigate = useNavigate();
+  const {navigateToSignUp, navigateToLogin, navigateForgotPassword, navigateHome} = useNavigateTo();
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const [isSignedUp, setIsSignedUp] = useState<boolean>(false);
 
@@ -15,16 +16,17 @@ export default function AuthComponent() {
 
   const handleAuth = () => {
     if (isLogin) {
-      navigate("/sign-up");
+      navigateToSignUp()
     } else {
-      navigate("/login");
+      navigateToLogin()
     }
     setIsLogin(!isLogin);
   };
-  
-  const handleForgotPass = () => {
-    navigate("/forgot-password");
+
+  const navigateForgotPass = () => {
+    navigateForgotPassword()
   };
+
 
   const handleSignUpSuccess = () => {
     setIsSignedUp(true);
@@ -47,14 +49,11 @@ export default function AuthComponent() {
       {/* left container */}
       <div className="lg:w-1/2 p-5 w-full rounded-l-3xl overflow-auto flex justify-center items-center">
         {isSignedUp ? (
-          <VerifyBlock
-            handleAuth={handleAuth}
-            onSignUpSuccess={handleSignUpSuccess}
-          />
+          <VerifyBlock handleAuth={handleAuth} onVerifySuccess={navigateHome} />
         ) : isLogin ? (
           <SignInBlock
             handleAuth={handleAuth}
-            handleForgotPass={handleForgotPass}
+            handleForgotPass={navigateForgotPass}
           />
         ) : (
           <SignupBlock

@@ -4,6 +4,7 @@ import { axiosRequest } from "../../../config/axios.config";
 import { z } from "zod";
 import { useRecoilValue } from "recoil";
 import { verifyEmailState } from "../../../atoms/authState";
+import useNavigateTo from "../../../hooks/useNavigateTo";
 
 // Định nghĩa schema cho dữ liệu form
 const verifySchema = z.object({
@@ -16,16 +17,14 @@ type FormData = z.infer<typeof verifySchema>;
 
 interface VerifyBlockProps {
   handleAuth: () => void;
-  onSignUpSuccess: () => void;
+  onVerifySuccess: () => void;
 }
 
-const VerifyBlock: React.FC<VerifyBlockProps> = ({
-  // handleAuth,
-  onSignUpSuccess,
-}) => {
+const VerifyBlock: React.FC<VerifyBlockProps> = ({  }) => {
   const [otp, setOtp] = useState<string[]>(Array(5).fill(""));
   const [error, setError] = useState<string | null>(null);
   const verifyEmailRecoidValue = useRecoilValue(verifyEmailState);
+  const { navigateHome } = useNavigateTo();
 
   // Khởi tạo dữ liệu form
   const [formData, setFormData] = useState<FormData>({
@@ -71,7 +70,7 @@ const VerifyBlock: React.FC<VerifyBlockProps> = ({
         OTP: formData.OTP,
       });
       console.log("Verification successful:", response.data);
-      onSignUpSuccess();
+      navigateHome();
     } catch (err) {
       console.error("Verification failed:", err);
       setError("Failed to verify OTP. Please try again.");

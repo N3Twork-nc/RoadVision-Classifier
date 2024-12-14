@@ -7,6 +7,7 @@ type LayoutPropsType = {
 };
 
 const AppLayout = ({ children }: LayoutPropsType) => {
+
   return (
     <div className="flex h-screen">
       <Sider />

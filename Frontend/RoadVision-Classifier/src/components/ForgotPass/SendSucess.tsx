@@ -1,10 +1,8 @@
 import forgot from "../../assets/img/forgot.png";
-import { useNavigate } from "react-router-dom";
+import useNavigateTo from "../../hooks/useNavigateTo";
 export default function SendSuccess() {
-  const navigate = useNavigate();
-  const handleLoginAgain = () => {
-    navigate("/");
-  }
+  const {navigateToLogin} = useNavigateTo();
+
   return (
     <div className="w-full h-screen bg-[#CFEEFF] flex justify-center items-center">
       <div className="flex flex-col p-10 justify-center items-center w-[60%] lg:h-[80%] h-fit rounded-2xl bg-white shadow-2xl">
@@ -24,7 +22,7 @@ export default function SendSuccess() {
           </a>
         </div>
         <button 
-          onClick={handleLoginAgain}        
+          onClick={navigateToLogin}        
           type="button"
           className="w-[50%] mt-10 h-12 bg-[#024296] rounded-lg text-white font-semibold text-base sm:text-lg flex justify-center items-center"
         >

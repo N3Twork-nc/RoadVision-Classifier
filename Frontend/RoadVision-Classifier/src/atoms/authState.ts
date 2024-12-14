@@ -1,8 +1,9 @@
-// atoms.js
+// atoms.js use to store Auth data state, similar to redux  
 import { atom } from "recoil";
+import { UserType } from "../defination/types/user.type";
 
 export const verifyEmailState = atom({
-  key: "verifyEmailState", 
+  key: "verifyEmailState",
   default: {
     email: "",
     username: "",
@@ -10,11 +11,11 @@ export const verifyEmailState = atom({
   }, // default value
 });
 
-// store username 
+// store username
 export const userState = atom({
-  key: "userState", 
+  key: "userState",
   default: {
     username: "",
-    password: "",
-  }, // default value
+    email: "",
+  } as UserType, // default value
 });

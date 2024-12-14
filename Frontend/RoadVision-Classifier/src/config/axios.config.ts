@@ -1,4 +1,6 @@
 import axios from "axios";
+import { getAccessToken } from "../utils/auth.util";
+
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const axiosRequest = axios.create({
@@ -6,13 +8,17 @@ const axiosRequest = axios.create({
 });
 
 axiosRequest.interceptors.request.use((config) => {
-  if (localStorage.getItem("USER_INFO_KEY")) {
-    const userInfo = JSON.parse(localStorage.getItem("USER_INFO_KEY") || "{}");
-    const accessToken = userInfo.access_token;
+  const accessToken = getAccessToken();
+
+  if (accessToken) {
     config.headers.Authorization = `Bearer ${accessToken}`;
   }
-  
+
   return config;
 });
 
-export { axiosRequest };
+axiosRequest.interceptors.response.use((response) => {
+  return response.data || response;
+});
+
+export { axiosRequest };

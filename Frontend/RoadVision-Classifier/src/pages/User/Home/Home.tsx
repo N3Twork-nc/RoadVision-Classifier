@@ -14,6 +14,9 @@ export default function Home() {
   };
   return (
     <AppLayout>
+      <h1>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Libero dignissimos et eaque, enim doloribus ut odio illo eveniet voluptates dolores totam aliquid! Non, asperiores! Ex incidunt magnam perferendis ratione pariatur.
+
+      </h1>
     <div>
       {currentComponent === "home" && (
         <HomeComponent
