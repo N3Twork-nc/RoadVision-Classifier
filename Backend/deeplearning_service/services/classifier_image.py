@@ -85,5 +85,7 @@ def make_datapath_list():
 #     logging.info(f"Start classify road")
 def classifier_road(img):
     img=ImageTransform(224)(img)
-    model = torch.load("ResEViT_multiclass_model.pth")
+    model = torch.load("C:\\Users\\caothi\\Downloads\\ResEViT_multiclass_model.pth")
     return model(img)
+
+    
