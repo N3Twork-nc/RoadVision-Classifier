@@ -1,12 +1,13 @@
 import { ReactNode } from "react";
 import Sider from "../Sider/Sider";
-import Header from "../Header/header";
+import Header from "./Header";
 
 type LayoutPropsType = {
   children?: ReactNode;
 };
 
 const AppLayout = ({ children }: LayoutPropsType) => {
+
   return (
     <div className="flex h-screen">
       <Sider />

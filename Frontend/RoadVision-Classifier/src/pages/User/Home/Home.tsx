@@ -14,16 +14,16 @@ export default function Home() {
   };
   return (
     <AppLayout>
-    <div>
-      {currentComponent === "home" && (
-        <HomeComponent
-          onAboutUsClick={handleAboutUs}
-          onLearnMoreClick={handleLearnMore}
-        />
-      )}
-      {currentComponent === "aboutUs" && <AboutUsComponent />}
-      {currentComponent === "learnMore" && <LearnMoreComponent />}
-    </div>
-  </AppLayout>
+      <div>
+        {currentComponent === "home" && (
+          <HomeComponent
+            onAboutUsClick={handleAboutUs}
+            onLearnMoreClick={handleLearnMore}
+          />
+        )}
+        {currentComponent === "aboutUs" && <AboutUsComponent />}
+        {currentComponent === "learnMore" && <LearnMoreComponent />}
+      </div>
+    </AppLayout>
   );
 }
