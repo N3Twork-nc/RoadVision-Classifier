@@ -2,6 +2,7 @@ from schemas import ImageSchema
 from kafka import KafkaProducer
 import json
 import base64
+from fastapi import Depends
 
 async def uploadImageService(imageSchema:ImageSchema):
     id=imageSchema.insertImage()[0]
