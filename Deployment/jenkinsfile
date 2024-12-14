@@ -3,9 +3,8 @@ pipeline {
     parameters {
         choice(
         name: 'RUN_STAGE',
-        choices: ['Authen', 'Data','Frontend'], // Thay các giá trị tùy chọn bằng các giá trị bạn muốn
-        description: 'Chọn một giai đoạn để chạy',
-        defaultValue: 'None' 
+        choices: ['None','Authen', 'Data','Frontend'], // Thay các giá trị tùy chọn bằng các giá trị bạn muốn
+        description: 'Chọn một giai đoạn để chạy'
     )
     }
     environment {
