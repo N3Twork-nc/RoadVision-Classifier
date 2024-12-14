@@ -1,19 +1,30 @@
-import { axiosRequest } from "../../config/axios.config";
-import { useState } from "react";
+import React, { useState } from "react";
 import { z } from "zod";
-interface EnterEmailProps {
+import authService from "../../services/auth.service";
+import { ForgotFormDataType } from "../../defination/types/auth.type";
+import SendSuccess from "./SendSucess";
+
+interface ForgotFormProps {
   onContinue?: Function;
 }
 const ForgotPassSchema = z.object({
   email: z.string(),
+  password: z.string(),
 });
 type FormData = z.infer<typeof ForgotPassSchema>;
 
-const EnterEmail: React.FC<EnterEmailProps> = () => {
+const ForgotForm: React.FC<ForgotFormProps> = () => {
   const [formData, setFormData] = useState<FormData>({
     email: "",
+    password: "",
   });
+
   const [error, setError] = useState<string | null>(null);
+  const [isSucess, setIsSucess] = React.useState<boolean>(false);
+
+  const handleResend = () => {
+    alert("Resend");
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -25,20 +36,19 @@ const EnterEmail: React.FC<EnterEmailProps> = () => {
 
   const handleContinue = async () => {
     setError(null);
+    setIsSucess(false);
+
     try {
-      console.log(formData);
-      const response = await axiosRequest.post(
-        "/auth/api/forgotPassword",
-        formData
-      );
-      if (response.status === 200) {
-        console.log("Email sent:", response.data);
-      }
+      await authService.forgotPass(formData as ForgotFormDataType);
+      setIsSucess(true);
     } catch (err) {
       setError("Email does not exist. Please check your email again!");
-      console.error(err);
     }
   };
+
+  if (isSucess) {
+    return <SendSuccess handleResend={handleResend} />;
+  }
 
   return (
     <div className="w-full h-screen bg-[#CFEEFF] flex justify-center items-center">
@@ -80,4 +90,4 @@ const EnterEmail: React.FC<EnterEmailProps> = () => {
   );
 };
 
-export default EnterEmail;
+export default ForgotForm;

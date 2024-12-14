@@ -1,5 +1,5 @@
-export type UserType = {
-    email: string;
-    id: string;
-    username: string;
-}
+export type UserType = Partial<{
+  email: string;
+  id: string;
+  username: string;
+}>;

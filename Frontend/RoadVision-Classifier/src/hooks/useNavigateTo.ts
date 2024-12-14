@@ -28,6 +28,7 @@ const useNavigateTo = () => {
   const navigateVerify = () => {
     navigateTo(PageEnum.VERIFY, { replace: true });
   };
+  
 
   return {
     navigateTo,

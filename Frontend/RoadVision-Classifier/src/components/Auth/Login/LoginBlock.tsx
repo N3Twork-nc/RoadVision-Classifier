@@ -1,35 +1,29 @@
-// Import assets for social login buttons
-import fb from "../../../assets/img/fb.png"; 
-import gg from "../../../assets/img/gg.png"; 
-import { z } from "zod"; 
-import { useState } from "react"; 
-import { useRecoilState } from "recoil"; 
+import fb from "../../../assets/img/fb.png";
+import gg from "../../../assets/img/gg.png";
+import { z } from "zod";
+import { useState } from "react";
+import { useRecoilState } from "recoil";
 import { userState } from "../../../atoms/authState";
-import authService from "../../../services/auth.service"; 
+import authService from "../../../services/auth.service";
 import useNavigateTo from "../../../hooks/useNavigateTo";
-import { setStoredUserInfo } from "../../../utils/local-storage.util"; 
+import { setStoredUserInfo } from "../../../utils/local-storage.util";
 import { saveAccessToken } from "../../../utils/auth.util";
 import { ERROR_MESSAGES } from "../../../defination/consts/messages.const";
 
-// Define the props for the SignInBlock component
-interface SignInBlockProps {
-  handleAuth: () => void; // Callback for handling sign-up flow
-  handleForgotPass: () => void; // Callback for handling forgot password flow
-}
-
 // Input validation schema using zod
 const signInSchema = z.object({
-  username: z.string().min(6, ERROR_MESSAGES.auth.username), 
-  password: z.string().min(6, ERROR_MESSAGES.auth.password), 
+  username: z.string().min(6, ERROR_MESSAGES.auth.username),
+  password: z.string().min(6, ERROR_MESSAGES.auth.password),
 });
 
 // Type for the sign-in data inferred from the schema
 type SignInData = z.infer<typeof signInSchema>;
 
 // Main SignInBlock component
-const SignInBlock: React.FC<SignInBlockProps> = ({ handleAuth }) => {
+const SignInBlock = () => {
   // Custom navigation hooks
-  const { navigateForgotPassword, navigateHome } = useNavigateTo();
+  const { navigateForgotPassword, navigateHome, navigateToSignUp } =
+    useNavigateTo();
 
   // State for form input data
   const [formData, setFormData] = useState<SignInData>({
@@ -47,20 +41,20 @@ const SignInBlock: React.FC<SignInBlockProps> = ({ handleAuth }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target; // Extract field name and value
     setFormData((prev) => ({
-      ...prev, // Preserve previous state
-      [name]: value, // Update the field dynamically
+      ...prev, 
+      [name]: value, 
     }));
   };
 
   // Handle sign-in button click
   const handleSignInClick = async () => {
-    setError(null); // Reset error state
+    setError(null); 
 
     // Validate input data using zod schema
     const parseResult = signInSchema.safeParse(formData);
     if (!parseResult.success) {
-      const errorMessage = parseResult.error.errors[0].message; // Extract error message
-      setError(errorMessage); // Set error message
+      const errorMessage = parseResult.error.errors[0].message; 
+      setError(errorMessage);
       return;
     }
 
@@ -70,15 +64,15 @@ const SignInBlock: React.FC<SignInBlockProps> = ({ handleAuth }) => {
 
       const { info, token } = data; // Extract user info and token from response
 
-      // Store user data and token locally
-      saveAccessToken(token); // Save token for future API calls
-      setStoredUserInfo(info); // Save user info to local storage
-      setUserState(info); // Update Recoil user state
+      if (info && token) {
+        saveAccessToken(token); // Save token for future API calls
+        setStoredUserInfo(info); // Save user info to local storage
+        setUserState(info); // Update Recoil user state
 
-      // Navigate to the home page after successful login
-      navigateHome();
+        // Navigate to the home page after successful login
+        navigateHome();
+      }
     } catch (err) {
-      setError("Please check your username/password again!");
       console.error(err);
     }
   };
@@ -157,7 +151,7 @@ const SignInBlock: React.FC<SignInBlockProps> = ({ handleAuth }) => {
           Don't have an account?{" "}
         </label>
         <button
-          onClick={handleAuth}
+          onClick={navigateToSignUp}
           className="cursor-pointer hover:text-blue-800 text-sm font-bold ml-1"
         >
           Sign up

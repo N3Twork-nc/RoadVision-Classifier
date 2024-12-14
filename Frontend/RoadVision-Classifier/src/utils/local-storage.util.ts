@@ -7,7 +7,7 @@ export const getStoredUserInfo = () => {
     const data: UserType = JSON.parse(storedUserInfo);
     return data;
   }
-  return null; // trả về null nếu không tìm thấy thông tin người dùng
+  return null; // return null if can not fine user infoinfo
 };
 
 export const setStoredUserInfo = (user: UserType): void => {

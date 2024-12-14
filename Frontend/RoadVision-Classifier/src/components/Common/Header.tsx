@@ -65,7 +65,7 @@ const Header: React.FC = () => {
                   className="w-9 h-9 mr-1 rounded-full"
                 />
                 <span className="flex font-medium text-center">
-                  {userRecoilStateValue?.username}
+                  {userRecoilStateValue.username}
                 </span>
                 <DownOutlined />
               </Space>

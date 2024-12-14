@@ -1,8 +1,9 @@
+// Define messages notifynotify
 export const ERROR_MESSAGES = {
   auth: {
     username: "Username must be at least 6 characters long",
     password: "Password must be at least 6 characters long",
-    signup: "Sign up fail"
+    passwordMatch: "Password doesn't match"
   },
   common: {
     email: "Invalid email format",

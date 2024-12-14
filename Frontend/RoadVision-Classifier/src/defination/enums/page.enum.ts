@@ -9,4 +9,5 @@ export enum PageEnum {
   PROFILE = "/profile",
   PUBLIC_MAP = "/public-map",
   VERIFY = "/verify",
+  NOT_FOUND = "*",
 }

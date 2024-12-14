@@ -1,51 +1,56 @@
 import { useEffect, useState } from "react";
-import React from "react";
-import { axiosRequest } from "../../../config/axios.config";
 import { z } from "zod";
-import { useRecoilValue } from "recoil";
-import { verifyEmailState } from "../../../atoms/authState";
 import useNavigateTo from "../../../hooks/useNavigateTo";
+import NotFound from "../../../pages/NotFound/NotFound";
+import { checkObjectAtLeastOneField } from "../../../utils/check.util";
+import { VerifyFormDataType } from "../../../defination/types/auth.type";
+import authService from "../../../services/auth.service";
 
-// Định nghĩa schema cho dữ liệu form
+// Input validation schema using zod
 const verifySchema = z.object({
   username: z.string(),
   password: z.string(),
   email: z.string(),
   OTP: z.string(),
 });
-type FormData = z.infer<typeof verifySchema>;
 
-interface VerifyBlockProps {
-  handleAuth: () => void;
-  onVerifySuccess: () => void;
+// Type for the verify data inferred from the schema
+// type FormData = z.infer<typeof verifySchema>;
+type VerifyData = z.infer<typeof verifySchema>;
+
+interface Props {
+  verifyEmailRecoidValue: VerifyFormDataType;
 }
+const VerifyBlock = ({ verifyEmailRecoidValue }: Props) => {
+  const { navigateToLogin } = useNavigateTo();
 
-const VerifyBlock: React.FC<VerifyBlockProps> = ({  }) => {
+  if (!checkObjectAtLeastOneField(verifyEmailRecoidValue)) {
+    return <NotFound />;
+  }
+
   const [otp, setOtp] = useState<string[]>(Array(5).fill(""));
   const [error, setError] = useState<string | null>(null);
-  const verifyEmailRecoidValue = useRecoilValue(verifyEmailState);
-  const { navigateHome } = useNavigateTo();
 
-  // Khởi tạo dữ liệu form
-  const [formData, setFormData] = useState<FormData>({
-    username: "",
-    password: "",
-    email: "",
-    OTP: "",
-  });
+    // State for form input data
+    const [formData, setFormData] = useState<VerifyData>({
+      username: "",
+      password: "",
+      email: "",
+      OTP: "",
+    });
 
   const handleChange = (value: string, index: number) => {
     const newOtp = [...otp];
     newOtp[index] = value.slice(0, 1);
     setOtp(newOtp);
 
-    // Cập nhật OTP trong formData
+    // Update otp in formData
     setFormData((prevData) => ({
       ...prevData,
       OTP: newOtp.join(""),
     }));
 
-    // Tự động chuyển sang ô input tiếp theo
+    // Auto next cell
     if (value && index < 4) {
       const nextInput = document.getElementById(`otp-input-${index + 1}`);
       if (nextInput) {
@@ -60,30 +65,25 @@ const VerifyBlock: React.FC<VerifyBlockProps> = ({  }) => {
       return;
     }
 
-    console.log("OTP to be sent:", formData.OTP);
-
     try {
-      const response = await axiosRequest.post("/auth/api/verifyEmail", {
-        username: formData.username,
-        password: formData.password,
-        email: formData.email,
-        OTP: formData.OTP,
-      });
-      console.log("Verification successful:", response.data);
-      navigateHome();
+
+      await authService.verify(formData);
+      
+      navigateToLogin();
     } catch (err) {
-      console.error("Verification failed:", err);
-      setError("Failed to verify OTP. Please try again.");
+      console.log(err);
     }
   };
 
   useEffect(() => {
-    setFormData({
-      ...formData,
-      email: verifyEmailRecoidValue.email,
-      password: verifyEmailRecoidValue.password,
-      username: verifyEmailRecoidValue.username,
-    });
+    if (checkObjectAtLeastOneField(verifyEmailRecoidValue)) {
+      setFormData({
+        ...formData,
+        email: verifyEmailRecoidValue?.email ?? "",
+        password: verifyEmailRecoidValue?.password ?? "",
+        username: verifyEmailRecoidValue?.username ?? "",
+      });
+    }
   }, [verifyEmailRecoidValue]);
 
   return (

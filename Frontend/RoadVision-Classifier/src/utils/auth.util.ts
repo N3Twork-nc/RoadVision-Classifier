@@ -17,7 +17,7 @@ export const getAccessToken = () => {
 
 export const removeAccessToken = () => {
   return Cookies.remove(CookieKeyEnum.ACCESS_TOKEN);
-};
+}; // when u logout you need to remove all datas
 
 export const handleLogOut = () => {
   removeAccessToken();

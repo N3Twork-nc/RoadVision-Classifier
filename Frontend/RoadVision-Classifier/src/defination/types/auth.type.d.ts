@@ -9,3 +9,12 @@ export type LoginDataType = {
   info: UserType;
   token: string;
 };
+export type VerifyFormDataType = Partial<{
+  username: string;
+  password: string;
+  email: string;
+  OTP: string;
+}>;
+export type ForgotFormDataType = {
+  email: string;
+};

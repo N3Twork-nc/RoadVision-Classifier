@@ -9,28 +9,27 @@ import {
   ERROR_MESSAGES,
   LAUNCHPAD_MESSAGES,
 } from "../../../defination/consts/messages.const";
-
-// Define the props for the SignupBlock component
-interface SignupBlockProps {
-  handleAuth: () => void; // Callback to handle switching to login flow
-  onSignUpSuccess: () => void; // Callback for successful sign-up handling
-}
+import useNavigateTo from "../../../hooks/useNavigateTo";
 
 // Input validation schema using zod
-const signupSchema = z.object({
-  username: z.string().min(6, ERROR_MESSAGES.auth.username), 
-  password: z.string().min(6, ERROR_MESSAGES.auth.password), 
-  email: z.string().email(ERROR_MESSAGES.common.email), 
-});
+const signupSchema = z
+  .object({
+    username: z.string().min(6, ERROR_MESSAGES.auth.username),
+    password: z.string().min(6, ERROR_MESSAGES.auth.password),
+    reEnterPassword: z.string().min(6, ERROR_MESSAGES.auth.password),
+    email: z.string().email(ERROR_MESSAGES.common.email),
+  })
+  .refine((data) => data.password === data.reEnterPassword, {
+    message: ERROR_MESSAGES.auth.passwordMatch,
+    path: ["reEnterPassword"], // Hiển thị lỗi trên trường này
+  });
 
 // Extend the schema with additional field for re-entering password
 type FormData = z.infer<typeof signupSchema> & { reEnterPassword: string };
 
 // Main SignupBlock component
-const SignupBlock: React.FC<SignupBlockProps> = ({
-  handleAuth,
-  onSignUpSuccess,
-}) => {
+const SignupBlock = () => {
+  const { navigateToLogin, navigateVerify } = useNavigateTo();
   // Recoil state for email verification
   const [, setVerifyEmailRecoidState] = useRecoilState(verifyEmailState);
 
@@ -61,21 +60,14 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
     // Validate input data using zod schema
     const parseResult = signupSchema.safeParse(formData);
     if (!parseResult.success) {
-      const errorMessage = parseResult.error.errors[0].message; 
-      setError(errorMessage); 
-      return;
-    }
-
-    // Check if passwords match
-    if (formData.password !== formData.reEnterPassword) {
-      setError("Passwords do not match");
+      const errorMessage = parseResult.error.errors[0].message;
+      setError(errorMessage);
       return;
     }
 
     try {
       // Call the API for sign-up
-      const response = await authService.signUp(formData);
-      console.log("Signup successful:", response.data);
+      await authService.signUp(formData);
 
       // Update Recoil state with verification info
       setVerifyEmailRecoidState({
@@ -83,11 +75,9 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
         password: formData.password,
         username: formData.username,
       });
-
-      onSignUpSuccess(); // Trigger success callback
+      navigateVerify();
     } catch (err) {
-      setError(ERROR_MESSAGES.auth.signup); 
-      console.error(err); 
+      console.log(error);
     }
   };
 
@@ -170,7 +160,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
           Already have an account?{" "}
         </label>
         <a
-          onClick={handleAuth}
+          onClick={navigateToLogin}
           className="cursor-pointer hover:text-blue-800 text-sm font-bold ml-1"
         >
           Login

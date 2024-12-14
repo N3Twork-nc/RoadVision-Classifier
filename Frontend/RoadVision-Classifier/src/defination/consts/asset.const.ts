@@ -1,3 +1,5 @@
+//define images
+
 export const ICONS = {};
 
 export const IMAGES = {};

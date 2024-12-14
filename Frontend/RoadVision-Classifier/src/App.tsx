@@ -9,11 +9,14 @@ import Home from "./pages/User/Home/Home";
 import PublicMap from "./pages/User/PublicMap/PublicMap";
 import MapManagement from "./pages/User/MapManagement/MapManagement";
 import MyLibrary from "./pages/User/MyLibrary/MyLibrary";
-import Auth from "./pages/User/Auth/Auth";
-import EnterEmail from "./components/ForgotPass/EnterEmail";
 import Profile from "./pages/User/Profile/Profile";
 import { PageEnum } from "./defination/enums/page.enum";
 import PrivateRoute from "./components/Common/PrivateRoute";
+import AuthLogin from "./pages/User/Auth/AuthLogin";
+import AuthSignUp from "./pages/User/Auth/AuthSignUp";
+import AuthForgotPass from "./pages/User/Auth/AuthForgotPass";
+import AuthVerifyEmail from "./pages/User/Auth/AuthVerifyEmail";
+import NotFound from "./pages/NotFound/NotFound";
 // import ReactQuery from "./components/ReactQuery";
 
 const App: React.FC = () => {
@@ -21,10 +24,10 @@ const App: React.FC = () => {
     <Router>
       <Routes>
         {/* AUTH ROUTES */}
-        <Route path={PageEnum.LOGIN} element={<Auth />} />
-        <Route path={PageEnum.SIGN_UP} element={<Auth />} />
-        {/* <Route path={PageEnum.VERIFY} element={<Auth />} /> */}
-        <Route path={PageEnum.FORGOT_PASSWORD} element={<EnterEmail />} />
+        <Route path={PageEnum.LOGIN} element={<AuthLogin />} />
+        <Route path={PageEnum.SIGN_UP} element={<AuthSignUp />} />
+        <Route path={PageEnum.VERIFY} element={<AuthVerifyEmail />} />
+        <Route path={PageEnum.FORGOT_PASSWORD} element={<AuthForgotPass />} />
         {/* END AUTH ROUTES *
 
         {/* PUBLIC ROUTES */}
@@ -34,6 +37,8 @@ const App: React.FC = () => {
         />
         <Route path={PageEnum.HOME} element={<Home />} />
         <Route path={PageEnum.PUBLIC_MAP} element={<PublicMap />} />
+        <Route path={PageEnum.NOT_FOUND} element={<NotFound />} />
+
         {/* END PUBLIC ROUTES */}
 
         <Route

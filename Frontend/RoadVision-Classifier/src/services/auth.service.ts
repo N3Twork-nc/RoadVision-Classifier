@@ -1,5 +1,6 @@
+// Manage Auth API
 import { axiosRequest } from "../config/axios.config";
-import { LoginDataType, LoginFormDataType } from "../defination/types/auth.type";
+import { ForgotFormDataType, LoginDataType, LoginFormDataType, VerifyFormDataType } from "../defination/types/auth.type";
 
 export default {
   signUp: async (formData: any) => {
@@ -8,8 +9,8 @@ export default {
     return data;
   },
 
-  verify: async (formData: any) => {
-    const url = `/auth/api/verify`;
+  verify: async (formData: VerifyFormDataType) => {
+    const url = `/auth/api/verifyEmail`;
     const data = await axiosRequest.post(url, formData);
     return data;
   },
@@ -19,4 +20,11 @@ export default {
     const data: LoginDataType = await axiosRequest.post(url, formData);
     return data;
   },
+
+  forgotPass: async (formData: ForgotFormDataType) => {
+    const url = `/auth/api/forgotPassword`;
+    const data: LoginDataType = await axiosRequest.post(url, formData);
+    return data;
+  },
+
 };
