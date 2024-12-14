@@ -13,7 +13,7 @@ services:
     restart: always
     networks:
       - app_network
-    volume:
+    volumes:
       - /home/$USER/Image_road:/app/roadImages/
 
 networks:
