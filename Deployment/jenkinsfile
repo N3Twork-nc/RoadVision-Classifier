@@ -3,7 +3,7 @@ pipeline {
     parameters {
         choice(
         name: 'RUN_STAGE',
-        choices: ['Authen', 'Frontend'], // Thay các giá trị tùy chọn bằng các giá trị bạn muốn
+        choices: ['','Authen', 'Data','Frontend'], // Thay các giá trị tùy chọn bằng các giá trị bạn muốn
         description: 'Chọn một giai đoạn để chạy'
     )
     }
@@ -29,7 +29,17 @@ pipeline {
                     // Gán giá trị biến môi trường cho các thư mục thay đổi
                     env.FRONTEND_CHANGED = changedDirs.any { it.startsWith('Frontend/RoadVision-Classifier') } ? 'true' : 'false'
                     env.AUTHEN_SERVICE_CHANGED = changedDirs.any { it.startsWith('Backend/auth_service') } ? 'true' : 'false'
+                    env.DATA_SERVICE_CHANGED = changedDirs.any { it.startsWith('Backend/data_service') } ? 'true' : 'false'
                     env.POSTGRES_CHANGED = changedDirs.any { it.startsWith('Database/PostgreSQL') } ? 'true' : 'false'
+                    
+                    withCredentials([usernamePassword(credentialsId: 'POSTGRES_USER_DEV', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        script {
+                            env.POSTGRESQL_USER=USERNAME
+                            env.POSTGRESQL_PASSWORD=PASSWORD
+                            env.POSTGRESQL_HOST="192.168.1.14"
+                            env.POSTGRESQL_PORT="5432"
+                        }
+                    }
                 }
             }
         }
@@ -48,15 +58,6 @@ pipeline {
                 expression { return  env.AUTHEN_SERVICE_CHANGED == 'true' || params.RUN_STAGE == 'Authen'}
             }
             steps {
-                // set variable
-                withCredentials([usernamePassword(credentialsId: 'POSTGRES_USER_DEV', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    script {
-                       env.POSTGRESQL_USER=USERNAME
-                       env.POSTGRESQL_PASSWORD=PASSWORD
-                       env.POSTGRESQL_HOST="192.168.1.14"
-                       env.POSTGRESQL_PORT="5432"
-                    }
-                }
                 withCredentials([string(credentialsId: 'secretjwt', variable: 'SECRET_TOKEN')]) {
                     script {
                         env.SECRET_KEY = SECRET_TOKEN
@@ -70,6 +71,23 @@ pipeline {
                 }
                 // Deploy the Docker compose
                 dir('Deployment/auth_service') {
+                    sh 'docker compose  down'
+                    sh 'docker compose up -d'
+                }
+            }
+        }
+        stage('Deploy data service') {
+            when {
+                expression { return  env.DATA_SERVICE_CHANGED == 'true' || params.RUN_STAGE == 'Data'}
+            }
+            steps {                
+                // Build and push the Docker image
+                dir('Backend/data_service') {
+                    sh 'docker build -t caothi/data_service:latest .'
+                    sh 'docker push caothi/data_service:latest'
+                }
+                // Deploy the Docker compose
+                dir('Deployment/data_service') {
                     sh 'docker compose  down'
                     sh 'docker compose up -d'
                 }
