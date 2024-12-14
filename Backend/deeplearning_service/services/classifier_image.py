@@ -73,7 +73,7 @@ def make_datapath_list():
 
 def classifier_road(img):
     img=ImageTransform(224)(img)
-    model = torch.load("./ResEViT_multiclass_model.pth",map_location=torch.device('cpu'))
+    model = torch.load("C:\\Users\\caothi\\Downloads\\ResEViT_multiclass_model.pth")
     model.eval()
     return model(img)
 
