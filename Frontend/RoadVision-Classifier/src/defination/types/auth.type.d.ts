@@ -1,0 +1,20 @@
+import { UserType } from "./user.type";
+
+//Define type data of API respone
+export type LoginFormDataType = {
+  username: string;
+  password: string;
+};
+export type LoginDataType = {
+  info: UserType;
+  token: string;
+};
+export type VerifyFormDataType = Partial<{
+  username: string;
+  password: string;
+  email: string;
+  OTP: string;
+}>;
+export type ForgotFormDataType = {
+  email: string;
+};

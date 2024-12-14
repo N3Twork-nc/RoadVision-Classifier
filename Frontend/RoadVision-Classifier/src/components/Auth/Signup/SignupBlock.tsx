@@ -5,27 +5,35 @@ import { z } from "zod";
 import { useRecoilState } from "recoil";
 import { verifyEmailState } from "../../../atoms/authState";
 import authService from "../../../services/auth.service";
+import {
+  ERROR_MESSAGES,
+  LAUNCHPAD_MESSAGES,
+} from "../../../defination/consts/messages.const";
+import useNavigateTo from "../../../hooks/useNavigateTo";
 
-interface SignupBlockProps {
-  handleAuth: () => void;
-  onSignUpSuccess: () => void;
-}
+// Input validation schema using zod
+const signupSchema = z
+  .object({
+    username: z.string().min(6, ERROR_MESSAGES.auth.username),
+    password: z.string().min(6, ERROR_MESSAGES.auth.password),
+    reEnterPassword: z.string().min(6, ERROR_MESSAGES.auth.password),
+    email: z.string().email(ERROR_MESSAGES.common.email),
+  })
+  .refine((data) => data.password === data.reEnterPassword, {
+    message: ERROR_MESSAGES.auth.passwordMatch,
+    path: ["reEnterPassword"], // Hiển thị lỗi trên trường này
+  });
 
-// Input validation rules
-const signupSchema = z.object({
-  username: z.string().min(6, "Username must be at least 6 characters long"),
-  password: z.string().min(6, "Password must be at least 6 characters long"),
-  email: z.string().email("Invalid email format"),
-});
-
+// Extend the schema with additional field for re-entering password
 type FormData = z.infer<typeof signupSchema> & { reEnterPassword: string };
 
-const SignupBlock: React.FC<SignupBlockProps> = ({
-  handleAuth,
-  onSignUpSuccess,
-}) => {
+// Main SignupBlock component
+const SignupBlock = () => {
+  const { navigateToLogin, navigateVerify } = useNavigateTo();
+  // Recoil state for email verification
   const [, setVerifyEmailRecoidState] = useRecoilState(verifyEmailState);
 
+  // State for form input data
   const [formData, setFormData] = useState<FormData>({
     username: "",
     password: "",
@@ -33,20 +41,23 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
     reEnterPassword: "",
   });
 
+  // State for error messages
   const [error, setError] = useState<string | null>(null);
 
+  // Handle input field changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target; // Extract field name and value
     setFormData((prev) => ({
-      ...prev,
-      [name]: value,
+      ...prev, // Preserve previous state
+      [name]: value, // Update the field dynamically
     }));
   };
 
+  // Handle sign-up button click
   const handleSignupClick = async () => {
-    setError(null);
+    setError(null); // Reset error state
 
-    // Check Validate form data
+    // Validate input data using zod schema
     const parseResult = signupSchema.safeParse(formData);
     if (!parseResult.success) {
       const errorMessage = parseResult.error.errors[0].message;
@@ -54,39 +65,35 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
       return;
     }
 
-    // Check password
-    if (formData.password !== formData.reEnterPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-
     try {
-      // Call signup API
-      const response = await authService.signUp(formData);
-      console.log("Signup successful:", response.data);
+      // Call the API for sign-up
+      await authService.signUp(formData);
 
+      // Update Recoil state with verification info
       setVerifyEmailRecoidState({
         email: formData.email,
         password: formData.password,
         username: formData.username,
       });
-
-      onSignUpSuccess();
+      navigateVerify();
     } catch (err) {
-      setError("Signup failed.");
-      console.error(err);
+      console.log(error);
     }
   };
 
   return (
     <div className="p-4 sm:p-10 flex flex-col gap-2 items-center justify-center">
+      {/* Header Section */}
       <div className="Header w-full md:text-4xl text-3xl text-[#23038C] font-bold text-left">
-        SIGN UP
+        {LAUNCHPAD_MESSAGES.auth.sign_up}
       </div>
+
+      {/* Sign-Up Form */}
       <form className="w-full" onSubmit={(e) => e.preventDefault()}>
+        {/* Username Input */}
         <div className="Username w-full">
           <label className="text-[#2F3D4C] font-semibold text-base">
-            Username
+            {LAUNCHPAD_MESSAGES.common.username}
           </label>
           <input
             type="text"
@@ -98,8 +105,11 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
           />
         </div>
 
+        {/* Email Input */}
         <div className="Email w-full">
-          <label className="text-[#2F3D4C] font-semibold text-base">Email</label>
+          <label className="text-[#2F3D4C] font-semibold text-base">
+            {LAUNCHPAD_MESSAGES.common.email}
+          </label>
           <input
             type="email"
             name="email"
@@ -110,6 +120,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
           />
         </div>
 
+        {/* Password Input */}
         <div className="Password w-full">
           <label className="text-[#2F3D4C] font-semibold text-base">
             Password
@@ -124,6 +135,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
           />
         </div>
 
+        {/* Re-enter Password Input */}
         <div className="Re-enterpassword w-full">
           <label className="text-[#2F3D4C] font-semibold text-base">
             Re-enter password
@@ -139,21 +151,23 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
         </div>
       </form>
 
-      {/* Display error message */}
+      {/* Display Error Message */}
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
+      {/* Login Redirect Section */}
       <div className="flex items-center justify-center mt-4">
         <label className="inline-flex items-center">
           Already have an account?{" "}
         </label>
         <a
-          onClick={handleAuth}
+          onClick={navigateToLogin}
           className="cursor-pointer hover:text-blue-800 text-sm font-bold ml-1"
         >
           Login
         </a>
       </div>
 
+      {/* Sign-Up Button */}
       <button
         onClick={handleSignupClick}
         className="w-full h-12 bg-[#024296] rounded-lg text-white font-semibold text-sm sm:text-base flex justify-center items-center hover:bg-[#27558f]"
@@ -161,6 +175,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
         Create Account
       </button>
 
+      {/* Divider for Social Sign-Up */}
       <div className="flex items-center justify-center mt-4">
         <span className="text-[#2d2c2c]">________</span>
         <label className="inline-flex items-center text-[#2d2c2c] mx-2 text-sm">
@@ -169,6 +184,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
         <span className="text-[#2d2c2c]">________</span>
       </div>
 
+      {/* Social Sign-Up Buttons */}
       <div className="flex flex-row justify-center gap-2 mt-4">
         <button className="w-20 h-10 sm:w-15 sm:h-15 rounded-lg border-[2px] border-[#a5b3ff] flex justify-center items-center">
           <img src={fb} alt="Facebook" className="w-5 h-5 sm:w-6 sm:h-6" />
