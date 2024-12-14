@@ -3,14 +3,13 @@ import { removeStoredUserInfo } from "./local-storage.util";
 import { PageEnum } from "../defination/enums/page.enum";
 import { CookieKeyEnum } from "../defination/enums/key.enum";
 
-const domain = window.location.hostname;
 export const saveAccessToken = (accessToken: string) => {
   Cookies.set(CookieKeyEnum.ACCESS_TOKEN, accessToken, {
     expires: 30,
     path: "/",
-    secure: true,
-    sameSite: "Lax",  // Đổi sang "Lax" nếu cần cross-site
-    domain: domain,  // Thêm domain
+    secure: window.location.protocol === 'https:',
+    sameSite: "Strict",
+    domain: window.location.hostname
   });
 };
 export const getAccessToken = () => {
