@@ -3,3 +3,4 @@ fastapi
 kafka-python
 uvicorn==0.32.0
 psycopg2-binary
+requests
