@@ -13,6 +13,8 @@ services:
     restart: always
     networks:
       - app_network
+    volumes:
+      - /home/$USER/models/:/app/models/
 
 networks:
   app_network:
