@@ -3,7 +3,7 @@ pipeline {
     parameters {
         choice(
         name: 'RUN_STAGE',
-        choices: ['None','Authen', 'Data','Deeplearning','Frontend'], // Thay các giá trị tùy chọn bằng các giá trị bạn muốn
+        choices: ['None','Authen', 'Data','Deeplearning','User','Frontend'], // Thay các giá trị tùy chọn bằng các giá trị bạn muốn
         description: 'Chọn một giai đoạn để chạy'
     )
     }
@@ -31,6 +31,7 @@ pipeline {
                     env.AUTHEN_SERVICE_CHANGED = changedDirs.any { it.startsWith('Backend/auth_service') } ? 'true' : 'false'
                     env.DATA_SERVICE_CHANGED = changedDirs.any { it.startsWith('Backend/data_service') } ? 'true' : 'false'
                     env.DEEPLEARNING_SERVICE_CHANGED = changedDirs.any { it.startsWith('Backend/deeplearning_service') } ? 'true' : 'false'
+                    env.USER_SERVICE_CHANGED = changedDirs.any { it.startsWith('Backend/user_service') } ? 'true' : 'false'
                     env.POSTGRES_CHANGED = changedDirs.any { it.startsWith('Database/PostgreSQL') } ? 'true' : 'false'
                     
                     withCredentials([usernamePassword(credentialsId: 'POSTGRES_USER_DEV', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
@@ -106,6 +107,23 @@ pipeline {
                 }
                 // Deploy the Docker compose
                 dir('Deployment/deeplearning_service') {
+                    sh 'docker compose  down'
+                    sh 'docker compose up -d'
+                }
+            }
+        }
+        stage('Deploy user service') {
+            when {
+                expression { return  env.USER_SERVICE_CHANGED == 'true' || params.RUN_STAGE == 'User'}
+            }
+            steps {                
+                // Build and push the Docker image
+                dir('Backend/user_service') {
+                    sh 'docker build -t caothi/user_service:latest .'
+                    sh 'docker push caothi/user_service:latest'
+                }
+                // Deploy the Docker compose
+                dir('Deployment/user_service') {
                     sh 'docker compose  down'
                     sh 'docker compose up -d'
                 }
