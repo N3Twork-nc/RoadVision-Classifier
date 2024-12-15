@@ -1,7 +1,7 @@
 python-dotenv==1.0.1
 psycopg2-binary
 numpy==1.26.4
-torch==2.2.2 --index-url https://download.pytorch.org/whl
+torch==2.2.2 --find-links https://download.pytorch.org/whl/torch_stable.html
 torchaudio==2.2.2
 torchvision==0.17.2
 onnx==1.17.0
