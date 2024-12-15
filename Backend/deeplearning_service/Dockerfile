@@ -14,7 +14,7 @@ COPY requirements.txt .
 
 # Install the dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir torch==2.2.2  torchaudio==2.2.2 torchvision==0.17.2 timm==1.0.9 onnx==1.17.0 --extra-ind># Copy the rest of the application code into the container
+RUN pip install --no-cache-dir torch==2.2.2  torchaudio==2.2.2 torchvision==0.17.2 timm==1.0.9 onnx==1.17.0 --extra-index-url https://download.pytorch.org/whl/cpu
 COPY . .
 
 # Expose the port the app runs on
