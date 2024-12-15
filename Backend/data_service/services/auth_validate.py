@@ -1,11 +1,13 @@
 import requests
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Depends
+from fastapi.security import HTTPBearer
+reusable_oauth2 = HTTPBearer(scheme_name='Authorization')
 
 
 API_AUTHORIZATION_URL = "http://192.168.120.26/auth/api/authorization"
 
-def validate_token(token: str):
-    headers = {"Authorization": f"Bearer {token}"}
+def validate_token(token=Depends(reusable_oauth2)):
+    headers = {"Authorization": f"Bearer {token.credentials}"}
     try:
         response = requests.get(API_AUTHORIZATION_URL, headers=headers)
         if response.status_code == 200:
