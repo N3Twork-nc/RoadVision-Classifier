@@ -18,7 +18,7 @@ def signin_service(account: Account):
         return format_response(
             status="Error",
             data=None,
-            message="User not found",
+            message="Login failed",
             status_code=404
         )
     
