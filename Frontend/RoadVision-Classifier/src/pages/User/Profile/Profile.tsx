@@ -8,10 +8,9 @@ import History from "../../../components/Profile/History";
 import ChangePassword from "../../../components/Profile/ChangePassword";
 import { useRecoilValue } from "recoil";
 import { userState } from "../../../atoms/authState";
-
 export default function Profile() {
   const userRecoilStateValue = useRecoilValue(userState);
-  const [activeTab, setActiveTab] = useState(0); // Current tabs
+  const [activeTab, setActiveTab] = useState(0); 
 
   // All Tabs
   const tabs = [
