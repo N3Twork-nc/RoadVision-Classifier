@@ -68,6 +68,7 @@ class Account(BaseModel):
         db.update('account', f"password = '{compute_hash(new_password)}'", f"email = '{self.email}'")
         db.commit()
         db.close()
+        
     def deleteAccount(self):
         db = Postgresql()
         db.delete('account', f"username='{self.username}'")

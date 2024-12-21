@@ -1,3 +1,6 @@
+import os
+from fastapi import UploadFile, HTTPException
+from fastapi.responses import FileResponse
 from schemas import User
 from .format_response import format_response
 
@@ -24,7 +27,8 @@ class ProfileService:
             message="Profile updated successfully",
             status_code=200
         )
-
+    
+    
     @staticmethod
     def get_profile(username: str):
         user = User(username=username)
@@ -42,3 +46,47 @@ class ProfileService:
             message="Profile retrieved successfully",
             status_code=200
         )
+
+    
+    @staticmethod
+    def upload_avatar(username: str, file: UploadFile):
+        if not username:
+            raise HTTPException(status_code=401, detail="Invalid token or unauthorized")
+
+        upload_folder = "Backend/user_service/avatar"
+        os.makedirs(upload_folder, exist_ok=True)
+
+        file_extension = file.filename.split(".")[-1]
+        if file_extension.lower() not in ["jpg", "jpeg", "png"]:
+            raise HTTPException(status_code=400, detail="Invalid file format")
+
+        file_path = os.path.join(upload_folder, f"{username}.{file_extension}")
+        file_path = file_path.replace("\\", "/") 
+
+        with open(file_path, "wb") as f:
+            f.write(file.file.read())
+
+        user = User(username=username)
+        if not user.update_avatar(file_path):
+            raise HTTPException(status_code=500, detail="Failed to update avatar")
+
+        return format_response(
+            status="Success",
+            message="Avatar uploaded successfully",
+            status_code=200
+        )
+    
+    @staticmethod
+    def get_image_by_username(username: str):
+        user = User(username=username)
+        avatar_relative_path = user.get_avatar()
+
+        if not avatar_relative_path:
+            raise HTTPException(status_code=404, detail="Avatar not found in database")
+
+        file_path = os.path.abspath(avatar_relative_path)
+
+        if not os.path.exists(file_path):
+            raise HTTPException(status_code=404, detail="Image file not found on server")
+
+        return FileResponse(file_path)
