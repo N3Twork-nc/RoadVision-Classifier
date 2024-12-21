@@ -49,7 +49,7 @@ class User(BaseModel):
         try:
             result = db.select(
                 '"user"',
-                'user_id, fullname, avatar, birthday, gender, phonenumber, location, state',
+                'user_id, fullname, birthday, gender, phonenumber, location, state',
                 f"user_id = (SELECT id FROM account WHERE username = '{self.username}')"
             )
 
@@ -59,7 +59,6 @@ class User(BaseModel):
                 return {
                     "user_id": result[0],
                     "fullname": result[1],
-                    "avatar": result[2],
                     "birthday": birthday,
                     "gender": result[4],
                     "phonenumber": result[5],
@@ -71,5 +70,38 @@ class User(BaseModel):
         except Exception as e:
             print(f"Error getting profile: {e}")
             return {}
+        finally:
+            db.close()
+
+    def update_avatar(self, avatar_path: str) -> bool:
+        db = Postgresql()
+        try:
+            db.update(
+                '"user"',
+                f"avatar = '{avatar_path}'",
+                f"user_id = (SELECT id FROM account WHERE username = '{self.username}')"
+            )
+            db.commit()
+            return True
+        except Exception as e:
+            print(f"Error updating avatar: {e}")
+            return False
+        finally:
+            db.close()
+
+    def get_avatar(self) -> str:
+        db = Postgresql()
+        try:
+            result = db.select(
+                '"user"',
+                'avatar',
+                f"user_id = (SELECT id FROM account WHERE username = '{self.username}')"
+            )
+            if result and result[0]:
+                return result[0]
+            return None
+        except Exception as e:
+            print(f"Error getting avatar: {e}")
+            return None
         finally:
             db.close()
