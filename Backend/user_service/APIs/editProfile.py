@@ -12,11 +12,10 @@ def edit_profile(data: User, username: str = Depends(validate_token)):
 def get_profile(username: str = Depends(validate_token)):
     return ProfileService.get_profile(username)
 
-@app.post('/uploadAvatar')
+@app.post('api/uploadAvatar')
 def upload_avatar(file: UploadFile = File(...), username: str = Depends(validate_token)):
     return ProfileService.upload_avatar(username, file)
 
-@app.get("/api/get_image")
+@app.get("/api/getAvatar")
 def get_image(username: str = Depends(validate_token)):
     return ProfileService.get_image_by_username(username)
-
