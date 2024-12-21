@@ -45,7 +45,7 @@ class ImageTransform():
 
 def classifier_road(img):
     model=restevit_road_cls(num_class=4)
-    checkpoint = torch.load('models\ResEViT_multiclass.pth',map_location=torch.device("cpu"))
+    checkpoint = torch.load('models/ResEViT_multiclass.pth',map_location=torch.device("cpu"))
     model.load_state_dict(checkpoint)
     img=ImageTransform(224)(img)
     model.eval()
@@ -72,6 +72,7 @@ def getRoadImage():
         group_id='road_classifier',
         value_deserializer=lambda v: json.loads(v.decode('utf-8')),
         client_id='deeplearning_service'
+        max_poll_interval_ms=300000 
     )
     for message in consumer:
         try:

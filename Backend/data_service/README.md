@@ -3,7 +3,7 @@
 Dùng để thực hiện các chức liên quan dữ liệu của ứng dụng
 ## 2. Các API cung cấp
 <details>
-  <summary><strong>ENDPOINT POST /datasvc/api/uploadImage</strong></summary>
+  <summary><strong>ENDPOINT POST /datasvc/api/uploadRoad</strong></summary>
 
 ## 2.1 Công dụng
 Upload hình ảnh đường lên để phân loại chất lượng mặt đường.

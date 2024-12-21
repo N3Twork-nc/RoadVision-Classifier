@@ -14,7 +14,7 @@ services:
     networks:
       - app_network
     volumes:
-      - /home/$USER/Image_road:/app/roadImages/
+      - /home/$USER/image/road:/app/roadImages/
 
 networks:
   app_network:
