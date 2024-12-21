@@ -28,7 +28,6 @@ class ProfileService:
             status_code=200
         )
     
-    
     @staticmethod
     def get_profile(username: str):
         user = User(username=username)
@@ -47,13 +46,12 @@ class ProfileService:
             status_code=200
         )
 
-    
     @staticmethod
     def upload_avatar(username: str, file: UploadFile):
         if not username:
             raise HTTPException(status_code=401, detail="Invalid token or unauthorized")
 
-        upload_folder = "Backend/user_service/avatar"
+        upload_folder = "avatar"
         os.makedirs(upload_folder, exist_ok=True)
 
         file_extension = file.filename.split(".")[-1]
@@ -61,7 +59,6 @@ class ProfileService:
             raise HTTPException(status_code=400, detail="Invalid file format")
 
         file_path = os.path.join(upload_folder, f"{username}.{file_extension}")
-        file_path = file_path.replace("\\", "/") 
 
         with open(file_path, "wb") as f:
             f.write(file.file.read())
