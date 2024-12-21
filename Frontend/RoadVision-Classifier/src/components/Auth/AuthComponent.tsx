@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import road from "../../assets/img/road.png";
-import LoginBlock from "./Login/LoginBlock";
 import SignupBlock from "./Signup/SignupBlock";
-
+import SignInBlock from "./Login/LoginBlock";
 import VerifyBlock from "./Verify/VerifyBlock";
 import { useNavigate, useLocation } from "react-router-dom";
-import SignInBlock from "./Login/LoginBlock";
+
 
 export default function AuthComponent() {
   const navigate = useNavigate();

@@ -2,8 +2,8 @@ import fb from "../../../assets/img/fb.png";
 import gg from "../../../assets/img/gg.png";
 import { z } from "zod";
 import { useState } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
-import { userState, verifyEmailState } from "../../../atoms/authState";
+import { useRecoilState } from "recoil";
+import { userState } from "../../../atoms/authState";
 import authService from "../../../services/auth.service";
 import { useNavigate } from "react-router-dom";
 

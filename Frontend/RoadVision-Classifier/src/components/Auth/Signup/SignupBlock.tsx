@@ -24,7 +24,7 @@ const SignupBlock: React.FC<SignupBlockProps> = ({
   handleAuth,
   onSignUpSuccess,
 }) => {
-  const [verifyEmailRecoidState, setVerifyEmailRecoidState] = useRecoilState(verifyEmailState);
+  const [, setVerifyEmailRecoidState] = useRecoilState(verifyEmailState);
 
   const [formData, setFormData] = useState<FormData>({
     username: "",
