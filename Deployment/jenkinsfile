@@ -169,5 +169,11 @@ pipeline {
                 }
             }
         }
+        stage('Restart Nginx') {
+            steps {
+                // Restart Nginx
+                sh 'cd /home/$USER/nginxn" && docker compose restart'
+            }
+        }
     }
 }
