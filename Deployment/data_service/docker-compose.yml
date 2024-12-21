@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  data_service:
+    image: caothi/data_service:latest
+    container_name: data_service
+    environment:
+      - POSTGRESQL_HOST=$POSTGRESQL_HOST
+      - POSTGRESQL_DB=$POSTGRESQL_DB
+      - POSTGRESQL_USER=$POSTGRESQL_USER
+      - POSTGRESQL_PASSWORD=$POSTGRESQL_PASSWORD
+      - POSTGRESQL_PORT=$POSTGRESQL_PORT
+    restart: always
+    networks:
+      - app_network
+    volumes:
+      - /home/$USER/Image_road:/app/roadImages/
+
+networks:
+  app_network:
+    external: true
