@@ -1,9 +1,11 @@
 from main import app
 from fastapi import File, UploadFile,Form
 from schemas import ImageSchema
-from services import uploadImageService
+from services import RoadService
 from fastapi import Depends
+from fastapi.responses import FileResponse
 from services.auth_validate import validate_token
+
 
 @app.post("/api/uploadImage")
 async def upload_image(file: UploadFile = File(...), latitude: float = Form(...),longitude: float=Form(...), username = Depends(validate_token)):
@@ -14,9 +16,14 @@ async def upload_image(file: UploadFile = File(...), latitude: float = Form(...)
         latitude=latitude,
         longitude=longitude
     )
-    await uploadImageService(img)
+    await RoadService.uploadImageS(img)
     response={
         "status": "success",
         "message": "Image uploaded successfully"
     }
     return response
+
+
+@app.get("/api/getImage")
+async def get_image(imagePath: str):
+    return FileResponse(imagePath)

@@ -1,1 +1,2 @@
-from .uploadImage_api import *
+from .image_api import *
+from .roads_api import *
