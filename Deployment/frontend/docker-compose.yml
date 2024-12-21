@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  auth_service:
+  frontend:
     image: caothi/frontend_roadvision_classifier:latest
     container_name: frontend
     restart: always
