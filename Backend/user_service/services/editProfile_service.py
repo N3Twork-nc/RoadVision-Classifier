@@ -28,7 +28,6 @@ class ProfileService:
             status_code=200
         )
     
-    
     @staticmethod
     def get_profile(username: str):
         user = User(username=username)
@@ -47,7 +46,6 @@ class ProfileService:
             status_code=200
         )
 
-    
     @staticmethod
     def upload_avatar(username: str, file: UploadFile):
         if not username:
