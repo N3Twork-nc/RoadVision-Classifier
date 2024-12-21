@@ -72,6 +72,7 @@ def getRoadImage():
         group_id='road_classifier',
         value_deserializer=lambda v: json.loads(v.decode('utf-8')),
         client_id='deeplearning_service'
+        max_poll_interval_ms=300000 
     )
     for message in consumer:
         try:
