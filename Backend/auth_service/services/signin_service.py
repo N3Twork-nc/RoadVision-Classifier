@@ -58,7 +58,6 @@ def authorization_service(username: str, role: str = None):
         else:
             return format_response(
                 status="Failed",
-                data={"username": username, "role": role},
-                message="User have not role",
+                message=f"User have not {role} role",
                 status_code=403
            )

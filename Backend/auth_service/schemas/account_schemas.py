@@ -46,7 +46,7 @@ class Account(BaseModel):
         id = id[0]
         db.update('account', f"active = true", f"username='{self.username}'")
         db.insert('"user"', 'user_id', id)
-        db.insert('role', 'user_id, permition_id', f"{id}, 3")
+        db.insert('role', 'user_id, permission_id', f"{id}, 3")
         db.commit()
         db.close()
         return True
@@ -78,9 +78,10 @@ class Account(BaseModel):
         db = Postgresql()
         result = db.select('account', 'username', f"token = '{token}'")
     def checkRole(self, role: str):
-        sql=f"SELECT permition.name FROM account INNER JOIN role ON account.id = role.user_id INNER JOIN permition ON role.permition_id = permition.id WHERE username = '{self.username}'"
+        sql=f"SELECT permission.name FROM account INNER JOIN role ON account.id = role.user_id INNER JOIN permission ON role.permission_id = permission.id WHERE username = '{self.username}'"
         db = Postgresql()
         result = db.execute(sql)
+        
         return result[0] == role
 
 class ChangePassword(BaseModel):
