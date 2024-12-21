@@ -43,7 +43,7 @@ class ProfileService:
         return format_response(
             status="Success",
             data=info,
-            message="Profile retrieved successfully",
+            message="Profile getting successfully",
             status_code=200
         )
 
