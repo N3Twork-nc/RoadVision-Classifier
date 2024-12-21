@@ -1,5 +1,7 @@
-asyncpg
 python-dotenv
 fastapi
-psycopg2
-PyJWT
+kafka-python
+uvicorn==0.32.0
+psycopg2-binary
+requests
+python-multipart==0.0.17

@@ -7,11 +7,10 @@ import EditProfile from "../../../components/Profile/EditProfile";
 import History from "../../../components/Profile/History";
 import ChangePassword from "../../../components/Profile/ChangePassword";
 import { useRecoilValue } from "recoil";
-import { userState, verifyEmailState } from "../../../atoms/authState";
+import { userState } from "../../../atoms/authState";
 
 export default function Profile() {
-  const userRecoilStateValue = useRecoilValue(userState)
-  const userRecoilVerifyEmail= useRecoilValue(verifyEmailState)
+  const userRecoilStateValue = useRecoilValue(userState);
   const [activeTab, setActiveTab] = useState(0); // Current tabs
 
   // All Tabs
@@ -21,7 +20,7 @@ export default function Profile() {
     { label: "Change Password", component: <ChangePassword /> },
     { label: "History", component: <History /> },
   ];
-  
+
   return (
     <AppLayout>
       <div className="w-full min-h-screen bg-[#F9F9F9] flex flex-col gap-5 justify-start items-center overflow-y-auto">
@@ -46,7 +45,7 @@ export default function Profile() {
             {userRecoilStateValue.username}
           </h1>
           <h2 className="text-center text-gray-600 text-sm font-semibold">
-            {userRecoilVerifyEmail.email}
+            {userRecoilStateValue.email}
           </h2>
         </div>
 
