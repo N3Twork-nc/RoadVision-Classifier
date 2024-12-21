@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 import hashlib
+from enum import Enum
 from Database import Postgresql
 
 def compute_hash(data: str) -> str:
@@ -39,12 +40,13 @@ class Account(BaseModel):
 
     def verifyEmail(self) -> bool:
         db = Postgresql()
-        id = db.select('account', 'id', f"username = '{self.username}' and verified = '{self.OTP}'")[0]
-        print(id)
+        id = db.select('account', 'id', f"username = '{self.username}' and verified = '{self.OTP}'")
         if id is None:
             return False
+        id = id[0]
         db.update('account', f"active = true", f"username='{self.username}'")
         db.insert('"user"', 'user_id', id)
+        db.insert('role', 'user_id, permission_id', f"{id}, 3")
         db.commit()
         db.close()
         return True
@@ -76,6 +78,12 @@ class Account(BaseModel):
     def authorization(token: str):
         db = Postgresql()
         result = db.select('account', 'username', f"token = '{token}'")
+    def checkRole(self, role: str):
+        sql=f"SELECT permission.name FROM account INNER JOIN role ON account.id = role.user_id INNER JOIN permission ON role.permission_id = permission.id WHERE username = '{self.username}'"
+        db = Postgresql()
+        result = db.execute(sql)
+        
+        return result[0] == role
 
 class ChangePassword(BaseModel):
     current_password: str
@@ -91,3 +99,7 @@ class ChangePassword(BaseModel):
         )
         db.commit()
         db.close()
+class Role(str, Enum):
+    admin = "admin"
+    technical = "technical"
+    user = "user"
