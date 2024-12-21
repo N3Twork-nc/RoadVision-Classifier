@@ -5,6 +5,17 @@ import 'leaflet-routing-machine';
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
 import 'leaflet-control-geocoder';
+import './map.css';
+
+declare module 'leaflet' {
+  namespace Control {
+    class Geocoder {
+      static nominatim(): any;
+      geocode(query: string, callback: (results: any[]) => void): void;
+    }
+  }
+}
+
 
 const Map: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);

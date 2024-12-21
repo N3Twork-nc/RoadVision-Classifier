@@ -38,7 +38,7 @@ const Sider: React.FC = () => {
         <h1 className="text-2xl font-bold text-[#23038C]">RoadVision</h1>
       </div>
       <nav className="flex-1 px-4 py-6 space-y-4">
-        <NavLink to="/" icon={FaHome} text="Home" />
+        <NavLink to="/home" icon={FaHome} text="Home" />
         <NavLink to="/public-map" icon={FaMap} text="Public map" />
         <NavLink to="/map-management" icon={FaTasks} text="Map management" />
         <NavLink to="/library" icon={FaBook} text="My library" />
