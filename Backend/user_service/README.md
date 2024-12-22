@@ -16,12 +16,13 @@ Gửi một JSON object với định dạng sau trong body:
 
 ```json
 {
-    "fullname": "string",
-    "birthday": "string",
-    "gender": "string",
-    "phonenumber": "string",
-    "location": "string",
-    "state": "string"
+  "username": "string",
+  "fullname": "string",
+  "birthday": "string",
+  "gender": "string",
+  "phonenumber": "string",
+  "location": "string",
+  "state": "string"
 }
 ```
 **Các trường:**
@@ -82,9 +83,11 @@ API không yêu cầu body trong request. Token xác thực danh tính người 
     "gender": "string",
     "phonenumber": "string",
     "location": "string",
-    "state": "string"
+    "state": "string",
+    "email": "string",
+    "created": "string"
   },
-  "message": "Profile retrieved successfully"
+  "message": "Profile getting successfully"
 }
 ```
 

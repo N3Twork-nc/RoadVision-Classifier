@@ -47,24 +47,38 @@ class User(BaseModel):
     def get_profile(self) -> dict:
         db = Postgresql()
         try:
-            result = db.select(
+            user_result = db.select(
                 '"user"',
                 'user_id, fullname, birthday, gender, phonenumber, location, state',
                 f"user_id = (SELECT id FROM account WHERE username = '{self.username}')"
             )
 
-            if result:
-                birthday = result[3].strftime('%Y-%m-%d') if isinstance(result[3], date) else result[3]
+            account_result = db.select(
+                '"account"',
+                'email, created',
+                f"username = '{self.username}'"
+            )
 
-                return {
-                    "user_id": result[0],
-                    "fullname": result[1],
+            if user_result:
+                birthday = user_result[2].strftime('%Y-%m-%d') if isinstance(user_result[2], date) else user_result[2]
+
+                profile_data = {
+                    "user_id": user_result[0],
+                    "fullname": user_result[1],
                     "birthday": birthday,
-                    "gender": result[4],
-                    "phonenumber": result[5],
-                    "location": result[6],
-                    "state": result[7],
+                    "gender": user_result[3],
+                    "phonenumber": user_result[4],
+                    "location": user_result[5],
+                    "state": user_result[6],
                 }
+
+                if account_result:
+                    profile_data.update({
+                        "email": account_result[0],
+                        "created": account_result[1].strftime('%Y-%m-%d %H:%M:%S') if isinstance(account_result[1], date) else account_result[1]
+                    })
+
+                return profile_data
             return {}
 
         except Exception as e:
