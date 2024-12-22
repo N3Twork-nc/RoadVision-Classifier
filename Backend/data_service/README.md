@@ -37,7 +37,7 @@ Body in `multipart/form-data` format:
 </details>
 
 <details>
-  <summary><strong><span style="color: green;">ENDPOINT GET /datasvc/api/uploadRoad</strong></summary>
+  <summary><strong><span style="color: green;">ENDPOINT GET /datasvc/api/getInfoRoads</strong></summary>
  
 ## công dụng
 Lấy thông tin đường đã upload của tất cả user
