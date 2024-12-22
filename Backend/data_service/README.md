@@ -108,7 +108,8 @@ Dùng để xóa đường đã upload
 | `400`       | Bad Request             | Thiếu parameter hoặc sài format request          |
 | `401`       | Unauthorized            | Token bị sai                            |
 | `403`       | Not authenticated       | Thiếu token                            |
-| `404`       | Road not found          | Id đường khồng tồn tạitại                            |
+| `403`       | You don't have permission to delete this road | User không phải là user uplaod đường  |
+| `404`       | Road not found          | Id đường khồng tồn tại                           |
 | `500`       | Internal Server Error      | Lỗi từ server                        | 
 </details>
 
