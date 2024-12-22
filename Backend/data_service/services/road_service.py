@@ -6,6 +6,7 @@ from fastapi import Depends
 from fastapi.responses import JSONResponse
 from Database import Postgresql
 import os
+
 current_file_path = os.path.abspath(__file__)
 
 class RoadService:
@@ -26,7 +27,7 @@ class RoadService:
             producer.flush()
             return True
         except Exception as e:
-            print(current_file_pat, e)
+            print(current_file_path, e)
             return False
 
 
