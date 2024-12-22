@@ -3,6 +3,8 @@ from Database import Postgresql
 from datetime import datetime
 import time
 import os
+from PIL import Image
+from io import BytesIO
 current_file_path = os.path.abspath(__file__)
 
 
@@ -28,6 +30,12 @@ class RoadSchema(BaseModel):
                 values['user_id'] = result[0]
             else:
                 raise ValueError(f"Username '{username}' không tồn tại trong cơ sở dữ liệu.")
+        if values.get('file'):
+            image = Image.open(BytesIO(values['file']))
+            resized_image = image.resize((512,512), Image.LANCZOS)
+            output_buffer = BytesIO()
+            resized_image.save(output_buffer, format=image.format) 
+            values["file"] = output_buffer.getvalue()
         return values
 
     def insertRoad(self):
