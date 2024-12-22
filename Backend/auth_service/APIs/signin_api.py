@@ -1,6 +1,6 @@
 from main import app
-from schemas.account_schemas import Account,Role
-from services.signin_service import signin_service,authorization_service
+from schemas.account_schemas import Account, Role
+from services.signin_service import signin_service, authorization_service
 from fastapi import Depends
 from JWT import Authentication
 
