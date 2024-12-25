@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 import hashlib
 from enum import Enum
+from datetime import datetime
 from Database import Postgresql
 
 def compute_hash(data: str) -> str:
@@ -22,12 +23,12 @@ class Account(BaseModel):
 
     def getInfoAccount(self) -> dict:
         db = Postgresql()
-        info = db.select('account', 'id, email, username', f"username = '{self.username}'")
-        return {"id": info[0], "email": info[1], "username": info[2]} if info else {}
+        info = db.execute("select c.id, c.email, c.username, p.name from account c JOIN role r on c.id=r.user_id JOIN permission p on p.id=r.permission_id")
+        return {"id": info[0], "email": info[1], "username": info[2], "role":info[3]} if info else {}
 
     def insertAccount(self, OTP: str):
         db = Postgresql()
-        result = db.insert('account', 'username, password ,email,verified', f"'{self.username}', '{compute_hash(self.password)}','{self.email}', {OTP}")
+        result = db.insert('account', 'username, password ,email, verified', f"'{self.username}', '{compute_hash(self.password)}','{self.email}', {OTP}")
         db.commit()
         db.close()
         return result
@@ -74,6 +75,7 @@ class Account(BaseModel):
         db.delete('account', f"username='{self.username}'")
         db.commit()
         db.close()
+
     @staticmethod
     def authorization(token: str):
         db = Postgresql()
@@ -99,7 +101,49 @@ class ChangePassword(BaseModel):
         )
         db.commit()
         db.close()
+        
 class Role(str, Enum):
     admin = "admin"
     technical = "technical"
     user = "user"
+
+class AddUser(BaseModel):
+    username: str
+    password: str
+    permission_id: int
+    email: str = None
+
+    def insert_user(self):
+        db = Postgresql()
+        hashed_password = compute_hash(self.password)
+
+        email_part = f", email" if self.email else ""
+        email_value = f", '{self.email}'" if self.email else ""
+
+        db.insert(
+            'account',
+            f'username, password{email_part}, active, created', 
+            f"'{self.username}', '{hashed_password}'{email_value}, true, '{datetime.now()}'"
+        )
+        
+        user_id = db.select(
+            'account',
+            'id',
+            f"username = '{self.username}' AND password = '{hashed_password}'"
+        )[0]
+        
+        db.insert(
+            '"user"',  
+            'user_id',
+            f"{user_id}" 
+        )
+
+        db.insert(
+            'role',
+            'user_id, permission_id',
+            f"{user_id}, {self.permission_id}"
+        )
+        
+        db.commit()
+        db.close()
+        return user_id

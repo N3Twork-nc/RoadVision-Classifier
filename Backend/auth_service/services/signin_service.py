@@ -2,16 +2,9 @@ from schemas import Account
 from .format_response import format_response 
 from JWT import Authentication
 
-def signin_service(account: Account,role=None):
+def signin_service(account: Account):
     try:
         if account.checkAccount():
-            if role is not None and not account.checkRole(role):
-                return format_response(
-                    status="Failed",
-                    data={},
-                    message=f"User have not {role} role",
-                    status_code=403
-                )
             token = Authentication().generate_token(account.username)
             info = account.getInfoAccount()
             info.pop('password', None)
@@ -36,28 +29,28 @@ def signin_service(account: Account,role=None):
             message="Failed in login process",
             status_code=500
         )
-def authorization_service(username: str, role: str = None):
-    if role is None:
-        response={
-            "status":"Success",
-            "message":"Token is valid",
-            "data":{
-                "username":username
-            }
+def authorization_service(username: str):
+    # if role is None:
+    response={
+        "status":"Success",
+        "message":"Token is valid",
+        "data":{
+            "username":username
         }
-        return response
-    else:
-        account = Account(username=username)
-        if account.checkRole(role):
-            return format_response(
-                status="Success",
-                data={"username": username, "role": role},
-                message="Authorization success",
-                status_code=200
-            )
-        else:
-            return format_response(
-                status="Failed",
-                message=f"User have not {role} role",
-                status_code=403
-           )
+    }
+    return response
+    # else:
+    #     account = Account(username=username)
+    #     if account.checkRole(role):
+    #         return format_response(
+    #             status="Success",
+    #             data={"username": username, "role": role},
+    #             message="Authorization success",
+    #             status_code=200
+    #         )
+    #     else:
+    #         return format_response(
+    #             status="Failed",
+    #             message=f"User have not {role} role",
+    #             status_code=403
+    #        )

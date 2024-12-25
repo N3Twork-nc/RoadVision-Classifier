@@ -16,12 +16,13 @@ Gửi một JSON object với định dạng sau trong body:
 
 ```json
 {
-    "fullname": "string",
-    "birthday": "string",
-    "gender": "string",
-    "phonenumber": "string",
-    "location": "string",
-    "state": "string"
+  "username": "string",
+  "fullname": "string",
+  "birthday": "string",
+  "gender": "string",
+  "phonenumber": "string",
+  "location": "string",
+  "state": "string"
 }
 ```
 **Các trường:**
