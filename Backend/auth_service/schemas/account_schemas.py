@@ -23,8 +23,8 @@ class Account(BaseModel):
 
     def getInfoAccount(self) -> dict:
         db = Postgresql()
-        info = db.select('account', 'id, email, username', f"username = '{self.username}'")
-        return {"id": info[0], "email": info[1], "username": info[2]} if info else {}
+        info = db.execute("select c.id, c.email, c.username, p.name from account c JOIN role r on c.id=r.user_id JOIN permission p on p.id=r.permission_id")
+        return {"id": info[0], "email": info[1], "username": info[2], "role":info[3]} if info else {}
 
     def insertAccount(self, OTP: str):
         db = Postgresql()
