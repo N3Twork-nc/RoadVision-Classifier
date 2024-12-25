@@ -3,7 +3,7 @@ pipeline {
     parameters {
         choice(
         name: 'RUN_STAGE',
-        choices: ['None','Authen', 'Data','Deeplearning','User','Frontend'], // Thay các giá trị tùy chọn bằng các giá trị bạn muốn
+        choices: ['None','Authen', 'Data','Deeplearning','User','Frontend',"Postgresql",'Mongodb'], // Thay các giá trị tùy chọn bằng các giá trị bạn muốn
         description: 'Chọn một giai đoạn để chạy'
     )
     }
@@ -33,6 +33,7 @@ pipeline {
                     env.DEEPLEARNING_SERVICE_CHANGED = changedDirs.any { it.startsWith('Backend/deeplearning_service') } ? 'true' : 'false'
                     env.USER_SERVICE_CHANGED = changedDirs.any { it.startsWith('Backend/user_service') } ? 'true' : 'false'
                     env.POSTGRES_CHANGED = changedDirs.any { it.startsWith('Database/PostgreSQL') } ? 'true' : 'false'
+                    env.MONGODB_CHANGED = changedDirs.any { it.startsWith('Database/MongoDB') } ? 'true' : 'false'
                     
                     withCredentials([usernamePassword(credentialsId: 'POSTGRES_USER_DEV', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         script {
@@ -129,9 +130,9 @@ pipeline {
                 }
             }
         }
-        stage('Deploy Database') {
+        stage('Deploy Postgresql') {
             when {
-                expression { return  env.POSTGRES_CHANGED == 'true' }
+                expression { return  env.POSTGRES_CHANGED == 'true' || params.RUN_STAGE == 'Postgresql'}
             }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'POSTGRES_USER', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
@@ -147,6 +148,23 @@ pipeline {
                     }
                 }
                 dir('Database/PostgreSQL') {
+                    sh 'docker compose down'
+                    sh 'docker compose up -d'
+                }
+            }
+        }
+        stage('Deploy Mongodb') {
+            when {
+                expression { return  env.MONGODB_CHANGED == 'true' || RUN.STAGE == 'Mongodb'}
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'MONGODB_USER', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    script {
+                       env.MONGODB_USERNAME=USERNAME
+                       env.MONGODB_PASSWORD=PASSWORD
+                    }
+                }
+                dir('Database/MongoDB') {
                     sh 'docker compose down'
                     sh 'docker compose up -d'
                 }
