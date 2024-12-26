@@ -1,7 +1,7 @@
 from main import app
 from fastapi import Depends, File, UploadFile
 from schemas.user_schemas import User
-from services.editProfile_service import ProfileService
+from services.profile_service import ProfileService
 from services.auth_validate import validate_token
 
 @app.post('/api/editProfile')

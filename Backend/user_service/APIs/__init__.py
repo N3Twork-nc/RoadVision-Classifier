@@ -1,1 +1,2 @@
-from .editProfile import *
+from .userProfile import *
+from .userStatistics import *

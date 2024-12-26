@@ -26,7 +26,7 @@ class RoadService:
             producer.flush()
             return True
         except Exception as e:
-            print(current_file_pat, e)
+            print(current_file_path, e)
             return False
 
 

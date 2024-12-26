@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from Database import Postgresql
 from pydantic import BaseModel
 
@@ -117,5 +117,82 @@ class User(BaseModel):
         except Exception as e:
             print(f"Error getting avatar: {e}")
             return None
+        finally:
+            db.close()
+
+    def get_user_statistics(self) -> dict:
+        db = Postgresql()
+        try:
+            query = '''
+                SELECT u.user_id, u.fullname, a.username, a.created
+                FROM "user" u
+                JOIN "account" a ON u.user_id = a.id
+                JOIN "role" r ON r.user_id = a.id
+                WHERE r.permission_id = 3
+            '''
+
+            user_results = db.execute(query, fetch='all')
+
+            if not user_results:
+                return {"data": []}
+
+            users_data = []
+            for row in user_results:
+                created = row[3].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[3], datetime) else row[3]
+                
+                count_query = '''
+                    SELECT COUNT(*) 
+                    FROM "road" 
+                    WHERE user_id = %s
+                '''
+                db.cursor.execute(count_query, (row[0],)) 
+                contribution = db.cursor.fetchone()[0] 
+                
+                users_data.append({
+                    "user_id": row[0],
+                    "fullname": row[1],
+                    "username": row[2],
+                    "created": created,
+                    "contribution": contribution  
+                })
+
+            return {"data": users_data}
+
+        except Exception as e:
+            print(f"Error getting users: {e}")
+            return {"data": []}
+        finally:
+            db.close()
+
+    def get_technical_statistics(self) -> list:
+        db = Postgresql()
+        try:
+            query = '''
+                SELECT u.user_id, u.fullname, a.username, a.created
+                FROM "user" u
+                JOIN "account" a ON u.user_id = a.id
+                JOIN "role" r ON r.user_id = a.id
+                WHERE r.permission_id = 2
+            '''
+            
+            user_results = db.execute(query, fetch='all')
+
+            if not user_results:
+                return {"data": []}
+
+            users_data = []
+            for row in user_results:
+                created = row[3].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[3], datetime) else row[3]
+                users_data.append({
+                    "user_id": row[0],
+                    "fullname": row[1],
+                    "username": row[2],
+                    "created": created
+                })
+
+            return {"data": users_data}
+        except Exception as e:
+            print(f"Error getting users: {e}")
+            return {"data": []}
         finally:
             db.close()
