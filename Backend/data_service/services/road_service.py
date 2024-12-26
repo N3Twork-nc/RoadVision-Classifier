@@ -16,13 +16,12 @@ from geopy.geocoders import Nominatim
 def get_district_nominatim(lat, lon):
     geolocator = Nominatim(user_agent="21522613@gm.uit.edu.vn")
     location = geolocator.reverse((lat, lon), language="vi")
-    print (location)
     if location:
         address = location.raw.get('address', {})
         district = address.get('county', address.get('city',None))
-        return district
+        return district,location
     else:
-        return "Lỗi khi lấy dữ liệu"
+        return "unknow","unknow"
 
 current_file_path = os.path.abspath(__file__)
 
@@ -32,8 +31,9 @@ class RoadService:
         try: 
             latitude = roadSchema.latitude
             longitude = roadSchema.longitude
-            district = get_district_nominatim(latitude, longitude)
+            district,location = get_district_nominatim(latitude, longitude)
             db=Postgresql()
+            roadSchema.location=location
             roadSchema.district_id=db.execute(f"SELECT id FROM district WHERE name ilike '%{district}%'")[0]
             id=roadSchema.insertRoad()[0]
             img=roadSchema.file

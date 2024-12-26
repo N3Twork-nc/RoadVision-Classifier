@@ -18,7 +18,8 @@ async def upload_image(file: UploadFile = File(...), latitude: float = Form(...)
             latitude=latitude,
             longitude=longitude
         )
-        await RoadService.insertRoad(road)
+        if  not RoadService.insertRoad(road):
+            return JSONResponse(content={"status": "error", "message": "Internal server error"}, status_code=500)  
         return JSONResponse(content={"status": "success", "message": "Image uploaded successfully"}, status_code=200)
     except Exception as e:
         print(current_file_path, e)
