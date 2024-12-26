@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import Sider from "../Common/Sider";
+import Sider from "./Sider";
 import Header from "../Common/Header";
 
 type LayoutPropsType = {

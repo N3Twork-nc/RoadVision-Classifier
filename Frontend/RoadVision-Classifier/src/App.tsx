@@ -19,6 +19,7 @@ import AuthVerifyEmail from "./pages/User/Auth/AuthVerifyEmail";
 import NotFound from "./pages/NotFound/NotFound";
 import Dashboard from "./pages/Admin/Dashboard/Dashboard";
 import UsersManagement from "./pages/Admin/Users/UsersManagement";
+import TechniciansManagement from "./pages/Admin/Technicians/TechniciansManagement";
 
 
 const App: React.FC = () => {
@@ -37,7 +38,7 @@ const App: React.FC = () => {
         <Route path={PageEnum.PUBLIC_MAP} element={<PublicMap />} />
         <Route path={PageEnum.NOT_FOUND} element={<NotFound />} />
 
-        {/* USER ROUTES */}
+        USER ROUTES
         <Route
           path={PageEnum.PROFILE}
           element={
@@ -77,6 +78,14 @@ const App: React.FC = () => {
           element={
             <PrivateRoute allowedRoles={["admin"]}>
               <UsersManagement />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path={AdminPageEnum.TECHNICIAN_MANAGEMENT}
+          element={
+            <PrivateRoute allowedRoles={["admin"]}>
+              <TechniciansManagement />
             </PrivateRoute>
           }
         />

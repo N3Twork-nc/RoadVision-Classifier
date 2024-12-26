@@ -1,7 +1,15 @@
-import React from 'react'
-
-export default function UsersManagement() {
+import {AppLayout} from "../../../components/ADMIN/Common/AppLayout";
+import AllUser from "../../../components/ADMIN/Users/AllUser";
+import UserInfo from "../../../components/ADMIN/Users/UserInfo";
+const UsersManagement: React.FC = () => {
   return (
-    <div>UsersManagement</div>
-  )
-}
+    <AppLayout>
+      <div className="p-4 bg-gray-50">
+        <AllUser />
+        {/* <UserInfo /> */}
+      </div>
+    </AppLayout>
+  );
+};
+
+export default UsersManagement;

@@ -36,13 +36,17 @@ const Sider: React.FC = () => {
   return (
     <aside className="h-screen bg-white text-gray-800 w-55 flex flex-col">
       <div className="flex flex-col items-center justify-center py-6">
+        <h2 className="text-2xl font-bold text-[#23038C]">ADMIN</h2>
         <h1 className="text-2xl font-bold text-[#23038C]">RoadVision</h1>
-        <h2 className="text-2xl font-bold text-[#23038C]">ADMIN ROLE</h2>
       </div>
       <nav className="flex-1 px-4 py-6 space-y-4">
-        <NavLink to="/admin-home" icon={FaHome} text="Home" />
-        <NavLink to="/admin-users" icon={FaUser} text="Users" />
-        <NavLink to="/admin-technicians" icon={GrUserWorker} text="Technicians" />
+        <NavLink to="/dashboard" icon={FaHome} text="Dashboard" />
+        <NavLink to="/user-management" icon={FaUser} text="Users" />
+        <NavLink
+          to="/technician-management"
+          icon={GrUserWorker}
+          text="Technicians"
+        />
       </nav>
     </aside>
   );
