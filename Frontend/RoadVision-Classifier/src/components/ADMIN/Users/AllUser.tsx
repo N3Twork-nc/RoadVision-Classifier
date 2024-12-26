@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import manageAlluserService from "../../../services/manageAlluser.service";
 import { Button, Form, Input, Modal } from "antd";
+import { useRecoilState } from "recoil";
+import { userState } from "../../../atoms/admin/userState";
+
 interface DataType {
   key: React.Key;
   username: string;
@@ -9,11 +12,15 @@ interface DataType {
   joindate: string;
   contribution: number;
 }
+interface AllUserProps {
+    onViewUserInfo: (user: DataType) => void; // Hàm chuyển đổi view
+  }
 
-export default function AllUser() {
+export default function AllUser({ onViewUserInfo }: AllUserProps)  {
   const [dataSource, setDataSource] = useState<DataType[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [, setRecoilProfile] = useRecoilState<any>(userState);
 
   // Get all user
   const fetchAllUsers = async () => {
@@ -28,6 +35,7 @@ export default function AllUser() {
         contribution: user.contribution,
       }));
       setDataSource(users);
+      setRecoilProfile(users);
     } catch (error) {
       console.log("Không thể lấy danh sách người dùng!");
     } finally {
@@ -56,6 +64,7 @@ export default function AllUser() {
       console.log("Thêm tài khoản thất bại!");
     }
   };
+
 
   return (
     <div className="flex flex-col gap-2">
@@ -92,15 +101,16 @@ export default function AllUser() {
             </tr>
           </thead>
           <tbody>
-            {dataSource.map((data) => (
+            {dataSource.map((user) => (
               <tr
-                key={data.key}
-                className="text-base py-3 text-[#0A0A0B] font-normal border-b border-gray-300"
+                key={user.key}
+                className="cursor-pointer text-base py-3 text-[#0A0A0B] font-normal border-b border-gray-300"
+                onClick={() => onViewUserInfo(user)}
               >
-                <td className="py-3">{data.username}</td>
-                <td className="py-3">{data.fullname}</td>
-                <td className="py-3">{data.joindate}</td>
-                <td className="py-3">{data.contribution}</td>
+                <td className="py-3">{user.username}</td>
+                <td className="py-3">{user.fullname}</td>
+                <td className="py-3">{user.joindate}</td>
+                <td className="py-3">{user.contribution}</td>
                 <td className="py-3">
                   <button className="text-red-500">
                     <AiOutlineDelete className="w-5 h-5" />

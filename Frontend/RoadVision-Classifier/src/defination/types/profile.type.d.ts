@@ -12,6 +12,7 @@ export type ProfileDataType = {
   fullname: string;
   gender: string;
   state: string;
+  contribution: int;
 };
 
 export type EditProfileDataType = {
