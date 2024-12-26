@@ -11,3 +11,10 @@ export enum PageEnum {
   VERIFY = "/verify",
   NOT_FOUND = "*",
 }
+
+export enum AdminPageEnum {
+  INDEX = "/",
+  DASHBOARD = "/dashboard",
+  USER_MANAGEMENT = "/user-management",
+  TECHNICIAN_MANAGEMENT = "/technician-management",
+}

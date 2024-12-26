@@ -108,9 +108,9 @@ export default function Account() {
       </div>
 
       <div>
-        <button className="w-fit bg-[#3749A6] text-white font-semibold p-2 px-5 rounded-full hover:ring-4 hover:ring-blue-300">
+        {/* <button className="w-fit bg-[#3749A6] text-white font-semibold p-2 px-5 rounded-full hover:ring-4 hover:ring-blue-300">
           Delete Account
-        </button>
+        </button> */}
       </div>
     </div>
   );

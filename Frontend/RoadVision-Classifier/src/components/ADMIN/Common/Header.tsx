@@ -2,20 +2,20 @@ import React from "react";
 import { DownOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Dropdown, Space } from "antd";
-import search from "../../assets/img/search.png";
-import notification from "../../assets/img/notification.png";
-import { useRecoilValue } from "recoil";
-import { accountState } from "../../atoms/authState";
+import search from "../../../assets/img/search.png";
+import notification from "../../../assets/img/notification.png";
+//import { useRecoilValue } from "recoil";
+//import {  } from "../../atoms/authState";
 import { Link } from "react-router-dom";
-import { PageEnum } from "../../defination/enums/page.enum";
-import { handleLogOut } from "../../utils/auth.util";
+//import { PageEnum } from "../../defination/enums/page.enum";
+//import { handleLogOut } from "../../utils/auth.util";
 const Header: React.FC = () => {
-  const userRecoilStateValue = useRecoilValue(accountState);
+  //const userRecoilStateValue = useRecoilValue(userState);
  
   const items: MenuProps["items"] = [
     {
       label: (
-        <Link className="text-base p-1" to={PageEnum.PROFILE}>
+        <Link className="text-base p-1" to="/profile">
           Profile
         </Link>
       ),
@@ -23,7 +23,7 @@ const Header: React.FC = () => {
     },
     {
       label: (
-        <div className="text-base p-1" onClick={handleLogOut}>
+        <div className="text-base p-1">
           Log out
         </div>
       ),
@@ -65,7 +65,7 @@ const Header: React.FC = () => {
                   className="w-9 h-9 mr-1 rounded-full"
                 />
                 <span className="flex font-medium text-center">
-                  {userRecoilStateValue.username}
+                  ADMIN
                 </span>
                 <DownOutlined />
               </Space>

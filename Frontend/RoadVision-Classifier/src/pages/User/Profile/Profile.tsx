@@ -7,9 +7,9 @@ import EditProfile from "../../../components/Profile/EditProfile";
 import History from "../../../components/Profile/History";
 import ChangePassword from "../../../components/Profile/ChangePassword";
 import { useRecoilValue } from "recoil";
-import { userState } from "../../../atoms/authState";
+import { accountState } from "../../../atoms/authState";
 export default function Profile() {
-  const userRecoilStateValue = useRecoilValue(userState);
+  const userRecoilStateValue = useRecoilValue(accountState);
   const [activeTab, setActiveTab] = useState(0); 
 
   // All Tabs
