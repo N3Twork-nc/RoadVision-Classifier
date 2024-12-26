@@ -155,7 +155,7 @@ pipeline {
         }
         stage('Deploy Mongodb') {
             when {
-                expression { return  env.MONGODB_CHANGED == 'true' || RUN.STAGE == 'Mongodb'}
+                expression { return  env.MONGODB_CHANGED == 'true' ||params.RUN_STAGE == 'Mongodb'}
             }
             steps {
                 withCredentials([usernamePassword(credentialsId: 'MONGODB_USER', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
