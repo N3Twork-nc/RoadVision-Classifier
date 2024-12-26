@@ -8,3 +8,4 @@ python-multipart==0.0.18
 pillow
 pymongo==4.10.1
 numpy==1.26.4
+geopy==2.4.1
