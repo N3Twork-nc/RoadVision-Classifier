@@ -18,7 +18,8 @@ class RoadSchema(BaseModel):
     longitude: float = Field(None, description="Longitude of the location")
     level: str = Field(None, description="Level of road")
     created_at: datetime = Field(None, description="Created at")
-
+    district_id: int = Field(None, description="District id")
+    location: str = Field("unknow", description="Location")
     
     @root_validator(pre=True)
     def resolve_user_id(cls, values):
@@ -41,7 +42,7 @@ class RoadSchema(BaseModel):
     def insertRoad(self):
         db = Postgresql()
         file_path = f"roadImages/{self.user_id}_{time.time()}.jpg"
-        id=db.execute(f"INSERT INTO road (user_id,image_path,latitude,longitude,level) VALUES ({self.user_id},'{file_path}',{self.latitude},{self.longitude},'classifing') RETURNING id")
+        id=db.execute(f"INSERT INTO road (user_id,image_path,latitude,longitude,level,district_id) VALUES ({self.user_id},'{file_path}',{self.latitude},{self.longitude},'classifing',{self.district_id}) RETURNING id")
         db.commit()
         db.close()
         with open(file_path , "wb") as f:

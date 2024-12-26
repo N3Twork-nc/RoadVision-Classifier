@@ -4,5 +4,8 @@ kafka-python
 uvicorn==0.32.0
 psycopg2-binary
 requests
-python-multipart==0.0.17
+python-multipart==0.0.18
 pillow
+pymongo
+numpy
+scikit-learn
