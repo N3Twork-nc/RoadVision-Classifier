@@ -40,6 +40,7 @@ class Postgresql:
             return self.cursor.fetchall()
         else:
             return self.cursor
+        
     def commit(self):
         self.connection.commit()
 
