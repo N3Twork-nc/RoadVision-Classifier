@@ -47,21 +47,33 @@ class User(BaseModel):
     def get_profile(self) -> dict:
         db = Postgresql()
         try:
+            # Lấy thông tin user
             user_result = db.select(
                 '"user"',
                 'user_id, fullname, birthday, gender, phonenumber, location, state',
                 f"user_id = (SELECT id FROM account WHERE username = '{self.username}')"
             )
 
+            # Lấy thông tin account
             account_result = db.select(
                 '"account"',
                 'email, created',
                 f"username = '{self.username}'"
             )
 
+            # Đếm số ảnh đã tải lên từ bảng road
+            contribution_query = '''
+                SELECT COUNT(*)
+                FROM road
+                WHERE user_id = (SELECT id FROM account WHERE username = %s)
+            '''
+            db.cursor.execute(contribution_query, (self.username,))
+            contribution = db.cursor.fetchone()[0]
+
             if user_result:
                 birthday = user_result[2].strftime('%Y-%m-%d') if isinstance(user_result[2], date) else user_result[2]
 
+                # Tạo dữ liệu profile
                 profile_data = {
                     "user_id": user_result[0],
                     "fullname": user_result[1],
@@ -70,6 +82,7 @@ class User(BaseModel):
                     "phonenumber": user_result[4],
                     "location": user_result[5],
                     "state": user_result[6],
+                    "contribution": contribution  # Thêm số ảnh vào profile
                 }
 
                 if account_result:
