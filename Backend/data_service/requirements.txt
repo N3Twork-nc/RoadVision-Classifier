@@ -8,4 +8,3 @@ python-multipart==0.0.18
 pillow
 pymongo==4.10.1
 numpy==1.26.4
-scikit-learn==1.6.0 --only-binary=:all:
