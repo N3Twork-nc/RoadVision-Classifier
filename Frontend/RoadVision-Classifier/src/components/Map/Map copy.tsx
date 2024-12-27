@@ -227,37 +227,17 @@ const Map: React.FC = () => {
   // Hàm cập nhật mảng tọa độ
   const updatePath = () => {
     try {
-      const parsedCoordinates = JSON.parse(coordinates); // Parse dữ liệu từ textarea
+      const parsedCoordinates = JSON.parse(coordinates);
       if (
-        typeof parsedCoordinates === "object" &&
-        Object.values(parsedCoordinates).every(
-          (route) =>
-            Array.isArray(route) &&
-            route.every((point) => Array.isArray(point) && point.length === 2)
+        Array.isArray(parsedCoordinates) &&
+        parsedCoordinates.every(
+          (item) => Array.isArray(item) && item.length === 2
         )
       ) {
-        // Xóa các route cũ nếu đã tồn tại
-        if (routingControl) {
-          routingControl.remove();
-        }
-
-        // Lặp qua từng route để tạo đường đi
-        Object.values(parsedCoordinates).forEach(
-          (route: [number, number][]) => {
-            const waypoints = route.map(([lat, lng]) => L.latLng(lat, lng));
-
-            const newRoutingControl = L.Routing.control({
-              waypoints: waypoints,
-              routeWhileDragging: true,
-            }).addTo(leafletMap.current!);
-
-            // Lưu trạng thái routing control (nếu cần sau này)
-            setRoutingControl(newRoutingControl);
-          }
-        );
+        setPath(parsedCoordinates);
       } else {
         alert(
-          "Dữ liệu không hợp lệ. Đảm bảo object chứa danh sách các mảng tọa độ [latitude, longitude]."
+          "Dữ liệu không hợp lệ. Đảm bảo mảng chứa các cặp [latitude, longitude]."
         );
       }
     } catch (error) {
@@ -347,10 +327,9 @@ const Map: React.FC = () => {
         <textarea
           value={coordinates}
           onChange={(e) => setCoordinates(e.target.value)}
-          placeholder="Nhập dữ liệu route dạng: {0: [[10.850314, 106.792049], [10.850252, 106.791877]], 1: [[10.848641, 106.791873], [10.848641, 106.791873]]}"
+          placeholder="Nhập mảng tọa độ dạng: [[10.762622, 106.660172], [10.773832, 106.660989]]"
           className="textarea"
         ></textarea>
-
         <button onClick={updatePath} className="button">
           Vẽ đường đi
         </button>
