@@ -16,6 +16,7 @@ export const verifyEmailState = atom({
 export const accountState = atom({
   key: "accountState",
   default: {
+    avatar: "",
     username: "",
     email: "",
     role: "",

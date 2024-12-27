@@ -8,7 +8,7 @@ import notification from "../../../assets/img/notification.png";
 //import {  } from "../../atoms/authState";
 import { Link } from "react-router-dom";
 //import { PageEnum } from "../../defination/enums/page.enum";
-//import { handleLogOut } from "../../utils/auth.util";
+import { handleLogOut } from "../../../utils/auth.util";
 const Header: React.FC = () => {
   //const userRecoilStateValue = useRecoilValue(userState);
  
@@ -23,7 +23,7 @@ const Header: React.FC = () => {
     },
     {
       label: (
-        <div className="text-base p-1">
+        <div onClick={handleLogOut} className="text-base p-1">
           Log out
         </div>
       ),

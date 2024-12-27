@@ -37,6 +37,7 @@ export default function EditProfile() {
 
       const updatedProfileData: EditProfileDataType = {
         username: "",
+        avatar: "",
         fullname: fullname,
         birthday: selectedBirthday,
         gender: selectedGender,
