@@ -6,22 +6,43 @@ from fastapi import Depends
 from fastapi.responses import JSONResponse
 from Database import Postgresql
 import os
-
-
-
-from geopy.geocoders import Nominatim
+from .routemap_service import RouteMap
+from geopy.geocoders import Nominatim,Photon
+from geopy.exc import GeocoderTimedOut
+import threading
+import random
 
 # Hàm lấy thông tin quận/huyện từ tọa độ
 
-def get_district_nominatim(lat, lon):
-    geolocator = Nominatim(user_agent="21522613@gm.uit.edu.vn")
-    location = geolocator.reverse((lat, lon), language="vi")
-    if location:
-        address = location.raw.get('address', {})
-        district = address.get('county', address.get('city',None))
-        return district,location
-    else:
-        return "unknow","unknow"
+def get_location(lat, lon):
+    try:
+        geolocator = Nominatim(user_agent='n3twork@gmail.com')
+        location = geolocator.reverse((lat, lon), language="vi")
+        if location:
+            location = location.raw.get('display_name')
+            location_part = location.split(', ')
+            province = location_part[-3]
+            district = location_part[-4]
+            ward = location_part[-5]
+            location=", ".join(location_part[:-2])
+            return location,[ward, district, province]
+        else:
+            return None, []
+    except Exception as e:
+        print("GeocoderTimedOut: Trying with Photon")
+        geolocator = Photon(user_agent="myGeocoder")
+        location = geolocator.reverse((lat, lon), language="vi")
+        print(location)
+        if location:
+            location = location.raw.get('display_name')
+            location_part = location.split(', ')
+            province = location_part[-3]
+            district = location_part[-4]
+            ward = location_part[-5]
+            location=", ".join(location_part[:-2])
+            return location,[ward, district, province]
+        else:
+            return None, []
 
 current_file_path = os.path.abspath(__file__)
 
@@ -31,11 +52,10 @@ class RoadService:
         try: 
             latitude = roadSchema.latitude
             longitude = roadSchema.longitude
-            district,location = get_district_nominatim(latitude, longitude)
+            roadSchema.location,roadSchema.location_part = get_location(latitude, longitude)
             db=Postgresql()
-            roadSchema.location=location
-            roadSchema.district_id=db.execute(f"SELECT id FROM district WHERE name ilike '%{district}%'")[0]
             id=roadSchema.insertRoad()[0]
+            threading.Thread(target=RouteMap,args=(roadSchema.ward_id,)).start()
             img=roadSchema.file
             producer=KafkaProducer(
                 bootstrap_servers='192.168.120.26:9092',
