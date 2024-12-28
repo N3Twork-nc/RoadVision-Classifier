@@ -2,6 +2,7 @@
 import { atom } from "recoil";
 import { UserType } from "../defination/types/user.type";
 import { VerifyFormDataType } from "../defination/types/auth.type";
+import { getStoredUserInfo } from "../utils/local-storage.util";
 
 export const verifyEmailState = atom({
   key: "verifyEmailState",
@@ -15,10 +16,5 @@ export const verifyEmailState = atom({
 // store username
 export const accountState = atom({
   key: "accountState",
-  default: {
-    avatar: "",
-    username: "",
-    email: "",
-    role: "",
-  } as UserType, // default value
+ default: getStoredUserInfo() as UserType // default value
 });

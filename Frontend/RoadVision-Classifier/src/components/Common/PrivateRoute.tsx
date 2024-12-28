@@ -3,7 +3,6 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { accountState } from "../../atoms/authState";
-import useInitializeUser from "../../hooks/useInitializeUser";
 import { getAccessToken, handleLogOut } from "../../utils/auth.util";
 
 interface PrivateRouteProps {
@@ -13,7 +12,7 @@ interface PrivateRouteProps {
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) => {
   const accessToken = getAccessToken();
-  const account = useRecoilValue(accountState).role ||"";
+  const account = useRecoilValue(accountState);
 
   React.useEffect(() => {
     if (!accessToken) {
@@ -21,14 +20,18 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) =
     }
   }, [accessToken]);
 
-  if (!accessToken) {
-    return null;
+  const role = account?.role || localStorage.getItem("userRole");
+
+  if (!role) {
+    return null; // Hiển thị spinner hoặc component loading
   }
-  if (!allowedRoles.includes(account)) {
-    return <Navigate to="/not-authorized" replace />; // Redirect if role is not allowed
+
+  if (!allowedRoles.includes(role)) {
+    return <Navigate to="/not-authorized" replace />;
   }
-  useInitializeUser();
+
   return <>{children}</>;
 };
+
 
 export default PrivateRoute;

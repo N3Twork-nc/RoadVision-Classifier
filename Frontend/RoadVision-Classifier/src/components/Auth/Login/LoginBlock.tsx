@@ -69,13 +69,17 @@ const SignInBlock = () => {
           setAccountState(info); // Update Recoil user state
           // Navigate to the home page after successful login
           console.log(data.info.role);
-          if (data.info.role === "user") {
-          navigateHome();}
-          else if (data.info.role === "admin") {
-            navigateToDashboard();
-          }
-          else if (data.info.role === "technical") {
-            navigateToDashboardTechnician();
+          if (data.info.role) {
+            localStorage.setItem("userRole", data.info.role); // Ensure role is defined
+            if (data.info.role === "user") {
+              navigateHome();
+            } else if (data.info.role === "admin") {
+              navigateToDashboard();
+            } else if (data.info.role === "technical") {
+              navigateToDashboardTechnician();
+            }
+          } else {
+            console.error("Role is undefined");
           }
       }
     } catch (err) {
