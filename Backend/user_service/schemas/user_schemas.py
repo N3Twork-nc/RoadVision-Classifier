@@ -47,21 +47,18 @@ class User(BaseModel):
     def get_profile(self) -> dict:
         db = Postgresql()
         try:
-            # Lấy thông tin user
             user_result = db.select(
                 '"user"',
                 'user_id, fullname, birthday, gender, phonenumber, location, state',
                 f"user_id = (SELECT id FROM account WHERE username = '{self.username}')"
             )
 
-            # Lấy thông tin account
             account_result = db.select(
                 '"account"',
                 'email, created',
                 f"username = '{self.username}'"
             )
 
-            # Đếm số ảnh đã tải lên từ bảng road
             contribution_query = '''
                 SELECT COUNT(*)
                 FROM road
@@ -73,7 +70,6 @@ class User(BaseModel):
             if user_result:
                 birthday = user_result[2].strftime('%Y-%m-%d') if isinstance(user_result[2], date) else user_result[2]
 
-                # Tạo dữ liệu profile
                 profile_data = {
                     "user_id": user_result[0],
                     "fullname": user_result[1],
@@ -82,7 +78,7 @@ class User(BaseModel):
                     "phonenumber": user_result[4],
                     "location": user_result[5],
                     "state": user_result[6],
-                    "contribution": contribution  # Thêm số ảnh vào profile
+                    "contribution": contribution  
                 }
 
                 if account_result:
@@ -207,5 +203,52 @@ class User(BaseModel):
         except Exception as e:
             print(f"Error getting users: {e}")
             return {"data": []}
+        finally:
+            db.close()
+
+class Task(BaseModel): 
+    username: str
+    fullname: str
+    ward_name: str
+    deadline: str # Định dạng: 'YYYY-MM-DD HH:MM:SS'
+
+    def assign_task(self) -> bool:
+        db = Postgresql()
+        try:
+            user_result = db.select(
+                '"account"',
+                'id',
+                f"username = '{self.username}'"
+            )
+
+            if not user_result:
+                print(f"User '{self.username}' does not exist.")
+                return False
+
+            user_id = user_result[0]  
+
+            ward_result = db.select(
+                '"ward"',
+                'id',
+                f"name = '{self.ward_name}'"
+            )
+            
+            if not ward_result:
+                print(f"Ward '{self.ward_name}' does not exist.")
+                return False
+
+            ward_id = ward_result[0]
+
+            db.insert(
+                '"assignment"',
+                'user_id, ward_id, deadline',
+                f"{user_id}, {ward_id}, '{self.deadline}'"
+            )
+            db.commit()
+            print(f"Task assigned to {self.username} successfully.")
+            return True
+        except Exception as e:
+            print(f"Error assigning task: {e}")
+            return False
         finally:
             db.close()
