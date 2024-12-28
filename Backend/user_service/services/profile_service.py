@@ -7,6 +7,8 @@ from .format_response import format_response
 class ProfileService:
     @staticmethod
     def edit_profile(user: User, username: str):
+        if not isinstance(username, str):
+            username = username.get("username") if isinstance(username, dict) else None
         if not username:
             return format_response(
                 status="Error",
@@ -30,6 +32,15 @@ class ProfileService:
     
     @staticmethod
     def get_profile(username: str):
+        if not isinstance(username, str):
+            username = username.get("username") if isinstance(username, dict) else None
+        if not username:
+            return format_response(
+                status="Error",
+                message="Invalid token or unauthorized",
+                status_code=401
+            )
+
         user = User(username=username)
         info = user.get_profile()
         if not info:
@@ -42,12 +53,14 @@ class ProfileService:
         return format_response(
             status="Success",
             data=info,
-            message="Profile getting successfully",
+            message="Profile retrieved successfully",
             status_code=200
         )
 
     @staticmethod
     def upload_avatar(username: str, file: UploadFile):
+        if not isinstance(username, str):
+            username = username.get("username") if isinstance(username, dict) else None
         if not username:
             raise HTTPException(status_code=401, detail="Invalid token or unauthorized")
 
@@ -75,6 +88,11 @@ class ProfileService:
     
     @staticmethod
     def get_image_by_username(username: str):
+        if not isinstance(username, str):
+            username = username.get("username") if isinstance(username, dict) else None
+        if not username:
+            raise HTTPException(status_code=401, detail="Invalid token or unauthorized")
+
         user = User(username=username)
         avatar_relative_path = user.get_avatar()
 

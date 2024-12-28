@@ -1,9 +1,19 @@
 from schemas import User
+from fastapi import HTTPException, status
 from .format_response import format_response
 
 class StatisticsService:
     @staticmethod
-    def list_all_users(username: str):
+    def list_all_users(user_data: dict):
+        username = user_data.get("username")
+        role = user_data.get("role")
+
+        if role != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Permission denied: Admin role required"
+            )
+
         user = User(username=username)
         data = user.get_user_statistics()
         if not data:
@@ -20,7 +30,16 @@ class StatisticsService:
         )
 
     @staticmethod
-    def list_all_technicals(username: str):
+    def list_all_technicals(user_data: dict):
+        username = user_data.get("username")
+        role = user_data.get("role")
+
+        if role != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Permission denied: Admin role required"
+            )
+
         user = User(username=username)
         data = user.get_technical_statistics()
         if not data:
