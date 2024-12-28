@@ -1,32 +1,39 @@
-import React, { useEffect, useRef, useState } from 'react';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import 'leaflet-routing-machine';
-import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
-import 'leaflet-control-geocoder/dist/Control.Geocoder.css';
-import 'leaflet-control-geocoder';
-import './map.css';
+import React, { useEffect, useRef, useState } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import "leaflet-routing-machine";
+import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+import "leaflet-control-geocoder/dist/Control.Geocoder.css";
+import "leaflet-control-geocoder";
+import "./map.css"; // Import CSS file
+import dataService from "../../services/data.service";
 
-declare module 'leaflet' {
+declare module "leaflet" {
   namespace Control {
-    class Geocoder {
+    class CustomGeocoder {
       static nominatim(): any;
       geocode(query: string, callback: (results: any[]) => void): void;
     }
   }
 }
 
-
 const Map: React.FC = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMap = useRef<L.Map | null>(null);
   const [isRouteInputVisible, setIsRouteInputVisible] = useState(false);
-  const [searchLocation, setSearchLocation] = useState('');
-  const [startLocation, setStartLocation] = useState('');
-  const [endLocation, setEndLocation] = useState('');
-  const [routingControl, setRoutingControl] = useState<L.Routing.Control | null>(null);
+  const [searchLocation, setSearchLocation] = useState("");
+  const [startLocation, setStartLocation] = useState("");
+  const [endLocation, setEndLocation] = useState("");
+  const [routingControl, setRoutingControl] =
+    useState<L.Routing.Control | null>(null);
   const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [, setRoadsData] = useState<any[]>([]);
+  const [path] = useState<[number, number][]>([]);
+  const [routeInfo, setRouteInfo] = useState<any[]>([]);
+  const [startMarker, setStartMarker] = useState<L.Marker | null>(null);
+  const [endMarker, setEndMarker] = useState<L.Marker | null>(null);
 
+  // Determine marker color based on road level
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -37,7 +44,7 @@ const Map: React.FC = () => {
 
     leafletMap.current = map;
 
-    const key = '9CPtNtP8hRSOoBHJXppf';
+    const key = "9CPtNtP8hRSOoBHJXppf";
     L.tileLayer(
       `https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}`,
       {
@@ -55,9 +62,84 @@ const Map: React.FC = () => {
         const { latitude, longitude } = position.coords;
         const currentLocation = L.latLng(latitude, longitude);
         map.setView(currentLocation, 14);
-        L.marker(currentLocation).addTo(map).bindPopup('Vị trí hiện tại của bạn').openPopup();
+        L.marker(currentLocation)
+          .addTo(map)
+          .bindPopup("Vị trí hiện tại của bạn")
+          .openPopup();
       });
     }
+    const fetchRoadsData = async () => {
+      try {
+        const data = await dataService.getInfoRoads({});
+
+        if (Array.isArray(data)) {
+          if (data.length > 0) {
+            const roads = data.map((item: string) => JSON.parse(item));
+            console.log("Dữ liệu đường:", roads);
+
+            setRoadsData(roads);
+
+            roads.forEach(async (road: any) => {
+              const { latitude, longitude, filepath, level } = road;
+              let markerColor;
+              switch (road.level) {
+                case "Good":
+                  markerColor = "green";
+                  break;
+                case "Poor":
+                  markerColor = "yellow";
+                  break;
+                case "Very poor":
+                  markerColor = "red";
+                  break;
+                case "Satisfactory":
+                  markerColor = "blue";
+                  break;
+                default:
+                  markerColor = "gray";
+              }
+              const customIcon = L.divIcon({
+                className: "",
+                html: `
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="${markerColor}">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 4.25 7 13 7 13s7-8.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+                </svg>
+              `,
+                iconSize: [30, 30],
+                iconAnchor: [15, 30],
+              });
+              const fullImageUrl = `http://192.168.120.26/${filepath}`;
+              try {
+                const marker = L.marker([latitude, longitude], {
+                  icon: customIcon,
+                }).addTo(leafletMap.current!);
+                marker.bindPopup(`
+                  <div>
+                    <p><b>Road status:</b> ${level}</p>
+                    <p><b>Lat:</b> ${latitude}</p>
+                    <p><b>Long:</b> ${longitude}</p>
+                    <img src="${fullImageUrl}" alt="Ảnh đường" style="width: 100px; height: auto;" />
+                  </div>
+                `);
+              } catch (error) {
+                console.error(
+                  `Lỗi khi lấy thông tin tên đường tại tọa độ (${latitude}, ${longitude}):`,
+                  error
+                );
+              }
+            });
+          } else {
+            console.error("Dữ liệu không hợp lệ, mảng rỗng:", data);
+          }
+        } else {
+          console.error("Dữ liệu không phải mảng:", data);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu đường:", error);
+      }
+    };
+
+    fetchRoadsData();
 
     return () => {
       map.remove();
@@ -71,10 +153,13 @@ const Map: React.FC = () => {
         const { center } = results[0];
         if (leafletMap.current) {
           leafletMap.current.setView(center, 14);
-          L.marker(center).addTo(leafletMap.current!).bindPopup(location).openPopup();
+          L.marker(center)
+            .addTo(leafletMap.current!)
+            .bindPopup(location)
+            .openPopup();
         }
       } else {
-        alert('Không tìm thấy vị trí.');
+        alert("Không tìm thấy vị trí.");
       }
     });
   };
@@ -110,23 +195,83 @@ const Map: React.FC = () => {
 
         const endCoords = resultsEnd[0].center;
 
+        startMarker?.remove();
+        endMarker?.remove();
+
+        const start = L.marker([startCoords.lat, startCoords.lng])
+          .addTo(leafletMap.current!)
+          .bindPopup("Start")
+          .openPopup();
+        setStartMarker(start);
+
+        const end = L.marker([endCoords.lat, endCoords.lng])
+          .addTo(leafletMap.current!)
+          .bindPopup("End")
+          .openPopup();
+        setEndMarker(end);
+
+        const router = L.Routing.osrmv1({
+          serviceUrl: "https://router.project-osrm.org/route/v1",
+          profile: "car",
+        });
+
         const newRoutingControl = L.Routing.control({
-          waypoints: [L.latLng(startCoords.lat, startCoords.lng), L.latLng(endCoords.lat, endCoords.lng)],
+          waypoints: [
+            L.latLng(startCoords.lat, startCoords.lng),
+            L.latLng(endCoords.lat, endCoords.lng),
+          ],
+          router: router,
           routeWhileDragging: true,
-        }).addTo(leafletMap.current!);
+          showAlternatives: true,
+          altLineOptions: {
+            extendToWaypoints: true,
+            missingRouteTolerance: 1,
+            styles: [
+              { color: "blue", opacity: 0.7, weight: 5 },
+              { color: "green", opacity: 0.5, weight: 3 },
+            ],
+          },
+        })
+          .on("routesfound", (e) => {
+            const routes = e.routes.map((route: any) => ({
+              summary: route.summary,
+              distance: (route.summary.totalDistance / 1000).toFixed(2),
+              time: (route.summary.totalTime / 60).toFixed(0),
+            }));
+
+            setRouteInfo(routes);
+          })
+          .addTo(leafletMap.current!);
 
         setRoutingControl(newRoutingControl);
       });
     });
   };
 
+  // Cập nhật hàm để hiển thị tuyến đường qua tọa độ
+  useEffect(() => {
+    if (path.length === 0 || !leafletMap.current) return;
+
+    if (routingControl) {
+      routingControl.remove();
+    }
+
+    const waypoints = path.map(([lat, lng]) => L.latLng(lat, lng));
+    const newRoutingControl = L.Routing.control({
+      waypoints: waypoints,
+      routeWhileDragging: true,
+    }).addTo(leafletMap.current!);
+
+    setRoutingControl(newRoutingControl);
+  }, [path]);
+
   return (
-    <div style={styles.container}>
-      <div style={styles.sidebar}>
-        <h2 style={styles.header}>Tìm kiếm địa điểm</h2>
+    <div className="container">
+      <div className="sidebar">
+        <h2>Tìm kiếm địa điểm</h2>
         {!isRouteInputVisible ? (
           <>
-            <div style={styles.inputGroup}>
+            <div className="inputGroup">
               <input
                 type="text"
                 value={searchLocation}
@@ -135,9 +280,9 @@ const Map: React.FC = () => {
                   fetchSuggestions(e.target.value);
                 }}
                 placeholder="Nhập vị trí cần tìm"
-                style={styles.input}
+                className="input"
               />
-              <ul style={styles.suggestions}>
+              <ul className="suggestions">
                 {suggestions.map((suggestion, index) => (
                   <li
                     key={index}
@@ -146,137 +291,89 @@ const Map: React.FC = () => {
                       setSuggestions([]);
                       searchForLocation(suggestion.name);
                     }}
-                    style={styles.suggestionItem}
+                    className="suggestionItem"
                   >
                     {suggestion.name}
                   </li>
                 ))}
               </ul>
-              <button onClick={() => searchForLocation(searchLocation)} style={styles.button}>
+              <button
+                onClick={() => searchForLocation(searchLocation)}
+                className="button"
+              >
                 Tìm kiếm
               </button>
             </div>
-            <button onClick={() => setIsRouteInputVisible(true)} style={styles.secondaryButton}>
-              Nhập điểm bắt đầu/kết thúc
+            <button
+              onClick={() => setIsRouteInputVisible(true)}
+              className="secondaryButton"
+            >
+              Tìm tuyến đường
             </button>
           </>
         ) : (
           <>
-            <div style={styles.inputGroup}>
+            <div className="inputGroup">
               <input
                 type="text"
                 value={startLocation}
                 onChange={(e) => setStartLocation(e.target.value)}
-                placeholder="Điểm bắt đầu"
-                style={styles.input}
+                placeholder="Vị trí bắt đầu"
+                className="input"
               />
+            </div>
+            <div className="inputGroup">
               <input
                 type="text"
                 value={endLocation}
                 onChange={(e) => setEndLocation(e.target.value)}
-                placeholder="Điểm kết thúc"
-                style={styles.input}
+                placeholder="Vị trí kết thúc"
+                className="input"
               />
-              <button onClick={findRoute} style={styles.button}>
-                Tìm đường đi
-              </button>
             </div>
+            <button onClick={findRoute} className="button">
+              Tìm đường
+            </button>
+            {routeInfo.length > 0 && (
+              <div className="route-info">
+                <h3>Thông tin các tuyến đường</h3>
+                <ul>
+                  {routeInfo.map((route, index) => (
+                    <li key={index}>
+                      <p>
+                        <strong>Tuyến {index + 1}:</strong>
+                      </p>
+                      <p>Khoảng cách: {route.distance} km</p>
+                      <p>Thời gian dự kiến: {route.time} phút</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             <button
               onClick={() => {
                 setIsRouteInputVisible(false);
-                setStartLocation('');
-                setEndLocation('');
                 if (routingControl) {
                   routingControl.remove();
                   setRoutingControl(null);
                 }
+                startMarker?.remove();
+                setStartMarker(null);
+                endMarker?.remove();
+                setEndMarker(null);
               }}
-              style={styles.secondaryButton}
+              className="secondaryButton"
             >
-              Quay lại
+              Hủy
             </button>
           </>
         )}
       </div>
-      <div ref={mapRef} style={styles.map} />
+
+      <div ref={mapRef} className="map"></div>
     </div>
   );
 };
 
 export default Map;
-
-
-
-const styles: { [key: string]: React.CSSProperties } = {
-  container: {
-    display: 'flex',
-    height: '100vh',
-  },
-  sidebar: {
-    width: '30%',
-    padding: '20px',
-    background: '#f8f9fa',
-    boxShadow: '2px 0 8px rgba(0,0,0,0.1)',
-    overflowY: 'auto',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '20px',
-  },
-  header: {
-    fontSize: '18px',
-    fontWeight: 'bold',
-    color: '#343a40',
-    marginBottom: '10px',
-    borderBottom: '2px solid #dee2e6',
-    paddingBottom: '5px',
-  },
-  inputGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '10px',
-  },
-  input: {
-    padding: '10px',
-    border: '1px solid #ced4da',
-    borderRadius: '5px',
-    fontSize: '16px',
-  },
-  button: {
-    padding: '10px',
-    background: '#007bff',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    fontSize: '16px',
-    cursor: 'pointer',
-    transition: 'background 0.3s',
-  },
-  secondaryButton: {
-    padding: '10px',
-    background: '#6c757d',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '5px',
-    fontSize: '16px',
-    cursor: 'pointer',
-    transition: 'background 0.3s',
-  },
-  map: {
-    flex: 1,
-  },
-  suggestions: {
-    listStyle: 'none',
-    padding: 0,
-    margin: 0,
-    border: '1px solid #ced4da',
-    borderRadius: '5px',
-    backgroundColor: '#fff',
-    maxHeight: '150px',
-    overflowY: 'auto',
-  },
-  suggestionItem: {
-    padding: '10px',
-    cursor: 'pointer',
-    borderBottom: '1px solid #dee2e6',
-  },
-};

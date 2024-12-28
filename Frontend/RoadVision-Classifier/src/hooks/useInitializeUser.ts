@@ -5,6 +5,7 @@ import { getStoredUserInfo } from "../utils/local-storage.util";
 
 const useInitializeUser = () => {
   const [userInfo, setUserInfo] = useRecoilState(accountState);
+
   useEffect(() => {
     const storedUserInfo = getStoredUserInfo(); //get data from local storage
     if (storedUserInfo && !userInfo.id) {
