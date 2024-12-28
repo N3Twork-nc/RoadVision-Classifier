@@ -1,55 +1,81 @@
 import { useState } from "react";
-import { Dropdown, Menu, Select } from "antd";
+import { Select, DatePicker } from "antd";
 import { countryList } from "./country";
-import { DatePicker } from "antd";
-import { DownOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { useRecoilValue } from "recoil";
+import { profileState } from "../../atoms/profileState";
+import userProfileService from "../../services/userprofile.service";
+import { EditProfileDataType } from "../../defination/types/profile.type";
 
 dayjs.extend(customParseFormat);
 const { Option } = Select;
-const dateFormatList = ["DD/MM/YYYY"];
-
-const defaultCountry = "Select Country";
+const dateFormatList = ["DD-MM-YYYY"];
 
 export default function EditProfile() {
-  const [gender, setGender] = useState("Select gender");
+  const profileData = useRecoilValue(profileState);
 
-  const handleGenderChange = (value: string) => {
-    setGender(value);
-  };
+  const [selectedGender, setSelectedGender] = useState<string>(profileData.gender || "");
+  const [fullname, setFullname] = useState(profileData.fullname || "");
+  const [phonenumber, setPhonenumber] = useState(profileData.phonenumber || "");
+  const [address, setAddress] = useState(profileData.location || "");
+  const [selectedCountry, setSelectedCountry] = useState<string>(profileData.state || "");
+  const [selectedBirthday, setSelectedBirthday] = useState<string>(profileData.birthday || "");
 
-  const [selectedCountry, setSelectedCountry] =
-    useState<string>("Select Country");
-
-  const handleMenuClick = (e: any) => {
-    if (countryList) {
-      const country = countryList.find((item) => item?.key === e.key)?.label;
-      if (country) {
-        setSelectedCountry(country);
-      }
+  const handleGenderChange = (value: string) => setSelectedGender(value);
+  const handleBirthdayChange = (date: dayjs.Dayjs | null) => {
+    if (date) {
+      setSelectedBirthday(date.format("YYYY-DD-MM"));
+    } else {
+      setSelectedBirthday(""); 
     }
   };
-  const menu = <Menu onClick={handleMenuClick} items={countryList} />;
+  const handleCountryChange = (value: string) => setSelectedCountry(value);
+  const handleSave = async () => {
+    try {
+      const phoneNumberAsString = String(phonenumber);
+
+      const updatedProfileData: EditProfileDataType = {
+        username: "",
+        fullname: fullname,
+        birthday: selectedBirthday,
+        gender: selectedGender,
+        phonenumber: phoneNumberAsString,
+        location: address,
+        state: selectedCountry,
+      };
+      
+      const response = await userProfileService.editProfile(updatedProfileData);
+
+      if (response.status.toString() === "Success") {
+        alert("Profile updated successfully!");
+      } else {
+        alert("An error occurred while updating your profile.");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center w-full h-72 text-center py-5 gap-10">
-      <div className="flex flex-rol px-5 justify-between items-center w-[95%] gap-2">
-        {/* Name */}
+      <div className="flex flex-row px-5 justify-between items-center w-[95%] gap-2">
+
         <div className="w-[30%]">
           <div className="text-left font-normal font-sm text-gray-700 text-sm">
-            Name
+            Full Name
           </div>
           <div className="flex items-center space-x-4 mt-1 px-2 py-2 bg-white border rounded-md">
             <input
               type="text"
-              placeholder="Nguyễn Trà Bảo Ngân"
+              value={fullname}
+              onChange={(e) => setFullname(e.target.value)}
               className="flex-1 bg-white text-base outline-none"
+              placeholder={profileData.fullname || "Enter full name"}
             />
           </div>
         </div>
 
-        {/* Phone Number */}
         <div className="w-[30%]">
           <div className="text-left font-normal font-sm text-gray-700 text-sm">
             Phone number
@@ -57,36 +83,41 @@ export default function EditProfile() {
           <div className="flex items-center space-x-4 mt-1 px-2 py-2 bg-white border rounded-md">
             <input
               type="text"
-              placeholder="+84 123456789"
+              value={phonenumber}
+              onChange={(e) => setPhonenumber(e.target.value)}
               className="flex-1 bg-white text-base outline-none"
+              placeholder={profileData.phonenumber || "Enter phone number"}
             />
           </div>
         </div>
 
-        {/* Date of Birth */}
         <div className="w-[30%]">
           <div className="text-left font-normal font-sm text-gray-700 text-sm">
             Date of birth
           </div>
           <DatePicker
-            className="w-full py-2 mt-1 text-base"
-            defaultValue={dayjs("01/01/2015", dateFormatList[0])}
-            format={dateFormatList}
+            className="w-full py-2 mt-1 text-xl font-semibold"
+            value={
+              selectedBirthday ? dayjs(selectedBirthday, "YYYY-MM-DD") : null
+            } 
+            format={dateFormatList[0]}
+            placeholder="Select your date of birth"
+            onChange={handleBirthdayChange} 
           />
         </div>
       </div>
 
-      <div className="flex flex-rol px-5 justify-between items-center w-[95%] gap-2">
-        {/* Gender */}
+      <div className="flex flex-row px-5 justify-between items-center w-[95%] gap-2">
+        
         <div className="w-[30%]">
           <div className="text-left font-normal font-sm text-gray-700 text-sm">
             Gender
           </div>
           <Select
-            value={gender}
+            value={selectedGender || "Select gender"} 
             onChange={handleGenderChange}
             className={`w-full text-left text-base mt-1 h-10 font-base ${
-              gender === "Select gender" ? "text-gray-400" : "text-black"
+              selectedGender === "Select gender" ? "text-gray-400" : "text-gray"
             }`}
           >
             <Option value="Male">Male</Option>
@@ -95,7 +126,6 @@ export default function EditProfile() {
           </Select>
         </div>
 
-        {/* Address */}
         <div className="w-[30%]">
           <div className="text-left font-normal font-sm text-gray-700 text-sm">
             Address
@@ -103,8 +133,10 @@ export default function EditProfile() {
           <div className="flex items-center space-x-4 mt-1 px-2 py-2 bg-white border rounded-md">
             <input
               type="text"
-              placeholder="An Binh, Di An, Binh Duong"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
               className="flex-1 bg-white text-base outline-none"
+              placeholder={profileData.location || "Enter your address"}
             />
           </div>
         </div>
@@ -113,23 +145,25 @@ export default function EditProfile() {
           <div className="text-left font-normal font-sm text-gray-700 text-sm">
             Country
           </div>
-          <Dropdown overlay={menu} trigger={["click"]}>
-            <button
-              className={`w-full bg-white border rounded-md px-3 py-2 mt-1 text-left flex justify-between items-center ${
-                selectedCountry === defaultCountry
-                  ? "text-gray-400"
-                  : "text-black"
-              }`}
-            >
-              {selectedCountry} <DownOutlined />
-            </button>
-          </Dropdown>
+          <Select
+            value={selectedCountry} 
+            onChange={handleCountryChange}
+            className={`w-full text-left text-base mt-1 h-10 font-base`}
+          >
+            {countryList.map((country) => (
+              <Option key={country.key} value={country.label}>
+                {country.label}
+              </Option>
+            ))}
+          </Select>
         </div>
       </div>
 
-      {/* Delete Account Button */}
       <div>
-        <button className="w-fit bg-[#3749A6] text-white font-semibold mt-2 p-2 px-5 rounded-full hover:ring-4 hover:ring-blue-300">
+        <button
+          onClick={handleSave} 
+          className="w-fit bg-[#3749A6] text-white font-semibold mt-2 p-2 px-5 rounded-full hover:ring-4 hover:ring-blue-300"
+        >
           Save Information
         </button>
       </div>

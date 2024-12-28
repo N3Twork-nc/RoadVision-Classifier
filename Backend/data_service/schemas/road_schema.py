@@ -3,6 +3,8 @@ from Database import Postgresql
 from datetime import datetime
 import time
 import os
+from PIL import Image
+from io import BytesIO
 current_file_path = os.path.abspath(__file__)
 
 
@@ -16,7 +18,9 @@ class RoadSchema(BaseModel):
     longitude: float = Field(None, description="Longitude of the location")
     level: str = Field(None, description="Level of road")
     created_at: datetime = Field(None, description="Created at")
-
+    ward_id: int = Field(None, description="District id")
+    location: str = Field("unknow", description="Location")
+    location_part: list = Field([], description="Address raw")
     
     @root_validator(pre=True)
     def resolve_user_id(cls, values):
@@ -28,12 +32,20 @@ class RoadSchema(BaseModel):
                 values['user_id'] = result[0]
             else:
                 raise ValueError(f"Username '{username}' không tồn tại trong cơ sở dữ liệu.")
+        if values.get('file'):
+            image = Image.open(BytesIO(values['file']))
+            resized_image = image.resize((512,512), Image.LANCZOS)
+            output_buffer = BytesIO()
+            resized_image.save(output_buffer, format=image.format) 
+            values["file"] = output_buffer.getvalue()
         return values
 
     def insertRoad(self):
         db = Postgresql()
         file_path = f"roadImages/{self.user_id}_{time.time()}.jpg"
-        id=db.execute(f"INSERT INTO road (user_id,image_path,latitude,longitude,level) VALUES ({self.user_id},'{file_path}',{self.latitude},{self.longitude},'classifing') RETURNING id")
+        if self.location !=None:
+            self.ward_id=db.execute(f"SELECT w.id FROM ward w JOIN district d on w.district_id=d.id JOIN province p on d.province_id=p.id WHERE w.name ilike'%{self.location_part[0]}%' and d.name ilike'%{self.location_part[1]}%' and p.name ilike'%{self.location_part[2]}%'")[0]
+        id=db.execute(f"INSERT INTO road (user_id,image_path,latitude,longitude,level,ward_id,location) VALUES ({self.user_id},'{file_path}',{self.latitude},{self.longitude},'classifing',{self.ward_id},'{self.location}') RETURNING id")
         db.commit()
         db.close()
         with open(file_path , "wb") as f:

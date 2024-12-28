@@ -23,8 +23,8 @@ class Account(BaseModel):
 
     def getInfoAccount(self) -> dict:
         db = Postgresql()
-        info = db.select('account', 'id, email, username', f"username = '{self.username}'")
-        return {"id": info[0], "email": info[1], "username": info[2]} if info else {}
+        info = db.execute(f"select c.id, c.email, c.username, p.name from account c JOIN role r on c.id=r.user_id JOIN permission p on p.id=r.permission_id where c.username='{self.username}'")
+        return {"id": info[0], "email": info[1], "username": info[2], "role":info[3]} if info else {}
 
     def insertAccount(self, OTP: str):
         db = Postgresql()
@@ -80,12 +80,13 @@ class Account(BaseModel):
     def authorization(token: str):
         db = Postgresql()
         result = db.select('account', 'username', f"token = '{token}'")
-    def checkRole(self, role: str):
-        sql=f"SELECT permission.name FROM account INNER JOIN role ON account.id = role.user_id INNER JOIN permission ON role.permission_id = permission.id WHERE username = '{self.username}'"
+
+
+    def getRole(self):
+        sql=f"SELECT permission.name FROM account JOIN role ON account.id = role.user_id JOIN permission ON role.permission_id = permission.id WHERE username = '{self.username}'"
         db = Postgresql()
         result = db.execute(sql)
-        
-        return result[0] == role
+        return result[0]
 
 class ChangePassword(BaseModel):
     current_password: str
