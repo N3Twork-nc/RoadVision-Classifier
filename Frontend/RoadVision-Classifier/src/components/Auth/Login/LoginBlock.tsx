@@ -22,7 +22,7 @@ type SignInData = z.infer<typeof signInSchema>;
 // Main SignInBlock component
 const SignInBlock = () => {
   // Custom navigation hooks
-  const { navigateForgotPassword, navigateHome, navigateToSignUp, navigateToDashboard } =
+  const { navigateForgotPassword, navigateHome, navigateToSignUp, navigateToDashboard, navigateToDashboardTechnician } =
     useNavigateTo();
 
   // State for form input data
@@ -68,10 +68,14 @@ const SignInBlock = () => {
           setStoredUserInfo(info); // Save user info to local storage
           setAccountState(info); // Update Recoil user state
           // Navigate to the home page after successful login
+          console.log(data.info.role);
           if (data.info.role === "user") {
           navigateHome();}
           else if (data.info.role === "admin") {
             navigateToDashboard();
+          }
+          else if (data.info.role === "technical") {
+            navigateToDashboardTechnician();
           }
       }
     } catch (err) {

@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { removeStoredAdminInfo, removeStoredUserInfo } from "./local-storage.util";
+import { removeStoredAdminInfo, removeStoredTechnicianInfo, removeStoredUserInfo } from "./local-storage.util";
 import { PageEnum } from "../defination/enums/page.enum";
 import { CookieKeyEnum } from "../defination/enums/key.enum";
 
@@ -23,6 +23,7 @@ export const handleLogOut = () => {
   removeAccessToken();
   removeStoredUserInfo();
   removeStoredAdminInfo();
+  removeStoredTechnicianInfo();
   window.location.href = PageEnum.LOGIN;
 
 };

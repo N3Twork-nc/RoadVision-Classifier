@@ -1,8 +1,8 @@
 // useNavigateTo.ts use for define page navigate path
 import { useNavigate, NavigateOptions } from "react-router-dom";
-import { AdminPageEnum, PageEnum } from "../defination/enums/page.enum";
+import { AdminPageEnum, PageEnum, TechnicianPageEnum } from "../defination/enums/page.enum";
 
-type PageType = PageEnum | AdminPageEnum;
+type PageType = PageEnum | AdminPageEnum | TechnicianPageEnum;
 
 const useNavigateTo = () => {
   const navigate = useNavigate();
@@ -42,6 +42,14 @@ const useNavigateTo = () => {
   const navigateToTechnician = () => {
     navigateTo(AdminPageEnum.TECHNICIAN_MANAGEMENT, { replace: true });
   }
+//---------- TECHNICIAN ------------
+const navigateToDashboardTechnician = () => {
+  navigateTo(TechnicianPageEnum.DASHBOARD, { replace: true });
+}
+const navigateToTaskManagement = () => {
+  navigateTo(TechnicianPageEnum.TASK_MANAGEMENT, { replace: true });
+}
+
   return {
     navigateTo,
     navigateToSignUp,
@@ -53,6 +61,8 @@ const useNavigateTo = () => {
     navigateToDashboard,
     navigateToUser,
     navigateToTechnician,
+    navigateToDashboardTechnician,
+    navigateToTaskManagement
   };
 };
 

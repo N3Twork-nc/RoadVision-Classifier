@@ -17,7 +17,6 @@ export type ProfileDataType = {
 };
 
 export type EditProfileDataType = {
-  avatar: string;
   username: string;
   fullname: string;
   phonenumber: string;
@@ -25,6 +24,9 @@ export type EditProfileDataType = {
   gender: string;
   location: string;
   state: string;
+}
+export type UploadAvatarType = {  
+  file: File;
 }
 
 export type ChangePasswordDataType = {

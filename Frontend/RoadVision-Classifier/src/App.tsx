@@ -10,7 +10,7 @@ import PublicMap from "./pages/User/PublicMap/PublicMap";
 import MapManagement from "./pages/User/MapManagement/MapManagement";
 import MyLibrary from "./pages/User/MyLibrary/MyLibrary";
 import Profile from "./pages/User/Profile/Profile";
-import { PageEnum, AdminPageEnum } from "./defination/enums/page.enum";
+import { PageEnum, AdminPageEnum, TechnicianPageEnum } from "./defination/enums/page.enum";
 import PrivateRoute from "./components/Common/PrivateRoute";
 import AuthLogin from "./pages/User/Auth/AuthLogin";
 import AuthSignUp from "./pages/User/Auth/AuthSignUp";
@@ -20,8 +20,8 @@ import NotFound from "./pages/NotFound/NotFound";
 import Dashboard from "./pages/Admin/Dashboard/Dashboard";
 import UsersManagement from "./pages/Admin/Users/UsersManagement";
 import TechniciansManagement from "./pages/Admin/Technicians/TechniciansManagement";
-
-
+import DashboardTechnician from "./pages/Technician/Dashboard/Dashboard";
+import TaskManagement from "./pages/Technician/TaskManagement/TaskManagement";
 const App: React.FC = () => {
   return (
     <Router>
@@ -38,7 +38,7 @@ const App: React.FC = () => {
         <Route path={PageEnum.PUBLIC_MAP} element={<PublicMap />} />
         <Route path={PageEnum.NOT_FOUND} element={<NotFound />} />
 
-        USER ROUTES
+       {/* USER ROUTES */}
         <Route
           path={PageEnum.PROFILE}
           element={
@@ -86,6 +86,24 @@ const App: React.FC = () => {
           element={
             <PrivateRoute allowedRoles={["admin"]}>
               <TechniciansManagement />
+            </PrivateRoute>
+          }
+        />
+
+        {/* TECHNICIAN ROUTE */}
+        <Route
+          path={TechnicianPageEnum.DASHBOARD}
+          element={
+            <PrivateRoute allowedRoles={["technical"]}>
+              <DashboardTechnician />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path={TechnicianPageEnum.TASK_MANAGEMENT}
+          element={
+            <PrivateRoute allowedRoles={["technical"]}>
+              <TaskManagement />
             </PrivateRoute>
           }
         />

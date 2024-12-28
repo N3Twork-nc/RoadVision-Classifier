@@ -8,7 +8,7 @@ export type LoginFormDataType = {
 export type LoginDataType = {
   info: UserType;
   token: string;
-  role: "user" | "admin" | "technician";
+  role: "user" | "admin" | "technical";
 };
 export type VerifyFormDataType = Partial<{
   username: string;

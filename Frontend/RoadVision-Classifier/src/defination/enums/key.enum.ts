@@ -3,7 +3,7 @@
 export enum LocalStorageKeyEnum {
   USER = "user",
   ADMIN = "admin",
-  TECHNICIAN = "technician",
+  TECHNICIAN = "technical",
 }
 export enum CookieKeyEnum {
   ACCESS_TOKEN = "access_token",
