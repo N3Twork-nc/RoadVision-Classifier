@@ -28,7 +28,7 @@ const MapPrivate: React.FC = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [latitude, setLatitude] = useState<number>(12.333);
   const [longitude, setLongitude] = useState<number>(45.87);
-  const [roadsData, setRoadsData] = useState<any[]>([]);
+  const [, setRoadsData] = useState<any[]>([]);
   const markersRef = useRef<L.Marker[]>([]);
   // const [currentMarkerdClick, setCurrentMarkerdClick] = useState<LatLng>();
 
@@ -61,21 +61,21 @@ const MapPrivate: React.FC = () => {
     let markerColor;
     switch (road.level) {
       case "Good":
-        markerColor = "green"; 
+        markerColor = "green";
         break;
       case "Poor":
-        markerColor = "yellow"; 
+        markerColor = "yellow";
         break;
       case "Very poor":
-        markerColor = "red"; 
+        markerColor = "red";
         break;
       case "Satisfactory":
-        markerColor = "blue"; 
+        markerColor = "blue";
         break;
       default:
-        markerColor = "gray"; 
+        markerColor = "gray";
     }
-  
+
     const customIcon = L.divIcon({
       className: "",
       html: `
@@ -83,13 +83,15 @@ const MapPrivate: React.FC = () => {
           <path d="M12 2C8.13 2 5 5.13 5 9c0 4.25 7 13 7 13s7-8.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
         </svg>
       `,
-      iconSize: [40, 40], 
-      iconAnchor: [15, 30], 
+      iconSize: [40, 40],
+      iconAnchor: [15, 30],
     });
-    
-    const marker = L.marker([lat, lng], { icon: customIcon }).addTo(leafletMap.current!);
+
+    const marker = L.marker([lat, lng], { icon: customIcon }).addTo(
+      leafletMap.current!
+    );
     markersRef.current.push(marker);
-  
+
     const image_url = generateImageDomain(road.filepath);
     marker.bindPopup(`
       <div>
@@ -99,7 +101,7 @@ const MapPrivate: React.FC = () => {
         <img src=${image_url} alt="Road image" style="width: 100px; height: auto;" />
       </div>
     `);
-  
+
     marker.on("click", (event) => {
       setImageData(road);
       const { lat, lng } = event.latlng;
@@ -107,7 +109,6 @@ const MapPrivate: React.FC = () => {
       marker.openPopup();
     });
   };
-  
 
   const handleTakePhoto = async () => {
     if (canvasRef.current && videoRef.current) {
@@ -145,10 +146,9 @@ const MapPrivate: React.FC = () => {
               formData.append("file", file);
               formData.append("latitude", currentLatitude.toString());
               formData.append("longitude", currentLongitude.toString());
-
               try {
                 // Call api upload road image
-                const data = await dataService.uploadRoad(
+                await dataService.uploadRoad(
                   formData as unknown as UploadImgFormDataType
                 );
                 closeUploadModal();
@@ -200,7 +200,7 @@ const MapPrivate: React.FC = () => {
 
               try {
                 // Call api upload road image
-                const data = await dataService.uploadRoad(
+                await dataService.uploadRoad(
                   formData as unknown as UploadImgFormDataType
                 );
                 closeUploadModal();
@@ -264,7 +264,7 @@ const MapPrivate: React.FC = () => {
   const handleCloseCamera = () => {
     if (videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
-      
+
       stream.getTracks().forEach((track) => {
         track.stop();
       });
@@ -272,13 +272,12 @@ const MapPrivate: React.FC = () => {
       setIsCameraActive(false);
     }
   };
-  
+
   useEffect(() => {
     return () => {
       handleCloseCamera();
     };
   }, []);
-  
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -325,7 +324,7 @@ const MapPrivate: React.FC = () => {
             setRoadsData(roads);
 
             roads.forEach(async (road: any) => {
-              const { latitude, longitude, filepath, level, roadname } = road;
+              const { latitude, longitude } = road;
 
               handleAddMarker(latitude, longitude, road);
             });
@@ -403,12 +402,35 @@ const MapPrivate: React.FC = () => {
                 </button>
               </div>
             </div>
-            <p>Status: {imageData.level}</p>
-            <p>Address: {imageData.address}</p>
             <p>
-              Location: {imageData.latitude}, {imageData.longitude}
+              {" "}
+              <strong>Status: </strong> {imageData.level}
             </p>
-            <p>Time: {imageData.created_at}</p>
+            <p>
+              {" "}
+              <strong>Address: </strong>
+              {imageData.location}
+            </p>
+            <p>
+              <strong>Location: </strong> <br />{" "}
+              <li>
+                Lat: {imageData.latitude}<br />
+              </li>
+              <li>
+                Long: {imageData.longitude}{" "}
+              </li>
+            </p>
+            <p>
+              <strong>Time: </strong>
+              {new Date(imageData.created_at).toLocaleString("vi-VN", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })}
+            </p>
             {/* <p>Road ID: {imageData.id}</p> */}
           </div>
         )}

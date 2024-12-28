@@ -10,7 +10,7 @@ import dataService from "../../services/data.service";
 
 declare module "leaflet" {
   namespace Control {
-    class Geocoder {
+    class CustomGeocoder {
       static nominatim(): any;
       geocode(query: string, callback: (results: any[]) => void): void;
     }
@@ -27,9 +27,11 @@ const Map: React.FC = () => {
   const [routingControl, setRoutingControl] =
     useState<L.Routing.Control | null>(null);
   const [suggestions, setSuggestions] = useState<any[]>([]);
-  const [roadsData, setRoadsData] = useState<any[]>([]);
-  const [coordinates, setCoordinates] = useState<string>("");
-  const [path, setPath] = useState<[number, number][]>([]);
+  const [, setRoadsData] = useState<any[]>([]);
+  const [path] = useState<[number, number][]>([]);
+  const [routeInfo, setRouteInfo] = useState<any[]>([]);
+  const [startMarker, setStartMarker] = useState<L.Marker | null>(null);
+  const [endMarker, setEndMarker] = useState<L.Marker | null>(null);
 
   // Determine marker color based on road level
   useEffect(() => {
@@ -193,20 +195,59 @@ const Map: React.FC = () => {
 
         const endCoords = resultsEnd[0].center;
 
+        startMarker?.remove();
+        endMarker?.remove();
+
+        const start = L.marker([startCoords.lat, startCoords.lng])
+          .addTo(leafletMap.current!)
+          .bindPopup("Start")
+          .openPopup();
+        setStartMarker(start);
+
+        const end = L.marker([endCoords.lat, endCoords.lng])
+          .addTo(leafletMap.current!)
+          .bindPopup("End")
+          .openPopup();
+        setEndMarker(end);
+
+        const router = L.Routing.osrmv1({
+          serviceUrl: "https://router.project-osrm.org/route/v1",
+          profile: "car",
+        });
+
         const newRoutingControl = L.Routing.control({
           waypoints: [
             L.latLng(startCoords.lat, startCoords.lng),
             L.latLng(endCoords.lat, endCoords.lng),
           ],
+          router: router,
           routeWhileDragging: true,
-        }).addTo(leafletMap.current!);
+          showAlternatives: true,
+          altLineOptions: {
+            extendToWaypoints: true,
+            missingRouteTolerance: 1,
+            styles: [
+              { color: "blue", opacity: 0.7, weight: 5 },
+              { color: "green", opacity: 0.5, weight: 3 },
+            ],
+          },
+        })
+          .on("routesfound", (e) => {
+            const routes = e.routes.map((route: any) => ({
+              summary: route.summary,
+              distance: (route.summary.totalDistance / 1000).toFixed(2),
+              time: (route.summary.totalTime / 60).toFixed(0),
+            }));
+
+            setRouteInfo(routes);
+          })
+          .addTo(leafletMap.current!);
 
         setRoutingControl(newRoutingControl);
       });
     });
   };
-  // Cập nhật hàm để hiển thị tuyến đường qua tọa độ
-  // Cập nhật hàm để hiển thị tuyến đường qua tọa độ
+
   // Cập nhật hàm để hiển thị tuyến đường qua tọa độ
   useEffect(() => {
     if (path.length === 0 || !leafletMap.current) return;
@@ -223,47 +264,6 @@ const Map: React.FC = () => {
 
     setRoutingControl(newRoutingControl);
   }, [path]);
-
-  // Hàm cập nhật mảng tọa độ
-  const updatePath = () => {
-    try {
-      const parsedCoordinates = JSON.parse(coordinates); // Parse dữ liệu từ textarea
-      if (
-        typeof parsedCoordinates === "object" &&
-        Object.values(parsedCoordinates).every(
-          (route) =>
-            Array.isArray(route) &&
-            route.every((point) => Array.isArray(point) && point.length === 2)
-        )
-      ) {
-        // Xóa các route cũ nếu đã tồn tại
-        if (routingControl) {
-          routingControl.remove();
-        }
-
-        // Lặp qua từng route để tạo đường đi
-        Object.values(parsedCoordinates).forEach(
-          (route: [number, number][]) => {
-            const waypoints = route.map(([lat, lng]) => L.latLng(lat, lng));
-
-            const newRoutingControl = L.Routing.control({
-              waypoints: waypoints,
-              routeWhileDragging: true,
-            }).addTo(leafletMap.current!);
-
-            // Lưu trạng thái routing control (nếu cần sau này)
-            setRoutingControl(newRoutingControl);
-          }
-        );
-      } else {
-        alert(
-          "Dữ liệu không hợp lệ. Đảm bảo object chứa danh sách các mảng tọa độ [latitude, longitude]."
-        );
-      }
-    } catch (error) {
-      alert("Lỗi khi phân tích JSON. Vui lòng nhập đúng định dạng.");
-    }
-  };
 
   return (
     <div className="container">
@@ -334,26 +334,41 @@ const Map: React.FC = () => {
             <button onClick={findRoute} className="button">
               Tìm đường
             </button>
+            {routeInfo.length > 0 && (
+              <div className="route-info">
+                <h3>Thông tin các tuyến đường</h3>
+                <ul>
+                  {routeInfo.map((route, index) => (
+                    <li key={index}>
+                      <p>
+                        <strong>Tuyến {index + 1}:</strong>
+                      </p>
+                      <p>Khoảng cách: {route.distance} km</p>
+                      <p>Thời gian dự kiến: {route.time} phút</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             <button
-              onClick={() => setIsRouteInputVisible(false)}
+              onClick={() => {
+                setIsRouteInputVisible(false);
+                if (routingControl) {
+                  routingControl.remove();
+                  setRoutingControl(null);
+                }
+                startMarker?.remove();
+                setStartMarker(null);
+                endMarker?.remove();
+                setEndMarker(null);
+              }}
               className="secondaryButton"
             >
               Hủy
             </button>
           </>
         )}
-      </div>
-      <div className="inputGroup">
-        <textarea
-          value={coordinates}
-          onChange={(e) => setCoordinates(e.target.value)}
-          placeholder="Nhập dữ liệu route dạng: {0: [[10.850314, 106.792049], [10.850252, 106.791877]], 1: [[10.848641, 106.791873], [10.848641, 106.791873]]}"
-          className="textarea"
-        ></textarea>
-
-        <button onClick={updatePath} className="button">
-          Vẽ đường đi
-        </button>
       </div>
 
       <div ref={mapRef} className="map"></div>
