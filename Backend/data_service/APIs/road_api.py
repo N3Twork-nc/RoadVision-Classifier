@@ -41,4 +41,5 @@ def get_roads(user_id: int=None, id_road: int=None):
     except Exception as e:
         print(current_file_path, e)
         return JSONResponse(content={"status": "error", "message": "Internal server error"}, status_code=500)
-    
+
+# @app.get("/api/getInfoRoad")

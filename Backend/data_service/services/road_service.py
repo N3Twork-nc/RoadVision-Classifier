@@ -2,18 +2,15 @@ from schemas import RoadSchema
 from kafka import KafkaProducer
 import json
 import base64
-from fastapi import Depends
 from fastapi.responses import JSONResponse
 from Database import Postgresql
 import os
 from .routemap_service import RouteMap
-from geopy.geocoders import Nominatim,Photon
-from geopy.exc import GeocoderTimedOut
+from geopy.geocoders import Nominatim
 import threading
 import random
 
 # Hàm lấy thông tin quận/huyện từ tọa độ
-
 def get_location(lat, lon):
     try:
         geolocator = Nominatim(user_agent='n3twork@gmail.com')
@@ -29,19 +26,7 @@ def get_location(lat, lon):
         else:
             return None, []
     except Exception as e:
-        print("GeocoderTimedOut: Trying with Photon")
-        geolocator = Photon(user_agent="myGeocoder")
-        location = geolocator.reverse((lat, lon), language="vi")
-        print(location)
-        if location:
-            location = location.raw.get('display_name')
-            location_part = location.split(', ')
-            province = location_part[-3]
-            district = location_part[-4]
-            ward = location_part[-5]
-            location=", ".join(location_part[:-2])
-            return location,[ward, district, province]
-        else:
+            print(e)
             return None, []
 
 current_file_path = os.path.abspath(__file__)
@@ -78,7 +63,6 @@ class RoadService:
         try:
             db=Postgresql()
             roads=db.execute(f"SELECT id, user_id,latitude,longitude,level,image_path,created_at,location FROM road where ({not id_road} or id={id_road if id_road else -1}) and ({not user_id} or user_id='{user_id if user_id else -1}')",fetch='all')
-            print(roads)
             road_schemas = [
                 RoadSchema(
                     id=id,
