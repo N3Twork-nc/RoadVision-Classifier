@@ -18,8 +18,9 @@ class RoadSchema(BaseModel):
     longitude: float = Field(None, description="Longitude of the location")
     level: str = Field(None, description="Level of road")
     created_at: datetime = Field(None, description="Created at")
-    district_id: int = Field(None, description="District id")
+    ward_id: int = Field(None, description="District id")
     location: str = Field("unknow", description="Location")
+    location_part: list = Field([], description="Address raw")
     
     @root_validator(pre=True)
     def resolve_user_id(cls, values):
@@ -42,7 +43,9 @@ class RoadSchema(BaseModel):
     def insertRoad(self):
         db = Postgresql()
         file_path = f"roadImages/{self.user_id}_{time.time()}.jpg"
-        id=db.execute(f"INSERT INTO road (user_id,image_path,latitude,longitude,level,district_id) VALUES ({self.user_id},'{file_path}',{self.latitude},{self.longitude},'classifing',{self.district_id}) RETURNING id")
+        if self.location !=None:
+            self.ward_id=db.execute(f"SELECT w.id FROM ward w JOIN district d on w.district_id=d.id JOIN province p on d.province_id=p.id WHERE w.name ilike'%{self.location_part[0]}%' and d.name ilike'%{self.location_part[1]}%' and p.name ilike'%{self.location_part[2]}%'")[0]
+        id=db.execute(f"INSERT INTO road (user_id,image_path,latitude,longitude,level,ward_id,location) VALUES ({self.user_id},'{file_path}',{self.latitude},{self.longitude},'classifing',{self.ward_id},'{self.location}') RETURNING id")
         db.commit()
         db.close()
         with open(file_path , "wb") as f:
