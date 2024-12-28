@@ -83,7 +83,16 @@ pipeline {
             when {
                 expression { return  env.DATA_SERVICE_CHANGED == 'true' || params.RUN_STAGE == 'Data'}
             }
-            steps {                
+            steps {    
+                withCredentials([usernamePassword(credentialsId: 'MONGODB_USER', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    script {
+                       env.MONGODB_USER=USERNAME
+                       env.MONGODB_PASSWORD=PASSWORD
+                       env.MONGODB_DB='roadvision_classifier'
+                       env.MONGODB_PORT='27017'
+                       env.MONGODB_HOST='mongodb'
+                    }
+                }            
                 // Build and push the Docker image
                 dir('Backend/data_service') {
                     sh 'docker build -t caothi/data_service:latest .'

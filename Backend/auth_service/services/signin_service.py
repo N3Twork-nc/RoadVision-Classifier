@@ -30,27 +30,13 @@ def signin_service(account: Account):
             status_code=500
         )
 def authorization_service(username: str):
-    # if role is None:
+    role=Account(username=username).getRole()
     response={
         "status":"Success",
         "message":"Token is valid",
         "data":{
-            "username":username
+            "username":username,
+            "role":role
         }
     }
     return response
-    # else:
-    #     account = Account(username=username)
-    #     if account.checkRole(role):
-    #         return format_response(
-    #             status="Success",
-    #             data={"username": username, "role": role},
-    #             message="Authorization success",
-    #             status_code=200
-    #         )
-    #     else:
-    #         return format_response(
-    #             status="Failed",
-    #             message=f"User have not {role} role",
-    #             status_code=403
-    #        )
