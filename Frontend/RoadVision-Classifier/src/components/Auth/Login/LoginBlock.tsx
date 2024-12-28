@@ -3,7 +3,7 @@ import gg from "../../../assets/img/gg.png";
 import { z } from "zod";
 import { useState } from "react";
 import { useRecoilState } from "recoil";
-import { userState } from "../../../atoms/authState";
+import { accountState } from "../../../atoms/authState";
 import authService from "../../../services/auth.service";
 import useNavigateTo from "../../../hooks/useNavigateTo";
 import { setStoredUserInfo } from "../../../utils/local-storage.util";
@@ -22,7 +22,7 @@ type SignInData = z.infer<typeof signInSchema>;
 // Main SignInBlock component
 const SignInBlock = () => {
   // Custom navigation hooks
-  const { navigateForgotPassword, navigateHome, navigateToSignUp } =
+  const { navigateForgotPassword, navigateHome, navigateToSignUp, navigateToDashboard, navigateToDashboardTechnician } =
     useNavigateTo();
 
   // State for form input data
@@ -35,25 +35,24 @@ const SignInBlock = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Recoil state for user information
-  const [, setUserState] = useRecoilState(userState);
-
+  const [, setAccountState] = useRecoilState(accountState);
   // Handle input field changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target; // Extract field name and value
     setFormData((prev) => ({
-      ...prev, 
-      [name]: value, 
+      ...prev,
+      [name]: value,
     }));
   };
 
   // Handle sign-in button click
   const handleSignInClick = async () => {
-    setError(null); 
+    setError(null);
 
     // Validate input data using zod schema
     const parseResult = signInSchema.safeParse(formData);
     if (!parseResult.success) {
-      const errorMessage = parseResult.error.errors[0].message; 
+      const errorMessage = parseResult.error.errors[0].message;
       setError(errorMessage);
       return;
     }
@@ -65,12 +64,19 @@ const SignInBlock = () => {
       const { info, token } = data; // Extract user info and token from response
 
       if (info && token) {
-        saveAccessToken(token); // Save token for future API calls
-        setStoredUserInfo(info); // Save user info to local storage
-        setUserState(info); // Update Recoil user state
-
-        // Navigate to the home page after successful login
-        navigateHome();
+          saveAccessToken(token); // Save token for future API calls
+          setStoredUserInfo(info); // Save user info to local storage
+          setAccountState(info); // Update Recoil user state
+          // Navigate to the home page after successful login
+          console.log(data.info.role);
+          if (data.info.role === "user") {
+          navigateHome();}
+          else if (data.info.role === "admin") {
+            navigateToDashboard();
+          }
+          else if (data.info.role === "technical") {
+            navigateToDashboardTechnician();
+          }
       }
     } catch (err) {
       console.error(err);

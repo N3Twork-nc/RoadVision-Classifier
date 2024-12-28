@@ -1,17 +1,19 @@
 import { useState } from "react";
 import AppLayout from "../../../components/Common/AppLayout";
-import avatar from "../../../assets/img/ntbn.jpg";
+import defaultAvatar from "../../../assets/img/defaultAvatar.png";
 import mask from "../../../assets/img/mask.png";
 import Account from "../../../components/Profile/Account";
 import EditProfile from "../../../components/Profile/EditProfile";
 import History from "../../../components/Profile/History";
 import ChangePassword from "../../../components/Profile/ChangePassword";
 import { useRecoilValue } from "recoil";
-import { userState } from "../../../atoms/authState";
+import { accountState } from "../../../atoms/authState";
 
 export default function Profile() {
-  const userRecoilStateValue = useRecoilValue(userState);
-  const [activeTab, setActiveTab] = useState(0); // Current tabs
+  const userRecoilStateValue = useRecoilValue(accountState);
+  const [activeTab, setActiveTab] = useState(0);
+
+
 
   // All Tabs
   const tabs = [
@@ -30,15 +32,18 @@ export default function Profile() {
             src={mask}
             className="absolute top-0 left-0 w-full h-full object-cover rounded-2xl"
           />
-          <div className="absolute bg-white rounded-full top-[40%] w-36 h-36 flex justify-center items-center">
+          <div
+            className="absolute bg-white rounded-full top-[40%] w-36 h-36 flex justify-center items-center"
+          >
             <img
-              src={avatar}
+              src={userRecoilStateValue.avatar || defaultAvatar}
               alt="Avatar"
               className="w-[95%] h-[95%] object-cover rounded-full"
             />
           </div>
         </div>
 
+       
         {/* User Info */}
         <div className="flex flex-col mt-12">
           <h1 className="text-center text-lg font-semibold">

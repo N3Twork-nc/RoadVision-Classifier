@@ -1,23 +1,17 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { DownOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Dropdown, Space } from "antd";
-import search from "../../assets/img/search.png";
-import notification from "../../assets/img/notification.png";
-import { useRecoilState, useRecoilValue, } from "recoil";
-import { accountState } from "../../atoms/authState";
+import search from "../../../assets/img/search.png";
+import notification from "../../../assets/img/notification.png";
 import { Link } from "react-router-dom";
-import { PageEnum } from "../../defination/enums/page.enum";
-import { handleLogOut } from "../../utils/auth.util";
-import userprofileService from "../../services/userprofile.service";
-import defaultAvatar from "../../assets/img/defaultAvatar.png";
+import { handleLogOut } from "../../../utils/auth.util";
+
 const Header: React.FC = () => {
-  const userRecoilStateValue = useRecoilValue(accountState);
-  const [userRecoilState, setUserRecoilState] = useRecoilState(accountState);
-  const items: MenuProps["items"] = [
+    const items: MenuProps["items"] = [
     {
       label: (
-        <Link className="text-base p-1" to={PageEnum.PROFILE}>
+        <Link className="text-base p-1" to="/profile">
           Profile
         </Link>
       ),
@@ -25,28 +19,13 @@ const Header: React.FC = () => {
     },
     {
       label: (
-        <div className="text-base p-1" onClick={handleLogOut}>
+        <div onClick={handleLogOut} className="text-base p-1">
           Log out
         </div>
       ),
       key: "1",
     },
   ];
-  useEffect(() => {
-    const fetchAvatar = async () => {
-      try {
-        const avatarUrl = await userprofileService.getAvatar();
-        setUserRecoilState((prevState) => ({
-          ...prevState,
-          avatar: avatarUrl,
-        }));
-      } catch (error) {
-        console.error("Failed to fetch avatar:", error);
-      }
-    };
-
-    fetchAvatar();
-  }, [setUserRecoilState]);
 
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-[#F9F9F9]">
@@ -77,12 +56,12 @@ const Header: React.FC = () => {
             >
               <Space>
                 <img
-                  src={userRecoilState.avatar || defaultAvatar}
+                  src="https://via.placeholder.com/40"
                   alt="User"
                   className="w-9 h-9 mr-1 rounded-full"
                 />
                 <span className="flex font-medium text-center">
-                  {userRecoilStateValue.username}
+                  TECHNICIAN
                 </span>
                 <DownOutlined />
               </Space>

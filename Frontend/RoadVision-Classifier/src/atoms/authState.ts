@@ -13,10 +13,12 @@ export const verifyEmailState = atom({
 });
 
 // store username
-export const userState = atom({
-  key: "userState",
+export const accountState = atom({
+  key: "accountState",
   default: {
+    avatar: "",
     username: "",
     email: "",
+    role: "",
   } as UserType, // default value
 });

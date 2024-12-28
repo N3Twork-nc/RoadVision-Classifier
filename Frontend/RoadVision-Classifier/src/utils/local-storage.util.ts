@@ -19,3 +19,24 @@ export const removeStoredUserInfo = (): void => {
   localStorage.removeItem(LocalStorageKeyEnum.USER);
   //   localStorage.removeItem("token");
 };
+
+export const setStoredAdminInfo = (admin: UserType): void => {
+  localStorage.setItem(LocalStorageKeyEnum.ADMIN, JSON.stringify(admin));
+  //   localStorage.setItem("token", token);
+};
+
+export const removeStoredAdminInfo = (): void => {
+  localStorage.removeItem(LocalStorageKeyEnum.ADMIN);
+  //   localStorage.removeItem("token");
+};
+
+
+export const setStoredTechnicianInfo = (technical: UserType): void => {
+  localStorage.setItem(LocalStorageKeyEnum.TECHNICIAN, JSON.stringify(technical));
+  //   localStorage.setItem("token", token);
+};
+
+export const removeStoredTechnicianInfo = (): void => {
+  localStorage.removeItem(LocalStorageKeyEnum.TECHNICIAN);
+  //   localStorage.removeItem("token");
+};
