@@ -80,12 +80,13 @@ class Account(BaseModel):
     def authorization(token: str):
         db = Postgresql()
         result = db.select('account', 'username', f"token = '{token}'")
-    def checkRole(self, role: str):
-        sql=f"SELECT permission.name FROM account INNER JOIN role ON account.id = role.user_id INNER JOIN permission ON role.permission_id = permission.id WHERE username = '{self.username}'"
+
+
+    def getRole(self):
+        sql=f"SELECT permission.name FROM account JOIN role ON account.id = role.user_id JOIN permission ON role.permission_id = permission.id WHERE username = '{self.username}'"
         db = Postgresql()
         result = db.execute(sql)
-        
-        return result[0] == role
+        return result[0]
 
 class ChangePassword(BaseModel):
     current_password: str
