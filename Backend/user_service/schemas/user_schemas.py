@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from typing import Tuple
 from Database import Postgresql
 from pydantic import BaseModel
 
@@ -6,7 +7,7 @@ class User(BaseModel):
     username: str
     fullname: str = None
     avatar: str = None
-    birthday: str = None
+    birthday: date = None
     gender: str = None
     phonenumber: str = None
     location: str = None
@@ -206,13 +207,15 @@ class User(BaseModel):
         finally:
             db.close()
 
-class Task(BaseModel): 
+class Task(BaseModel):
     username: str
-    fullname: str
+    province_name: str
+    district_name: str
     ward_name: str
-    deadline: str # Định dạng: 'YYYY-MM-DD HH:MM:SS'
+    deadline: datetime  # Định dạng: 'YYYY-MM-DD HH:MM:SS'
 
-    def assign_task(self) -> bool:
+
+    def assign_task(self) -> Tuple[bool, str, str, str]:
         db = Postgresql()
         try:
             user_result = db.select(
@@ -220,35 +223,56 @@ class Task(BaseModel):
                 'id',
                 f"username = '{self.username}'"
             )
-
             if not user_result:
                 print(f"User '{self.username}' does not exist.")
-                return False
+                return False, None, None, None
+            user_id = user_result[0]
 
-            user_id = user_result[0]  
-
-            ward_result = db.select(
-                '"ward"',
-                'id',
-                f"name = '{self.ward_name}'"
+            role_result = db.select(
+                '"role"',
+                'permission_id',
+                f"user_id = {user_id}"
             )
-            
+            if not role_result or role_result[0] != 2:
+                print(f"User not found or does not have 'technical' role.")
+                return False, None, None, None
+
+            user_info_result = db.select(
+                '"user"',
+                'fullname',
+                f"user_id = {user_id}"
+            )
+            if not user_info_result:
+                print(f"Fullname not found for user '{self.username}'.")
+                return False, None, None, None
+            fullname = user_info_result[0]
+
+            query = f"""
+                SELECT w.id, d.name, p.name
+                FROM "ward" w
+                JOIN "district" d ON w.district_id = d.id
+                JOIN "province" p ON d.province_id = p.id
+                WHERE w.name = '{self.ward_name}' AND d.name = '{self.district_name}' AND p.name = '{self.province_name}'
+            """
+            ward_result = db.execute(query, fetch='one')  
+
             if not ward_result:
                 print(f"Ward '{self.ward_name}' does not exist.")
-                return False
+                return False, None, None, None
 
-            ward_id = ward_result[0]
+            ward_id, district_name, province_name = ward_result
 
+            formatted_deadline = self.deadline.strftime('%Y-%m-%d %H:%M:%S')
             db.insert(
                 '"assignment"',
                 'user_id, ward_id, deadline',
-                f"{user_id}, {ward_id}, '{self.deadline}'"
+                f"{user_id}, {ward_id}, '{formatted_deadline}'"
             )
             db.commit()
             print(f"Task assigned to {self.username} successfully.")
-            return True
+            return True, fullname, district_name, province_name
         except Exception as e:
             print(f"Error assigning task: {e}")
-            return False
+            return False, None, None, None
         finally:
             db.close()
