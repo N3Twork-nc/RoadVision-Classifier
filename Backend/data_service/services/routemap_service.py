@@ -3,6 +3,7 @@ from sklearn.cluster import DBSCAN
 from Database import Postgresql,MongoDB
 import os
 import inspect
+from fastapi.responses import JSONResponse
 current_file_path = os.path.abspath(__file__)
 
 
@@ -54,7 +55,7 @@ class RouteMap():
                 # Duyệt qua tất cả các key trong 'routes' và gộp tất cả các tuyến vào all_routes
                 for route_key, route in document['routes'].items():
                     all_routes.append(route)  # Thêm các điểm tọa độ vào all_routes
-            return all_routes
+            return JSONResponse(content={'satus': 'Success','message':'Get route succesful','data': all_routes}, status_code=200)
         except Exception as e:
             print(current_file_path,inspect.currentframe().f_code.co_name, e)
             return {}
