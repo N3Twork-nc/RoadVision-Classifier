@@ -1,3 +1,4 @@
+from datetime import datetime
 from schemas import Task
 from .format_response import format_response
 from fastapi import HTTPException, status
@@ -12,22 +13,43 @@ class AssignService:
             )
 
         try:
-            if task.assign_task():
-                return format_response(
-                    status="Success",
-                    data={"username": task.username, "ward_name": task.ward_name, "deadline": task.deadline},
-                    message="Task assigned successfully",
-                    status_code=201
+            success, fullname, district_name, province_name = task.assign_task()
+
+            if not success:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="User not found or does not have 'technical' role."
                 )
-            else:
-                return format_response(
-                    status="Failed",
-                    data=None,
-                    message="Failed while assigning task",
-                    status_code=500
+
+            if not district_name or not province_name:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="District or province information is missing."
                 )
+
+            formatted_deadline = task.deadline.strftime('%d-%m-%Y %H:%M:%S')
+
+            return format_response(
+                status="Success",
+                data={
+                    "username": task.username,
+                    "fullname": fullname if fullname else "N/A",
+                    "ward_name": task.ward_name,
+                    "district_name": district_name,
+                    "province_name": province_name,
+                    "deadline": formatted_deadline
+                },
+                message="Task assigned successfully",
+                status_code=201
+            )
+        except HTTPException as e:
+            return format_response(
+                status="Error",
+                data=None,
+                message=e.detail,
+                status_code=e.status_code
+            )
         except Exception as e:
-            print(f"Error in assign task: {e}")
             return format_response(
                 status="Error",
                 data=None,

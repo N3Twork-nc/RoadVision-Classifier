@@ -1,6 +1,6 @@
 from main import app
 from schemas.account_schemas import AddUser
-from services.user_service import create_user_service, delete_user_service
+from services.admin_service import create_user_service, delete_user_service
 from fastapi import Depends
 from JWT import Authentication
 

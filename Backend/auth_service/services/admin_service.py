@@ -5,7 +5,7 @@ from psycopg2.errors import UniqueViolation
 def create_user_service(request: AddUser, current_user: str):
     try:
         account = Account(username=current_user)
-        if not account.checkRole("admin"):
+        if account.getRole() != "admin":
             return format_response(
                 status="Failed",
                 data=None,
@@ -48,8 +48,7 @@ def create_user_service(request: AddUser, current_user: str):
 def delete_user_service(username_to_delete: str, current_user: str):
     try:
         account = Account(username=current_user)
-        
-        if not account.checkRole("admin"):
+        if account.getRole() != "admin":
             return format_response(
                 status="Failed",
                 data=None,
