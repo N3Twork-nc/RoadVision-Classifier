@@ -8,7 +8,8 @@ import os
 from .routemap_service import RouteMap
 from geopy.geocoders import Nominatim
 import threading
-import random
+
+current_file_path = os.path.abspath(__file__)
 
 # Hàm lấy thông tin quận/huyện từ tọa độ
 def get_location(lat, lon):
@@ -29,7 +30,6 @@ def get_location(lat, lon):
             print(e)
             return None, []
 
-current_file_path = os.path.abspath(__file__)
 
 class RoadService:
     @staticmethod
@@ -38,9 +38,8 @@ class RoadService:
             latitude = roadSchema.latitude
             longitude = roadSchema.longitude
             roadSchema.location,roadSchema.location_part = get_location(latitude, longitude)
-            db=Postgresql()
             id=roadSchema.insertRoad()[0]
-            threading.Thread(target=RouteMap,args=(roadSchema.ward_id,)).start()
+            threading.Thread(target=RouteMap,args=([roadSchema.ward_id],)).start()
             img=roadSchema.file
             producer=KafkaProducer(
                 bootstrap_servers='192.168.120.26:9092',
@@ -63,6 +62,7 @@ class RoadService:
         try:
             db=Postgresql()
             roads=db.execute(f"SELECT id, user_id,latitude,longitude,level,image_path,created_at,location FROM road where ({not id_road} or id={id_road if id_road else -1}) and ({not user_id} or user_id='{user_id if user_id else -1}')",fetch='all')
+            db.close()
             road_schemas = [
                 RoadSchema(
                     id=id,
@@ -76,14 +76,12 @@ class RoadService:
                 )
                 for id, user_id, latitude, longitude, level, filepath, created_at,location in roads
             ]
-            db.close()
             data=[road.reformat().json() for road in road_schemas]
-            reponse=JSONResponse(content={
+            return JSONResponse(content={
                 "status": "success",
                 "data": data,
                 "message": "Get info road successfully"
                 },status_code=200)
-            return reponse
         except Exception as e:
             print(current_file_path, e)
             return JSONResponse(content={"status": "error", "message": "Internal server error"}, status_code=500)
@@ -91,17 +89,36 @@ class RoadService:
     @staticmethod
     def deleteRoad(id_road, username):
         try: 
-            db=Postgresql()
-            fetch_road=db.execute(f"SELECT id,image_path FROM road WHERE id={id_road}",fetch='one')
-            if (not fetch_road): 
+            roadSchema=RoadSchema(id=id_road,username=username)
+            if (not roadSchema.checkExist()): 
                 return JSONResponse(content={"status": "error", "message": "Road not found"}, status_code=404)
-            permission=db.execute(f"SELECT 1 FROM road join account on road.user_id=account.id join role on role.user_id=account.id WHERE (road.id={id_road} and account.username='{username}') or role.permission_id=1",fetch='one')
-            if (not permission):
+            if (not roadSchema.checkPermission()):
                 return JSONResponse(content={"status": "error", "message": "You don't have permission to delete this road"}, status_code=403)
-            road=RoadSchema(id=fetch_road[0],filepath=fetch_road[1])
-            road.deleteRoad()
-            db.close()
+            ward_id=roadSchema.getinfoRoad('ward_id')
+            if not roadSchema.deleteRoad():
+                return JSONResponse(content={"status": "error", "message": "Delete not successful"}, status_code=400)
+            threading.Thread(target=RouteMap,args=([ward_id],)).start()
             return JSONResponse(content={"status": "success", "message": "Road was deleted successfully"}, status_code=200)
+        except Exception as e:
+            print(current_file_path, e)
+            return JSONResponse(content={"status": "error", "message": "Internal server error"}, status_code=500)
+
+    def updateLocationRoad(id,latitude,longitude,username):
+        try:
+            roadSchema=RoadSchema(id=id,latitude=latitude,longitude=longitude,username=username)
+            if not roadSchema.checkExist():
+                return JSONResponse(content={"status": "error", "message": "Road not found"}, status_code=404)
+            if not roadSchema.checkPermission():
+                return JSONResponse(content={"status": "error", "message": "You don't have permission to update this road"}, status_code=403)
+            location,location_part = get_location(latitude, longitude)
+            roadSchema.location=location
+            roadSchema.location_part=location_part
+            old_value,new_value=roadSchema.update()
+            if not old_value:
+                return JSONResponse(content={"status": "error", "message": "Update not successful"},status_code=400)
+            ward_ids=[old_value[7],new_value[7]]
+            threading.Thread(target=RouteMap,args=(ward_ids,)).start()
+            return JSONResponse(content={"status": "success", "message": "Location was updated successfully"}, status_code=200)
         except Exception as e:
             print(current_file_path, e)
             return JSONResponse(content={"status": "error", "message": "Internal server error"}, status_code=500)
