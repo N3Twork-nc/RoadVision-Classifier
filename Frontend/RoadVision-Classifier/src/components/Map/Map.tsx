@@ -148,7 +148,7 @@ const Map: React.FC = () => {
   }, []);
 
   const searchForLocation = (location: string) => {
-    const geocoder = L.Control.Geocoder.nominatim();
+    const geocoder = (L.Control as any).Geocoder.nominatim();
     geocoder.geocode(location, (results: any) => {
       if (results.length > 0) {
         const { center } = results[0];
@@ -171,7 +171,7 @@ const Map: React.FC = () => {
       return;
     }
 
-    const geocoder = L.Control.Geocoder.nominatim();
+    const geocoder = (L.Control as any).Geocoder.nominatim();
     geocoder.geocode(query, (results: any[]) => {
       setSuggestions(results);
     });
