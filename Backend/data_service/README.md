@@ -84,7 +84,8 @@ Kết trả vể thành công sẽ có foramt:
 
 ## Công dụng
 Dùng để xóa đường đã upload
-##
+
+## Cách sử dụng
 ### Headers
 
 | Key            | Value                    | Description                                         |
@@ -92,7 +93,7 @@ Dùng để xóa đường đã upload
 | `accept`       | `application/json`       | Chấp nhận kiểu dữ liệu trả về        |
 | `Authorization`| `Bearer <token>`         | Token của user                |
 
-## Request Parameters
+### Request Parameters
 
 | Parameter | Type   | Required | Description              |
 |-----------|--------|----------|--------------------------|
@@ -100,7 +101,7 @@ Dùng để xóa đường đã upload
 
 
 
-## Responses
+### Responses
 
 | Status Code | Message                   | Description                             |
 |-------------|---------------------------|-----------------------------------------|
@@ -113,3 +114,84 @@ Dùng để xóa đường đã upload
 | `500`       | Internal Server Error      | Lỗi từ server                        | 
 </details>
 
+<details>
+<summary><strong>ENPOINT GET /api/getRouteMap<strong></summary>
+
+## Công dụng </br>
+Dùng để lấy Route của các tuyến đướng bị hư.
+
+## Cách sử dụng
+### Headers
+
+| Key            | Value                    | Description                                         |
+|----------------|--------------------------|-----------------------------------------------------|
+| `accept`       | `application/json`       | Chấp nhận kiểu dữ liệu trả về        |
+
+### Responses
+
+| Status Code | Message                   | Description                          |
+|-------------|---------------------------|--------------------------------------|
+| `200`       | Get route succesful       | Lấy route map thành công             |
+| `500`       | Internal Server Error     | Lỗi từ server                        | 
+
+
+
+
+Kết trả vể thành công sẽ có foramt:
+```
+{
+  "satus": "Success",
+  "message": "Get route succesful",
+  "data": [
+    [
+      "(10.8492, 106.78746)",
+      "(10.849439, 106.787501)"
+    ],
+    [
+      "(10.849927, 106.787617)",
+      "(10.850033, 106.787649)",
+      "(10.850077, 106.787623)"
+    ]
+  ]
+}
+```
+
+data sẽ là một các route map, trong route sẽ có dánh sách các tọa độ
+</details>
+
+<details>
+
+<summary><strong>ENPOINT PATCH /api/updateLocationRoad<strong></summary>
+
+## Công dụng </br>
+Dùng để cập nhật lại tọa độ đường đã update
+
+## Cách sử dụng
+### Headers
+
+| Key            | Value                    | Description                                         |
+|----------------|--------------------------|-----------------------------------------------------|
+| `accept`       | `application/json`       | Chấp nhận kiểu dữ liệu trả về        |
+| `Authorization`| `Bearer <token>`         | Token của user                       |
+
+### Request Parameters
+
+Body in `multipart/form-data` format:
+
+| Parameter  | Type   | Required | Description                              |
+|------------|--------|----------|------------------------------------------|
+| `id`       | INT    | Yes      | id của đường muốn cập nhật                |
+| `latitude` | Float  | Yes      | Vĩ độ mớimới              |
+| `longitude`| Float  | Yes      | Kinh đọ mớimới      |
+
+### Responses
+
+| Status Code | Message                   | Description                          |
+|-------------|---------------------------|--------------------------------------|
+| `200`       | Location was updated successfully      | Cập nhật tọa độ thành công             |
+| `400`       | Update not successful                    |  Cập nhật không thành công              | 
+| `403`       | You don't have permission to update this road                   | User không có quyền cập nhật               | 
+| `404`       | Road not found                     |  id đường không tồn tại                | 
+| `500`       | Internal Server Error               | Lỗi từ server                        | 
+
+</details>
