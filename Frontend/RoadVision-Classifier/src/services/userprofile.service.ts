@@ -2,6 +2,7 @@ import { axiosRequest } from "../config/axios.config";
 import {
   EditProfileDataType,
   ChangePasswordDataType,
+  UploadAvatarType,
 } from "../defination/types/profile.type";
 import { getAccessToken } from "../utils/auth.util";
 
@@ -18,7 +19,31 @@ export default {
       throw error;
     }
   },
-
+  
+  getAvatar: async () => {
+    const url = `/user/api/getAvatar`;
+    const token = getAccessToken();
+    return `http://192.168.120.26${url}?token=${token}`; 
+  },
+  
+  uploadAvatar: async (formData: UploadAvatarType) => {
+    const url = `/user/api/uploadAvatar`;
+    const token = getAccessToken();
+    const requestUrl = `${url}?token=${token}`;
+    try {
+      const data = await axiosRequest.post(requestUrl, formData, {
+        headers: {
+          "accept": "application/json",
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return data;
+    } catch (error) {
+      console.error("Error updating avatar:", error);
+      throw error;
+    }
+  },
+  
   editProfile: async (formData: EditProfileDataType) => {
     const url = `/user/api/editProfile`;
     const token = getAccessToken();

@@ -6,7 +6,7 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useRecoilValue } from "recoil";
 import { profileState } from "../../atoms/profileState";
 import userProfileService from "../../services/userprofile.service";
-import { EditProfileDataType } from "../../defination/types/profile.type";
+import { EditProfileDataType, UploadAvatarType } from "../../defination/types/profile.type";
 
 dayjs.extend(customParseFormat);
 const { Option } = Select;
@@ -15,19 +15,51 @@ const dateFormatList = ["DD-MM-YYYY"];
 export default function EditProfile() {
   const profileData = useRecoilValue(profileState);
 
-  const [selectedGender, setSelectedGender] = useState<string>(profileData.gender || "");
+  const [selectedGender, setSelectedGender] = useState<string>(
+    profileData.gender || ""
+  );
   const [fullname, setFullname] = useState(profileData.fullname || "");
   const [phonenumber, setPhonenumber] = useState(profileData.phonenumber || "");
   const [address, setAddress] = useState(profileData.location || "");
   const [selectedCountry, setSelectedCountry] = useState<string>(profileData.state || "");
   const [selectedBirthday, setSelectedBirthday] = useState<string>(profileData.birthday || "");
 
+  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      const formData = new FormData();
+      formData.append("file", file);
+      try {
+        // Replace with actual token retrieval logic
+        const uploadData: UploadAvatarType = { file: file };
+        const response = await userProfileService.uploadAvatar(uploadData);
+        
+        if (response.status === 200) {
+          alert("Avatar updated successfully!");
+        } else {
+          alert("Failed to upload avatar. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error uploading avatar:", error);
+        alert("Something went wrong while uploading avatar.");
+      }
+    }
+  };
+  
+  const handleButtonClick = () => {
+    const avatarInput = document.getElementById("avatar") as HTMLInputElement;
+    if (avatarInput) {
+      avatarInput.click();
+    }
+  };
+
   const handleGenderChange = (value: string) => setSelectedGender(value);
   const handleBirthdayChange = (date: dayjs.Dayjs | null) => {
     if (date) {
       setSelectedBirthday(date.format("YYYY-DD-MM"));
     } else {
-      setSelectedBirthday(""); 
+      setSelectedBirthday("");
     }
   };
   const handleCountryChange = (value: string) => setSelectedCountry(value);
@@ -44,7 +76,7 @@ export default function EditProfile() {
         location: address,
         state: selectedCountry,
       };
-      
+
       const response = await userProfileService.editProfile(updatedProfileData);
 
       if (response.status.toString() === "Success") {
@@ -57,10 +89,18 @@ export default function EditProfile() {
     }
   };
 
+
   return (
     <div className="flex flex-col items-center w-full h-72 text-center py-5 gap-10">
+      <button onClick={handleButtonClick}>Change Avatar</button>
+      <input
+        type="file"
+        id="avatar"
+        className="hidden"
+        accept="image/*"
+        onChange={handleAvatarChange}
+      />
       <div className="flex flex-row px-5 justify-between items-center w-[95%] gap-2">
-
         <div className="w-[30%]">
           <div className="text-left font-normal font-sm text-gray-700 text-sm">
             Full Name
@@ -99,22 +139,21 @@ export default function EditProfile() {
             className="w-full py-2 mt-1 text-xl font-semibold"
             value={
               selectedBirthday ? dayjs(selectedBirthday, "YYYY-MM-DD") : null
-            } 
+            }
             format={dateFormatList[0]}
             placeholder="Select your date of birth"
-            onChange={handleBirthdayChange} 
+            onChange={handleBirthdayChange}
           />
         </div>
       </div>
 
       <div className="flex flex-row px-5 justify-between items-center w-[95%] gap-2">
-        
         <div className="w-[30%]">
           <div className="text-left font-normal font-sm text-gray-700 text-sm">
             Gender
           </div>
           <Select
-            value={selectedGender || "Select gender"} 
+            value={selectedGender || "Select gender"}
             onChange={handleGenderChange}
             className={`w-full text-left text-base mt-1 h-10 font-base ${
               selectedGender === "Select gender" ? "text-gray-400" : "text-gray"
@@ -146,7 +185,7 @@ export default function EditProfile() {
             Country
           </div>
           <Select
-            value={selectedCountry} 
+            value={selectedCountry}
             onChange={handleCountryChange}
             className={`w-full text-left text-base mt-1 h-10 font-base`}
           >
@@ -161,7 +200,7 @@ export default function EditProfile() {
 
       <div>
         <button
-          onClick={handleSave} 
+          onClick={handleSave}
           className="w-fit bg-[#3749A6] text-white font-semibold mt-2 p-2 px-5 rounded-full hover:ring-4 hover:ring-blue-300"
         >
           Save Information
