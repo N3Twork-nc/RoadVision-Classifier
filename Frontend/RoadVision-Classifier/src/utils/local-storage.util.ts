@@ -7,7 +7,7 @@ export const getStoredUserInfo = () => {
     const data: UserType = JSON.parse(storedUserInfo);
     return data;
   }
-  return null; // return null if can not fine user infoinfo
+  return null; // return null if can not fine user info
 };
 
 export const setStoredUserInfo = (user: UserType): void => {

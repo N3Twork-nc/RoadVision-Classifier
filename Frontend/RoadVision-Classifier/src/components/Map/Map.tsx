@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import L from "leaflet";
+import L from 'leaflet';
 import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
@@ -7,6 +7,7 @@ import "leaflet-control-geocoder/dist/Control.Geocoder.css";
 import "leaflet-control-geocoder";
 import "./map.css"; // Import CSS file
 import dataService from "../../services/data.service";
+import "leaflet";
 
 declare module "leaflet" {
   namespace Control {
@@ -183,7 +184,7 @@ const Map: React.FC = () => {
       routingControl.remove();
     }
 
-    const geocoder = L.Control.Geocoder.nominatim();
+    const geocoder = (L.Control as any).Geocoder.nominatim();
 
     geocoder.geocode(startLocation, (resultsStart: any[]) => {
       if (resultsStart.length === 0) return;
