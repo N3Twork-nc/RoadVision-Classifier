@@ -89,8 +89,6 @@ class ProfileService:
     @staticmethod
     def get_image_by_username(username: str):
         if not isinstance(username, str):
-            username = username.get("username") if isinstance(username, dict) else None
-        if not username:
             raise HTTPException(status_code=401, detail="Invalid token or unauthorized")
 
         user = User(username=username)
