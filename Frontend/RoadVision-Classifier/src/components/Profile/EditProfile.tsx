@@ -31,6 +31,7 @@ export default function EditProfile() {
       const formData = new FormData();
       formData.append("file", file);
       try {
+        // Replace with actual token retrieval logic
         const uploadData: UploadAvatarType = { file: file };
         const response = await userProfileService.uploadAvatar(uploadData);
         
