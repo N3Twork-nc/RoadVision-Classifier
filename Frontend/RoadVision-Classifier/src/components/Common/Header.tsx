@@ -47,7 +47,7 @@ const Header: React.FC = () => {
 
     fetchAvatar();
   }, [setUserRecoilState]);
-  console.log(userRecoilStateValue);
+  
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-[#F9F9F9]">
       <div className="flex items-center space-x-4 w-96 px-4 py-2 bg-slate-100 border rounded-3xl focus-within:ring focus-within:ring-blue-300">

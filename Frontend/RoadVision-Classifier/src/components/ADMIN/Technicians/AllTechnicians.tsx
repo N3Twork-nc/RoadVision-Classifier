@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
-import manageAlluserService from "../../../services/manageAlluser.service";
 import { Button, Form, Input, Modal } from "antd";
 import { useRecoilState } from "recoil";
-import { userState } from "../../../atoms/admin/accountState";
+import { technicianState } from "../../../atoms/admin/accountState";
+import manageAlltechnicianService from "../../../services/manageAlltechnician.service";
+import manageAlluserService from "../../../services/manageAlluser.service";
+
 
 interface DataType {
   key: React.Key;
@@ -11,34 +13,31 @@ interface DataType {
   username: string;
   fullname: string;
   joindate: string;
-  contribution: number;
-}
-interface AllUserProps {
-  onViewUserInfo: (user: DataType) => void;
 }
 
-export default function AllUser({ onViewUserInfo }: AllUserProps) {
+interface AllTechniciansProps {
+  onViewTechnicianInfo: (user: DataType) => void;
+}
+
+export default function AllTechnicians({ onViewTechnicianInfo }: AllTechniciansProps) {
   const [dataSource, setDataSource] = useState<DataType[]>([]);
   const [loading, setLoading] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [, setRecoilProfile] = useRecoilState<any>(userState);
+  const [, setRecoilProfile] = useRecoilState<any>(technicianState);
   const [form] = Form.useForm();
 
-  const fetchAllUsers = async () => {
+  const fetchAllTechnicians = async () => {
     setLoading(true);
     try {
-      const response = await manageAlluserService.getAllUser({});
-      console.log("user",response);
-      const users = response.data?.map((user: any, index: number) => ({
+      const response = await manageAlltechnicianService.getAllTechnician({});
+      const technician = response.data?.map((technician: any, index: number) => ({
         key: index,
-        user_id: user.user_id,
-        username: user.username,
-        fullname: user.fullname,
-        joindate: user.created,
-        contribution: user.contribution,
+        username: technician.username,
+        fullname: technician.fullname,
+        joindate: technician.created,
       }));
-      setDataSource(users);
-      setRecoilProfile(users);
+      setDataSource(technician);
+      setRecoilProfile(technician);
     } catch (error) {
       console.log("Không thể lấy danh sách người dùng!");
     } finally {
@@ -47,24 +46,25 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
   };
 
   useEffect(() => {
-    fetchAllUsers();
+    fetchAllTechnicians();
   }, []);
 
   // ADD NEW USER
-  const handleAddUser = async (values: {
+  const handleAddTechnicians = async (values: {
     username: string;
+    fullname: string;
     email: string;
     password: string;
   }) => {
-    const payload = { ...values, permission_id: "3" };
+    const payload = { ...values, permission_id: "2" };
     try {
-      await manageAlluserService.addNewUser(payload);
-      alert("Add user successfully!");
-      fetchAllUsers();
+      await manageAlltechnicianService.addNewTechnician(payload);
+      alert("Add technician successfully!");
+      fetchAllTechnicians();
       form.resetFields();
       setIsModalVisible(false);
     } catch (error) {
-      console.log("Thêm tài khoản thất bại!");
+      console.log("Add technicians failed!");
     }
   };
 
@@ -72,10 +72,11 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
     form.resetFields();
     setIsModalVisible(false);
   };
-  const handleDeleteUser = async (username: string) => {
-    // DELETE USER
+
+      // DELETE TECHNICIAN
+  const handleDeleteTechnician = async (username: string) => {
     Modal.confirm({
-      title: "Are you sure you want to delete this user?",
+      title: "Are you sure you want to delete this technicians?",
       content: "This action cannot be undone.",
       okText: "Yes, delete",
       cancelText: "Cancel",
@@ -83,7 +84,7 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
         try {
           await manageAlluserService.deleteUser(username);
           alert("Delete user successfully!");
-          fetchAllUsers();
+          fetchAllTechnicians();
         } catch (error) {
           console.log("Xóa tài khoản thất bại!");
         }
@@ -97,12 +98,12 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-row justify-between items-center">
-        <h1 className="text-2xl font-bold p-4">All Users</h1>
+        <h1 className="text-2xl font-bold p-4">All Technicians</h1>
         <button
           className="bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg"
           onClick={() => setIsModalVisible(true)}
         >
-          Add new user
+          Add new technicians
         </button>
       </div>
       {loading ? (
@@ -121,7 +122,7 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
                 Join date
               </th>
               <th scope="col" className="px-6 py-5 w-[10%]">
-                Contribution
+                Status
               </th>
               <th scope="col" className="px-6 py-5 w-[15%]">
                 Action
@@ -129,21 +130,21 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
             </tr>
           </thead>
           <tbody>
-            {dataSource.map((user) => (
+            {dataSource.map((technician) => (
               <tr
-                key={user.key}
+                key={technician.key}
                 className="cursor-pointer text-base py-3 text-[#0A0A0B] font-normal border-b border-gray-300"
-                onClick={() => onViewUserInfo(user)}
+                onClick={() => onViewTechnicianInfo(technician)}
               >
-                <td className="py-3">{user.username}</td>
-                <td className="py-3">{user.fullname}</td>
-                <td className="py-3">{user.joindate}</td>
-                <td className="py-3">{user.contribution} image(s)</td>
+                <td className="py-3">{technician.username}</td>
+                <td className="py-3">{technician.fullname}</td>
+                <td className="py-3">{technician.joindate}</td>
+                <td className="py-3">hehe</td>
                 <td className="py-3">
                   <button
                     onClick={(e) => {
                       e.stopPropagation(); 
-                      handleDeleteUser(user.username);
+                      handleDeleteTechnician(technician.username);
                     }}
                     className="text-red-500"
                   >
@@ -161,11 +162,18 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
         onCancel={handleCancelModal}
         footer={null}
       >
-        <Form form={form} layout="vertical" onFinish={handleAddUser}>
+        <Form form={form} layout="vertical" onFinish={handleAddTechnicians}>
           <Form.Item
             name="username"
             label="Username"
             rules={[{ required: true, message: "Please input username!" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="fullname"
+            label="Fullname"
+            rules={[{ required: true, message: "Please input fullname!" }]}
           >
             <Input />
           </Form.Item>

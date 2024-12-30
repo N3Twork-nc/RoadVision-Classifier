@@ -8,3 +8,11 @@ export type AllUserType = Partial<{
     permission_id: string;
   }>;
   
+export interface RoadDataType {
+  key: React.Key;
+  road_id: number;
+  road_image: string;
+  road_type: string;
+  road_time: string;
+  road_location: string;
+}
