@@ -5,12 +5,12 @@ import "./mapprivate.css";
 import dataService from "../../services/data.service";
 import { UploadImgFormDataType } from "../../defination/types/data.type";
 import { useRecoilValue } from "recoil";
-import { userState } from "../../atoms/authState";
+import { accountState } from "../../atoms/authState";
 import { checkObjectAtLeastOneField } from "../../utils/check.util";
 import { generateImageDomain } from "../../utils/genrate.util";
 
 const MapPrivate: React.FC = () => {
-  const userRecoilStateValue = useRecoilValue(userState);
+  const userRecoilStateValue = useRecoilValue(accountState);
 
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMap = useRef<L.Map | null>(null);
@@ -209,6 +209,7 @@ const MapPrivate: React.FC = () => {
                   filepath:
                     "https://images4.alphacoders.com/115/thumb-1920-115716.jpg",
                 });
+                window.location.reload(); 
               } catch (error) {
                 console.error("Error uploading image:", error);
                 alert("An error occurred during the upload. Please try again.");

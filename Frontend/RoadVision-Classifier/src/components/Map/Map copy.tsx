@@ -27,7 +27,7 @@ const Map: React.FC = () => {
   const [routingControl, setRoutingControl] =
     useState<L.Routing.Control | null>(null);
   const [suggestions, setSuggestions] = useState<any[]>([]);
-  const [roadsData, setRoadsData] = useState<any[]>([]);
+  const [, setRoadsData] = useState<any[]>([]);
   const [coordinates, setCoordinates] = useState<string>("");
   const [path, setPath] = useState<[number, number][]>([]);
 
