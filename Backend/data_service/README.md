@@ -118,7 +118,7 @@ Dùng để xóa đường đã upload
 <summary><strong>ENPOINT GET /api/getRouteMap<strong></summary>
 
 ## Công dụng </br>
-Dùng để lấy Route của các tuyến đướng bị hư.
+Dùng để lấy Route của các tuyến đường bị hư.
 
 ## Cách sử dụng
 ### Headers
