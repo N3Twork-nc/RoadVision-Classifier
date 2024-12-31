@@ -149,6 +149,7 @@ class User(BaseModel):
             users_data = []
             for row in user_results:
                 created = row[3].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[3], datetime) else row[3]
+                avatar = f"/user/api/getAvatar?username={row[2]}"
                 
                 count_query = '''
                     SELECT COUNT(*) 
@@ -163,6 +164,7 @@ class User(BaseModel):
                     "fullname": row[1],
                     "username": row[2],
                     "created": created,
+                    "avatar": avatar,
                     "contribution": contribution  
                 })
 
@@ -178,10 +180,14 @@ class User(BaseModel):
         db = Postgresql()
         try:
             query = '''
-                SELECT u.user_id, u.fullname, a.username, a.created
+                SELECT u.user_id, u.fullname, a.username, a.created, s.deadline, s.status, w.name, d.name, p.name
                 FROM "user" u
                 JOIN "account" a ON u.user_id = a.id
                 JOIN "role" r ON r.user_id = a.id
+                JOIN "assignment" s ON s.user_id = a.id
+                JOIN "ward" w ON s.ward_id = w.id
+                JOIN "district" d ON w.district_id = d.id
+                JOIN "province" p ON d.province_id = p.id
                 WHERE r.permission_id = 2
             '''
             
@@ -190,15 +196,34 @@ class User(BaseModel):
             if not user_results:
                 return {"data": []}
 
-            users_data = []
+            grouped_users = {}
             for row in user_results:
+                user_id = row[0]
+                fullname = row[1]
+                username = row[2]
+                avatar = f"/user/api/getAvatar?username={row[2]}"
                 created = row[3].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[3], datetime) else row[3]
-                users_data.append({
-                    "user_id": row[0],
-                    "fullname": row[1],
-                    "username": row[2],
-                    "created": created
+                deadline = row[4].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[4], datetime) else row[4]
+
+                if user_id not in grouped_users:
+                    grouped_users[user_id] = {
+                        "user_id": user_id,
+                        "fullname": fullname,
+                        "username": username,
+                        "avatar": avatar,
+                        "created": created,
+                        "tasks": []
+                    }
+
+                grouped_users[user_id]["tasks"].append({
+                    "deadline": deadline,
+                    "status": row[5],
+                    "ward_name": row[6],
+                    "district_name": row[7],
+                    "province_name": row[8]
                 })
+
+            users_data = list(grouped_users.values())
 
             return {"data": users_data}
         except Exception as e:
@@ -209,13 +234,12 @@ class User(BaseModel):
 
 class Task(BaseModel):
     username: str
-    province_name: str
-    district_name: str
-    ward_name: str
-    deadline: datetime  # Định dạng: 'YYYY-MM-DD HH:MM:SS'
+    province_name: str = None
+    district_name: str = None
+    ward_name: str = None
+    deadline: datetime = None  # Định dạng: 'YYYY-MM-DD HH:MM:SS'
 
-
-    def assign_task(self) -> Tuple[bool, str, str, str]:
+    def assign_task(self) -> Tuple[bool, str, str, str, str]:
         db = Postgresql()
         try:
             user_result = db.select(
@@ -225,7 +249,7 @@ class Task(BaseModel):
             )
             if not user_result:
                 print(f"User '{self.username}' does not exist.")
-                return False, None, None, None
+                return False, None, None, None, None
             user_id = user_result[0]
 
             role_result = db.select(
@@ -233,9 +257,9 @@ class Task(BaseModel):
                 'permission_id',
                 f"user_id = {user_id}"
             )
-            if not role_result or role_result[0] != 2:
+            if not role_result or role_result[0] != 2:  # 2 là vai trò 'technical'
                 print(f"User not found or does not have 'technical' role.")
-                return False, None, None, None
+                return False, None, None, None, None
 
             user_info_result = db.select(
                 '"user"',
@@ -244,7 +268,7 @@ class Task(BaseModel):
             )
             if not user_info_result:
                 print(f"Fullname not found for user '{self.username}'.")
-                return False, None, None, None
+                return False, None, None, None, None
             fullname = user_info_result[0]
 
             query = f"""
@@ -254,25 +278,114 @@ class Task(BaseModel):
                 JOIN "province" p ON d.province_id = p.id
                 WHERE w.name = '{self.ward_name}' AND d.name = '{self.district_name}' AND p.name = '{self.province_name}'
             """
-            ward_result = db.execute(query, fetch='one')  
+            ward_result = db.execute(query, fetch='one')
 
             if not ward_result:
                 print(f"Ward '{self.ward_name}' does not exist.")
-                return False, None, None, None
+                return False, None, None, None, None
 
             ward_id, district_name, province_name = ward_result
 
             formatted_deadline = self.deadline.strftime('%Y-%m-%d %H:%M:%S')
+            status = "Not start"
             db.insert(
                 '"assignment"',
-                'user_id, ward_id, deadline',
-                f"{user_id}, {ward_id}, '{formatted_deadline}'"
+                'user_id, ward_id, deadline, status',
+                f"{user_id}, {ward_id}, '{formatted_deadline}', '{status}'"
             )
             db.commit()
+
             print(f"Task assigned to {self.username} successfully.")
-            return True, fullname, district_name, province_name
+            return True, fullname, district_name, province_name, status
         except Exception as e:
             print(f"Error assigning task: {e}")
-            return False, None, None, None
+            return False, None, None, None, None
+        finally:
+            db.close()
+
+
+    def update_status_assignment(self, status: str, user_id: int, ward_id: int) -> bool:
+        db = Postgresql()
+        try:
+            admin_result = db.select(
+                '"account"',
+                'id',
+                f"username = '{self.username}'"
+            )
+            if not admin_result:
+                print(f"Admin '{self.username}' does not exist.")
+                return False
+            admin_id = admin_result[0]
+
+            role_result = db.select(
+                '"role"',
+                'permission_id',
+                f"user_id = {admin_id}"
+            )
+            if not role_result or role_result[0] != 1: 
+                print(f"User '{self.username}' is not an admin.")
+                return False
+
+            assignment_result = db.select(
+                '"assignment"',
+                'id',
+                f"user_id = {user_id} AND ward_id = {ward_id}"
+            )
+            if not assignment_result:
+                print(f"No assignment found for user_id '{user_id}' and ward_id '{ward_id}'.")
+                return False
+
+            updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            db.update(
+                '"assignment"',
+                f"status = '{status}', updated_at = '{updated_at}'",
+                f"user_id = {user_id} AND ward_id = {ward_id}"
+            )
+            db.commit()
+            print(f"Assignment status updated to '{status}' for user_id '{user_id}' successfully.")
+            return True
+        except Exception as e:
+            print(f"Error updating assignment status: {e}")
+            return False
+        finally:
+            db.close()
+
+    def update_status_road(self, status: str, road_id: int) -> bool:
+        db = Postgresql()
+        try:
+            user_result = db.select(
+                '"account"',
+                'id',
+                f"username = '{self.username}'"
+            )
+            if not user_result:
+                print(f"User '{self.username}' does not exist.")
+                return False
+            user_id = user_result[0]
+
+            role_result = db.select(
+                '"role"',
+                'permission_id',
+                f"user_id = {user_id}"
+            )
+            if not role_result or role_result[0] != 2 or role_result[0] != 1:  
+                print(f"User '{self.username}' is not a admin/technical user.")
+                return False
+            
+            updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+
+            db.update(
+                '"road"',
+                f"status = '{status}', update_at = '{updated_at}'",
+                f"user_id = {user_id} AND id = {road_id}"
+            )
+            db.commit()
+            print(f"Road status updated to '{status}' for user '{self.username}' successfully.")
+            return True
+        except Exception as e:
+            print(f"Error updating road status: {e}")
+            return False
         finally:
             db.close()
