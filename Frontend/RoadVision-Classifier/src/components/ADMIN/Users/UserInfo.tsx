@@ -1,8 +1,9 @@
-import { Breadcrumb, Table } from "antd";
+import { Breadcrumb, Table, Tag } from "antd";
 import avt from "../../../assets/img/nct.png";
 import { useEffect, useState } from "react";
 import manageAlluserService from "../../../services/manageAlluser.service";
 import { RoadDataType } from "../../../defination/types/alluser.type";
+import { format } from 'date-fns';
 
 interface DataType {
   key: React.Key;
@@ -23,6 +24,8 @@ const columns = [
     title: "Road ID",
     dataIndex: "road_id",
     key: "road_id",
+    width: 100,
+    align: 'center' as 'center',
   },
   {
     title: "Image",
@@ -35,21 +38,34 @@ const columns = [
         style={{ width: "80px", height: "50px", objectFit: "cover" }}
       />
     ),
+    align: 'center' as 'center',
   },
   {
     title: "Type",
     dataIndex: "road_type",
     key: "road_type",
+    align: 'center' as 'center',
+    render: (text: string) => {
+      const colorMap: { [key: string]: string } = {
+        "Good": "green",
+        "Satisfactory": "blue",
+        "Poor": "orange",
+        "Very poor": "red",
+      };
+      return <Tag color={colorMap[text] || "default"}>{text}</Tag>;
+    },
   },
   {
-    title: "Date Created",
+    title: "Date Uploaded",
     dataIndex: "road_time",
     key: "road_time",
+    align: 'center' as 'center',
   },
   {
     title: "Location",
     dataIndex: "road_location",
     key: "road_location",
+    align: 'center' as 'center',
   },
 ];
 
@@ -60,22 +76,25 @@ export default function UserInfo({ user, onBack }: AllUserProps) {
     setLoading(true);
     try {
       const response = await manageAlluserService.getAllRoadInfo(user.user_id);
-
-      const roads = response.data.map((roadData: string) => {
-        const road = JSON.parse(roadData);
-        return {
+      console.log("response", response);
+      if (Array.isArray(response)) {
+        if (response.length > 0) {
+          const roads = response.map((roadData: string) => JSON.parse(roadData));
+          console.log("roads", roads);
+          const extractedRoads = roads.map((road) => ({
           key: road.id,
           road_id: road.id,
-          road_image: road.filepath,
+          road_image: `http://192.168.120.26${road.filepath}`,
           road_type: road.level,
-          road_time: road.created_at,
+          road_time: format(new Date(road.created_at), 'dd/MM/yyyy HH:mm:ss'),
           road_location: road.location,
-        };
-      });
+        }));
 
-      console.log("roads", roads);
+        console.log("Extracted roads", extractedRoads);
+        setDataSource(extractedRoads || []);
+      }}
+      else console.log("Mảng rỗng");
 
-      setDataSource(roads || []);
     } catch (error) {
       console.log("Không thể lấy danh sách đường!", error);
     } finally {
