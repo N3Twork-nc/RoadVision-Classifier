@@ -69,6 +69,12 @@ class RoadSchema(BaseModel):
     
     def reformat(self):
         self.filepath = f"/datasvc/api/getImage?imagePath={self.filepath}"
+        attributes_to_remove = ['file', 'location_part', 'username',]
+        for attr in attributes_to_remove:
+            if hasattr(self, attr):
+                delattr(self, attr)
+        
+        return self
         return self
 
     def update(self):

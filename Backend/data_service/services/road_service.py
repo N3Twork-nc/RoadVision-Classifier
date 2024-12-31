@@ -58,10 +58,10 @@ class RoadService:
 
 
     @staticmethod
-    def getlistRoad(user_id=None,id_road=None):
+    def getlistRoad(user_id=None,id_road=None,ward_id=None):
         try:
             db=Postgresql()
-            roads=db.execute(f"SELECT id, user_id,latitude,longitude,level,image_path,created_at,location FROM road where ({not id_road} or id={id_road if id_road else -1}) and ({not user_id} or user_id='{user_id if user_id else -1}')",fetch='all')
+            roads=db.execute(f"SELECT id, user_id,latitude,longitude,level,image_path,created_at,location FROM road where ({not id_road} or id={id_road if id_road else -1}) and ({not user_id} or user_id='{user_id if user_id else -1}') and ({not ward_id} or ward_id='{ward_id if ward_id else -1}')",fetch='all')
             db.close()
             road_schemas = [
                 RoadSchema(
@@ -119,6 +119,28 @@ class RoadService:
             ward_ids=[old_value[7],new_value[7]]
             threading.Thread(target=RouteMap,args=(ward_ids,)).start()
             return JSONResponse(content={"status": "success", "message": "Location was updated successfully"}, status_code=200)
+        except Exception as e:
+            print(current_file_path, e)
+            return JSONResponse(content={"status": "error", "message": "Internal server error"}, status_code=500)
+
+    def statistics_road(during,number,role):
+        try:
+            if role != 'admin':
+                return JSONResponse(content={"status": "error", "message": "You don't have permission to access this feature"}, status_code=403)
+            days= (30 if during=='monthly' else 365)*number
+            db=Postgresql()
+            count_all=db.execute(f"SELECT level, count(level) FROM road where level <> 'Good' and level <> 'classifing' and created_at >= NOW() - INTERVAL '{days} days' group by level",fetch='all')
+            count_done=db.execute(f"SELECT level, count(level) FROM road where level <> 'Good' and level <> 'classifing' and status='Done' and created_at >= NOW() - INTERVAL '{days} days' group by level",fetch='all')
+            db.close()
+            data={
+                'Total':[f"'{level}': {count}" for level,count in  count_all],
+                'Done':[f"'{level}': {count}" for level,count in  count_done]
+            }
+            return JSONResponse(content={
+                "status": "success",
+                "data": data,
+                "message": "Get statistics road successfully"
+                },status_code=200)
         except Exception as e:
             print(current_file_path, e)
             return JSONResponse(content={"status": "error", "message": "Internal server error"}, status_code=500)
