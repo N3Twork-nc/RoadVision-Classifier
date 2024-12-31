@@ -304,54 +304,7 @@ class Task(BaseModel):
             db.close()
 
 
-    def update_status_assignment(self, status: str, user_id: int, ward_id: int) -> bool:
-        db = Postgresql()
-        try:
-            admin_result = db.select(
-                '"account"',
-                'id',
-                f"username = '{self.username}'"
-            )
-            if not admin_result:
-                print(f"Admin '{self.username}' does not exist.")
-                return False
-            admin_id = admin_result[0]
-
-            role_result = db.select(
-                '"role"',
-                'permission_id',
-                f"user_id = {admin_id}"
-            )
-            if not role_result or role_result[0] != 1: 
-                print(f"User '{self.username}' is not an admin.")
-                return False
-
-            assignment_result = db.select(
-                '"assignment"',
-                'id',
-                f"user_id = {user_id} AND ward_id = {ward_id}"
-            )
-            if not assignment_result:
-                print(f"No assignment found for user_id '{user_id}' and ward_id '{ward_id}'.")
-                return False
-
-            updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
-            db.update(
-                '"assignment"',
-                f"status = '{status}', updated_at = '{updated_at}'",
-                f"user_id = {user_id} AND ward_id = {ward_id}"
-            )
-            db.commit()
-            print(f"Assignment status updated to '{status}' for user_id '{user_id}' successfully.")
-            return True
-        except Exception as e:
-            print(f"Error updating assignment status: {e}")
-            return False
-        finally:
-            db.close()
-
-    def update_status_road(self, status: str, road_id: int) -> bool:
+    def update_status(self, status: str, user_id: int = None, road_id: int = None, ward_id: int = None) -> bool:
         db = Postgresql()
         try:
             user_result = db.select(
@@ -362,30 +315,63 @@ class Task(BaseModel):
             if not user_result:
                 print(f"User '{self.username}' does not exist.")
                 return False
-            user_id = user_result[0]
+            user_id_from_db = user_result[0]
 
             role_result = db.select(
                 '"role"',
                 'permission_id',
-                f"user_id = {user_id}"
+                f"user_id = {user_id_from_db}"
             )
-            if not role_result or role_result[0] != 2 or role_result[0] != 1:  
-                print(f"User '{self.username}' is not a admin/technical user.")
+            if not role_result:
+                print(f"User '{self.username}' has no role assigned.")
                 return False
-            
-            updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            user_role = role_result[0]
 
+            if user_id and ward_id:
+                if user_role != 1:  
+                    print(f"User '{self.username}' is not an admin.")
+                    return False
 
-            db.update(
-                '"road"',
-                f"status = '{status}', update_at = '{updated_at}'",
-                f"user_id = {user_id} AND id = {road_id}"
-            )
-            db.commit()
-            print(f"Road status updated to '{status}' for user '{self.username}' successfully.")
-            return True
+                assignment_result = db.select(
+                    '"assignment"',
+                    'id',
+                    f"user_id = {user_id} AND ward_id = {ward_id}"
+                )
+                if not assignment_result:
+                    print(f"No assignment found for user_id '{user_id}' and ward_id '{ward_id}'.")
+                    return False
+
+                updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+                db.update(
+                    '"assignment"',
+                    f"status = '{status}', updated_at = '{updated_at}'",
+                    f"user_id = {user_id} AND ward_id = {ward_id}"
+                )
+                db.commit()
+                print(f"Assignment status updated to '{status}' for user_id '{user_id}' successfully.")
+                return True
+
+            if road_id:
+                if user_role not in [1, 2]:  # Admin or technical
+                    print(f"User '{self.username}' is not authorized to update road status.")
+                    return False
+
+                updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+                db.update(
+                    '"road"',
+                    f"status = '{status}', update_at = '{updated_at}'",
+                    f"id = {road_id}"
+                )
+                db.commit()
+                print(f"Road status updated to '{status}' for road_id '{road_id}' successfully.")
+                return True
+
+            print("Invalid parameters for updating status.")
+            return False
         except Exception as e:
-            print(f"Error updating road status: {e}")
+            print(f"Error updating status: {e}")
             return False
         finally:
             db.close()
