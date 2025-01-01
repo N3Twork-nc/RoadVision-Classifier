@@ -288,16 +288,15 @@ class Task(BaseModel):
             ward_id, district_name, province_name = ward_result
 
             formatted_deadline = self.deadline.strftime('%Y-%m-%d %H:%M:%S')
-            status = "Not start"
             db.insert(
                 '"assignment"',
-                'user_id, ward_id, deadline, status',
-                f"{user_id}, {ward_id}, '{formatted_deadline}', '{status}'"
+                'user_id, ward_id, deadline',
+                f"{user_id}, {ward_id}, '{formatted_deadline}'"
             )
             db.commit()
 
             print(f"Task assigned to {self.username} successfully.")
-            return True, fullname, district_name, province_name, status
+            return True, fullname, district_name, province_name
         except Exception as e:
             print(f"Error assigning task: {e}")
             return False, None, None, None, None
