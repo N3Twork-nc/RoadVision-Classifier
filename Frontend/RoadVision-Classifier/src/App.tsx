@@ -27,6 +27,7 @@ import TechniciansManagement from "./pages/Admin/Technicians/TechniciansManageme
 import DashboardTechnician from "./pages/Technician/Dashboard/Dashboard";
 import TaskManagement from "./pages/Technician/TaskManagement/TaskManagement";
 import { getUserRole, isAuthenticated } from "./utils/auth.util";
+import MapTechnician from "./pages/Technician/MapTechnician/MapTechnician";
 const App: React.FC = () => {
   const getDefaultHomePage = () => {
     if (!isAuthenticated()) {
@@ -129,6 +130,14 @@ const App: React.FC = () => {
           element={
             <PrivateRoute allowedRoles={["technical"]}>
               <TaskManagement />
+            </PrivateRoute>
+          }
+        />
+         <Route
+          path={TechnicianPageEnum.MAP}
+          element={
+            <PrivateRoute allowedRoles={["technical"]}>
+              <MapTechnician />
             </PrivateRoute>
           }
         />

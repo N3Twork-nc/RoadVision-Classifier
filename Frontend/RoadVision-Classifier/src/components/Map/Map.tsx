@@ -37,24 +37,6 @@ const Map: React.FC = () => {
   const [path, setPath] = useState<[number, number][][]>([]);
   const [isBadRoutesVisible, setIsBadRoutesVisible] = useState(false);
   const [isViewBadRoutes] = useState(false);
-  const handleToggleBadRoutes = () => {
-    setIsBadRoutesVisible((prev) => !prev);
-  };
-
-  useEffect(() => {
-    if (!leafletMap.current) return;
-
-    if (isBadRoutesVisible) {
-      // Hiển thị các tuyến đường xấu
-      updatePath(); // Gọi hàm cập nhật path khi bật switch
-    } else {
-      // Xóa các tuyến đường xấu khỏi bản đồ
-      if (routingControl) {
-        routingControl.remove();
-        setRoutingControl(null);
-      }
-    }
-  }, [isBadRoutesVisible]);
 
   // Determine marker color based on road level
   useEffect(() => {
@@ -367,16 +349,33 @@ const Map: React.FC = () => {
   }, [path]);
 
   useEffect(() => {
-    if (isViewBadRoutes) {
-      updatePath();
+    if (!leafletMap.current) return;
+  
+    // Nếu hiển thị tuyến đường xấu
+    if (isBadRoutesVisible) {
+      updatePath(); // Gọi hàm để vẽ tuyến đường
     } else {
+      // Xóa tất cả các tuyến đường nếu tắt
       if (routingControl) {
         routingControl.remove();
         setRoutingControl(null);
       }
+  
+      // Loại bỏ tất cả các polyline trên bản đồ
+      if (leafletMap.current) {
+        leafletMap.current.eachLayer((layer) => {
+          if (layer instanceof L.Polyline && !(layer instanceof L.Marker)) {
+            leafletMap.current?.removeLayer(layer);
+          }
+        });
+      }
     }
-  }, [isViewBadRoutes]);
+  }, [isBadRoutesVisible]);
 
+  const handleToggleBadRoutes = () => {
+    setIsBadRoutesVisible((prev) => !prev); 
+  };
+  
   return (
     <div className="container">
       <div className="sidebar">

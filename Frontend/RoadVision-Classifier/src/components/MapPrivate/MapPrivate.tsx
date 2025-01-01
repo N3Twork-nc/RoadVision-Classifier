@@ -154,6 +154,7 @@ const MapPrivate: React.FC = () => {
                 closeUploadModal();
                 handleAddMarker(currentLatitude, currentLongitude, {});
                 handleCloseCamera();
+                window.location.reload();
               } catch (error) {
                 console.error("Error uploading image:", error);
                 alert("An error occurred during the upload. Please try again.");
@@ -209,7 +210,7 @@ const MapPrivate: React.FC = () => {
                   filepath:
                     "https://images4.alphacoders.com/115/thumb-1920-115716.jpg",
                 });
-                
+                window.location.reload();
               } catch (error) {
                 console.error("Error uploading image:", error);
                 alert("An error occurred during the upload. Please try again.");
@@ -255,13 +256,6 @@ const MapPrivate: React.FC = () => {
     setShowDeleteModal(false);
   };
 
-  const handleEditCoordinates = () => {
-    setImageData({
-      ...imageData,
-      location: `${latitude} lat, ${longitude} long`,
-    });
-    setShowEditModal(false);
-  };
   const handleCloseCamera = () => {
     if (videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
@@ -381,6 +375,30 @@ const MapPrivate: React.FC = () => {
       setShowDeleteModal(false);
     }
   };
+  const handleSave = async () => {
+    try {
+      // Gọi API để cập nhật tọa độ
+      const response = await dataService.updateLocationRoad(
+        imageData.id,
+        latitude,
+        longitude
+      );
+      console.log("Update successful:", response);
+      alert("Coordinates updated successfully!");
+
+      setImageData((prevData: typeof imageData) => ({
+        ...prevData,
+        latitude,
+        longitude,
+      }));
+
+      closeEditModal();
+      window.location.reload();
+    } catch (error) {
+      console.error("Failed to update coordinates:", error);
+      alert("Failed to update coordinates. Please try again.");
+    }
+  };
 
   return (
     <div className="container">
@@ -415,11 +433,10 @@ const MapPrivate: React.FC = () => {
             <p>
               <strong>Location: </strong> <br />{" "}
               <li>
-                Lat: {imageData.latitude}<br />
+                Lat: {imageData.latitude}
+                <br />
               </li>
-              <li>
-                Long: {imageData.longitude}{" "}
-              </li>
+              <li>Long: {imageData.longitude} </li>
             </p>
             <p>
               <strong>Time: </strong>
@@ -468,32 +485,34 @@ const MapPrivate: React.FC = () => {
       )}
 
       {/* Edit Coordinates Modal */}
+
+      {/* Edit Coordinates Modal */}
       {showEditModal && (
         <div className="modal">
           <div className="modalContent">
-            <h3 className="modalTitle">Edit Coordinates</h3>
-            <div className="modalActions">
-              <label>
-                Latitude:
-                <input
-                  type="number"
-                  value={latitude}
-                  onChange={(e) => setLatitude(Number(e.target.value))}
-                />
-              </label>
-              <label>
-                Longitude:
-                <input
-                  type="number"
-                  value={longitude}
-                  onChange={(e) => setLongitude(Number(e.target.value))}
-                />
-              </label>
-              <button className="modalButton" onClick={handleEditCoordinates}>
-                Save
-              </button>
-              <button className="modalButtonCancel" onClick={closeEditModal}>
+            <h3>Edit Coordinates</h3>
+            <div className="inputGroup">
+              <label>Latitude:</label>
+              <input
+                type="number"
+                value={latitude}
+                onChange={(e) => setLatitude(parseFloat(e.target.value))}
+              />
+            </div>
+            <div className="inputGroup">
+              <label>Longitude:</label>
+              <input
+                type="number"
+                value={longitude}
+                onChange={(e) => setLongitude(parseFloat(e.target.value))}
+              />
+            </div>
+            <div className="buttonGroup">
+              <button className="cancelButton" onClick={closeEditModal}>
                 Cancel
+              </button>
+              <button className="saveButton" onClick={handleSave}>
+                Save
               </button>
             </div>
           </div>
