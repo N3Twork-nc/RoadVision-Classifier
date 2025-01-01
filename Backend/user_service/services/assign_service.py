@@ -1,7 +1,7 @@
 from schemas import Task
 from datetime import datetime
 from .format_response import format_response
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 class AssignService:
     @staticmethod
@@ -13,7 +13,7 @@ class AssignService:
             )
 
         try:
-            success, fullname, district_name, province_name, status = task.assign_task()
+            success, fullname, district_name, province_name = task.assign_task()
 
             if not success:
                 raise HTTPException(
@@ -43,7 +43,6 @@ class AssignService:
                     "ward_name": task.ward_name,
                     "district_name": district_name,
                     "province_name": province_name,
-                    "status": status,
                     "deadline": formatted_deadline
                 },
                 message="Task assigned successfully.",
@@ -60,7 +59,7 @@ class AssignService:
             return format_response(
                 status="Error",
                 data=None,
-                message="An error occurred while assigning task.",
+                message=f"An error occurred while assigning task: {e}",
                 status_code=500
             )
         
