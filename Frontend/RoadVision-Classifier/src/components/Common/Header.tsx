@@ -9,8 +9,9 @@ import { accountState } from "../../atoms/authState";
 import { Link } from "react-router-dom";
 import { PageEnum } from "../../defination/enums/page.enum";
 import { handleLogOut } from "../../utils/auth.util";
-import userprofileService from "../../services/userprofile.service";
 import defaultAvatar from "../../assets/img/defaultAvatar.png";
+const api_url =  import.meta.env.VITE_BASE_URL;
+
 const Header: React.FC = () => {
   const userRecoilStateValue = useRecoilValue(accountState);
   const [userRecoilState, setUserRecoilState] = useRecoilState(accountState);
@@ -35,7 +36,7 @@ const Header: React.FC = () => {
   useEffect(() => {
     const fetchAvatar = async () => {
       try {
-        const avatarUrl = await userprofileService.getAvatar();
+        const avatarUrl = `${api_url}/user/api/getAvatar?username=${userRecoilStateValue.username}`;;
         setUserRecoilState((prevState) => ({
           ...prevState,
           avatar: avatarUrl,

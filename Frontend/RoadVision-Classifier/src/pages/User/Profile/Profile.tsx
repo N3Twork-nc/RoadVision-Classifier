@@ -12,9 +12,7 @@ import { accountState } from "../../../atoms/authState";
 export default function Profile() {
   const userRecoilStateValue = useRecoilValue(accountState);
   const [activeTab, setActiveTab] = useState(0);
-
-
-
+  const avatar = userRecoilStateValue.avatar;
   // All Tabs
   const tabs = [
     { label: "Account", component: <Account /> },
@@ -32,18 +30,15 @@ export default function Profile() {
             src={mask}
             className="absolute top-0 left-0 w-full h-full object-cover rounded-2xl"
           />
-          <div
-            className="absolute bg-white rounded-full top-[40%] w-36 h-36 flex justify-center items-center"
-          >
+          <div className="absolute bg-white rounded-full top-[40%] w-36 h-36 flex justify-center items-center">
             <img
-              src={userRecoilStateValue.avatar || defaultAvatar}
+              src={avatar || defaultAvatar}
               alt="Avatar"
               className="w-[95%] h-[95%] object-cover rounded-full"
             />
           </div>
         </div>
 
-       
         {/* User Info */}
         <div className="flex flex-col mt-12">
           <h1 className="text-center text-lg font-semibold">

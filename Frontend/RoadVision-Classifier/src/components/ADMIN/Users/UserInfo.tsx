@@ -1,10 +1,10 @@
 import { Breadcrumb, Table, Tag } from "antd";
-import avt from "../../../assets/img/nct.png";
+import avt from "../../../assets/img/defaultAvatar.png";
 import { useEffect, useState } from "react";
 import manageAlluserService from "../../../services/manageAlluser.service";
 import { RoadDataType } from "../../../defination/types/alluser.type";
 import { format } from "date-fns";
-
+import { AiOutlineDelete } from "react-icons/ai";
 interface DataType {
   key: React.Key;
   user_id: number;
@@ -17,8 +17,9 @@ interface DataType {
 interface AllUserProps {
   user: DataType;
   onBack: () => void;
+  onViewRoadDetails: (road: any) => void;
 }
-
+const api_url =  import.meta.env.VITE_BASE_URL;
 const columns = [
   {
     title: "Road ID",
@@ -67,10 +68,25 @@ const columns = [
     key: "road_location",
     align: "center" as "center",
   },
-  
+  {
+    title: "Action",
+    key: "road_location",
+    align: "center" as "center",
+    render: () => (
+      <div>
+        <button className="text-red-500">
+          <AiOutlineDelete className="w-5 h-5" />
+        </button>
+      </div>
+    ),
+  },
 ];
 
-export default function UserInfo({ user, onBack }: AllUserProps) {
+export default function UserInfo({
+  user,
+  onBack,
+  onViewRoadDetails,
+}: AllUserProps) {
   const [dataSource, setDataSource] = useState<RoadDataType[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -89,10 +105,13 @@ export default function UserInfo({ user, onBack }: AllUserProps) {
           const extractedRoads = roads.map((road) => ({
             key: road.id,
             road_id: road.id,
-            road_image: `http://192.168.120.26${road.filepath}`,
+            road_image: `${api_url}${road.filepath}`,
             road_type: road.level,
             road_time: format(new Date(road.created_at), "dd/MM/yyyy HH:mm:ss"),
             road_location: road.location,
+            road_lat: road.latitude,
+            road_long: road.longitude,
+            road_status: road.status,
           }));
 
           console.log("Extracted roads", extractedRoads);
@@ -110,7 +129,6 @@ export default function UserInfo({ user, onBack }: AllUserProps) {
     fetchAllRoads();
   }, [user.user_id]);
 
-
   return (
     <div className="w-full min-h-screen bg-[#F9F9F9] flex flex-col gap-5 justify-start items-center overflow-y-auto">
       <Breadcrumb
@@ -124,6 +142,7 @@ export default function UserInfo({ user, onBack }: AllUserProps) {
           },
           {
             title: user.username || "User Info",
+            className: "text-[#23038C]"
           },
         ]}
       />
@@ -155,6 +174,15 @@ export default function UserInfo({ user, onBack }: AllUserProps) {
           loading={loading}
           pagination={{ pageSize: 5 }}
           rowKey="road_id"
+          onRow={(record) => ({
+            onClick: () => {
+              if (onViewRoadDetails) {
+                onViewRoadDetails(record); // Gọi hàm khi nhấp vào hàng
+              } else {
+                console.error("onViewRoadDetails is not defined");
+              }
+            },
+          })}
         />
       </div>
     </div>

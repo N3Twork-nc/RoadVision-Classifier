@@ -107,3 +107,28 @@
 .roadItem:hover {
   background-color: #f1f1f1; 
 }
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header h2 {
+  margin: 0;
+}
+
+.toggleGroup {
+  display: flex;        
+  align-items: center;       
+  gap: 10px;                  
+}
+
+.toggleIcon {
+  cursor: pointer;
+  width: 55px;
+  height: 55px;
+  vertical-align: middle;
+}
+
+

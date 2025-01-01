@@ -20,10 +20,9 @@ export default {
     }
   },
   
-  getAvatar: async () => {
+  getAvatar: async (username: string) => {
     const url = `/user/api/getAvatar`;
-    const token = getAccessToken();
-    return `http://192.168.120.26${url}?token=${token}`; 
+    return `http://192.168.120.26${url}?username=${username}`; 
   },
   
   uploadAvatar: async (formData: UploadAvatarType) => {
