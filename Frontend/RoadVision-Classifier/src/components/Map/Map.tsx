@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import L from 'leaflet';
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
@@ -8,6 +8,8 @@ import "leaflet-control-geocoder";
 import "./map.css"; // Import CSS file
 import dataService from "../../services/data.service";
 import "leaflet";
+import onButton from "../../assets/img/onButton.png";
+import offButton from "../../assets/img/offButton.png";
 
 declare module "leaflet" {
   namespace Control {
@@ -29,10 +31,30 @@ const Map: React.FC = () => {
     useState<L.Routing.Control | null>(null);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [, setRoadsData] = useState<any[]>([]);
-  const [path] = useState<[number, number][]>([]);
   const [routeInfo, setRouteInfo] = useState<any[]>([]);
   const [startMarker, setStartMarker] = useState<L.Marker | null>(null);
   const [endMarker, setEndMarker] = useState<L.Marker | null>(null);
+  const [path, setPath] = useState<[number, number][][]>([]);
+  const [isBadRoutesVisible, setIsBadRoutesVisible] = useState(false); 
+  const [isViewBadRoutes, ] = useState(false); 
+  const handleToggleBadRoutes = () => {
+    setIsBadRoutesVisible((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (!leafletMap.current) return;
+
+    if (isBadRoutesVisible) {
+      // Hiển thị các tuyến đường xấu
+      updatePath(); // Gọi hàm cập nhật path khi bật switch
+    } else {
+      // Xóa các tuyến đường xấu khỏi bản đồ
+      if (routingControl) {
+        routingControl.remove();
+        setRoutingControl(null);
+      }
+    }
+  }, [isBadRoutesVisible]);
 
   // Determine marker color based on road level
   useEffect(() => {
@@ -148,7 +170,7 @@ const Map: React.FC = () => {
   }, []);
 
   const searchForLocation = (location: string) => {
-    const geocoder = L.Control.Geocoder.nominatim();
+    const geocoder = (L.Control as any).Geocoder.nominatim();
     geocoder.geocode(location, (results: any) => {
       if (results.length > 0) {
         const { center } = results[0];
@@ -171,7 +193,7 @@ const Map: React.FC = () => {
       return;
     }
 
-    const geocoder = L.Control.Geocoder.nominatim();
+    const geocoder = (L.Control as any).Geocoder.nominatim();
     geocoder.geocode(query, (results: any[]) => {
       setSuggestions(results);
     });
@@ -249,7 +271,44 @@ const Map: React.FC = () => {
     });
   };
 
-  // Cập nhật hàm để hiển thị tuyến đường qua tọa độ
+  // Hàm cập nhật mảng tọa độ
+  const updatePath = async () => {
+    try {
+      const response = await dataService.getRouteMap();
+      console.error("Dữ liệu tọa độ:", response);
+      const parsedCoordinates = response;
+      if (
+        Array.isArray(parsedCoordinates) &&
+        parsedCoordinates.every(
+          (group) =>
+            Array.isArray(group) &&
+            group.every(
+              (point) =>
+                typeof point === "string" &&
+                /^\(\d+(\.\d+)?,\s*\d+(\.\d+)?\)$/.test(point)
+            )
+        )
+      ) {
+        // Chuyển đổi chuỗi tọa độ thành mảng [latitude, longitude]
+        const routes = parsedCoordinates.map((group) =>
+          group.map((point: string) => {
+            const [lat, lng] = point
+              .slice(1, -1)
+              .split(",")
+              .map((coord) => parseFloat(coord.trim())); // Chuyển chuỗi thành số
+            return [lat, lng];
+          })
+        );
+
+        setPath(routes); 
+      } else {
+        alert("Dữ liệu không hợp lệ. Đảm bảo đúng định dạng mảng tọa độ.");
+      }
+    } catch (error) {
+      alert("Lỗi khi phân tích JSON. Vui lòng nhập đúng định dạng.");
+    }
+  };
+
   useEffect(() => {
     if (path.length === 0 || !leafletMap.current) return;
 
@@ -257,19 +316,44 @@ const Map: React.FC = () => {
       routingControl.remove();
     }
 
-    const waypoints = path.map(([lat, lng]) => L.latLng(lat, lng));
-    const newRoutingControl = L.Routing.control({
-      waypoints: waypoints,
-      routeWhileDragging: true,
-    }).addTo(leafletMap.current!);
+    path.forEach((route) => {
+      const waypoints = Array.isArray(route) && route.every(point => Array.isArray(point) && point.length === 2) ? route.map((point: [number, number]) => L.latLng(point[0], point[1])) : [];
+      const newRoutingControl = L.Routing.control({
+        waypoints: waypoints,
+        routeWhileDragging: true,
+      }).addTo(leafletMap.current!);
 
-    setRoutingControl(newRoutingControl);
+      setRoutingControl(newRoutingControl);
+    });
   }, [path]);
+
+  useEffect(() => {
+    if (isViewBadRoutes) {
+      updatePath(); // Hiển thị các tuyến đường xấu
+    } else {
+      // Ẩn các tuyến đường xấu và reset map
+      if (routingControl) {
+        routingControl.remove();
+        setRoutingControl(null);
+      }
+    }
+  }, [isViewBadRoutes]);
 
   return (
     <div className="container">
       <div className="sidebar">
-        <h2>Tìm kiếm địa điểm</h2>
+        <div className="header">
+          <h2>Tìm kiếm địa điểm</h2>
+          <div className="inputGroup toggleGroup">
+            <h1>View bad routes</h1>
+            <img
+              src={isBadRoutesVisible ? onButton : offButton}
+              alt="Toggle View Bad Routes"
+              className="toggleIcon"
+              onClick={handleToggleBadRoutes}
+            />
+          </div>
+        </div>
         {!isRouteInputVisible ? (
           <>
             <div className="inputGroup">
@@ -371,7 +455,6 @@ const Map: React.FC = () => {
           </>
         )}
       </div>
-
       <div ref={mapRef} className="map"></div>
     </div>
   );
