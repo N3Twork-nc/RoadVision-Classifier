@@ -7,7 +7,7 @@ import { accountState } from "../../../atoms/authState";
 import authService from "../../../services/auth.service";
 import useNavigateTo from "../../../hooks/useNavigateTo";
 import { setStoredUserInfo } from "../../../utils/local-storage.util";
-import { saveAccessToken } from "../../../utils/auth.util";
+import { saveAccessToken, saveUserRole } from "../../../utils/auth.util";
 import { ERROR_MESSAGES } from "../../../defination/consts/messages.const";
 
 // Input validation schema using zod
@@ -66,11 +66,13 @@ const SignInBlock = () => {
       if (info && token) {
           saveAccessToken(token); // Save token for future API calls
           setStoredUserInfo(info); // Save user info to local storage
-          setAccountState(info); // Update Recoil user state
+          setAccountState(info); 
+           // Update Recoil user state
           // Navigate to the home page after successful login
           console.log(data.info.role);
           if (data.info.role) {
-            localStorage.setItem("userRole", data.info.role); // Ensure role is defined
+            localStorage.setItem("userRole", data.info.role);
+            saveUserRole(data.info.role);
             if (data.info.role === "user") {
               navigateHome();
             } else if (data.info.role === "admin") {

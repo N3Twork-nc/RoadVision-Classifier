@@ -1,5 +1,5 @@
 import { Breadcrumb } from "antd";
-import avt from "../../../assets/img/nct.png"
+import avt from "../../../assets/img/defaultAvatar.png"
 
 interface DataType {
   key: React.Key;
@@ -44,6 +44,9 @@ export default function TechnicianInfo({ technician, onBack }: AllTechniciansPro
           </div>
           <div className="text-white font-normal text-base">
             {technician.username || ""}
+          </div>
+          <div className="text-white font-normal text-base">
+            {technician.joindate || ""}
           </div>
         </div>
       </div>

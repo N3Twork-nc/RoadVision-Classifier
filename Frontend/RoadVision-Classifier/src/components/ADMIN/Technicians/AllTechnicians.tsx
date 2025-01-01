@@ -49,7 +49,7 @@ export default function AllTechnicians({ onViewTechnicianInfo }: AllTechniciansP
     fetchAllTechnicians();
   }, []);
 
-  // ADD NEW USER
+  // ADD NEW TECHNICIAN
   const handleAddTechnicians = async (values: {
     username: string;
     fullname: string;
@@ -58,11 +58,18 @@ export default function AllTechnicians({ onViewTechnicianInfo }: AllTechniciansP
   }) => {
     const payload = { ...values, permission_id: "2" };
     try {
-      await manageAlltechnicianService.addNewTechnician(payload);
-      alert("Add technician successfully!");
-      fetchAllTechnicians();
-      form.resetFields();
-      setIsModalVisible(false);
+      const response = await manageAlltechnicianService.addNewTechnician(payload);
+      if (response.status.toString() === "Success")
+      {
+        alert("Add technician successfully!");
+        fetchAllTechnicians();
+        form.resetFields();
+        setIsModalVisible(false);
+      }
+      else {
+        alert("Add technicians failed!");
+      }
+      
     } catch (error) {
       console.log("Add technicians failed!");
     }
@@ -73,7 +80,7 @@ export default function AllTechnicians({ onViewTechnicianInfo }: AllTechniciansP
     setIsModalVisible(false);
   };
 
-      // DELETE TECHNICIAN
+ // DELETE TECHNICIAN
   const handleDeleteTechnician = async (username: string) => {
     Modal.confirm({
       title: "Are you sure you want to delete this technicians?",
@@ -170,13 +177,13 @@ export default function AllTechnicians({ onViewTechnicianInfo }: AllTechniciansP
           >
             <Input />
           </Form.Item>
-          <Form.Item
+          {/* <Form.Item
             name="fullname"
             label="Fullname"
             rules={[{ required: true, message: "Please input fullname!" }]}
           >
             <Input />
-          </Form.Item>
+          </Form.Item> */}
           <Form.Item
             name="email"
             label="Email"

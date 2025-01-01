@@ -10,7 +10,11 @@ import PublicMap from "./pages/User/PublicMap/PublicMap";
 import MapManagement from "./pages/User/MapManagement/MapManagement";
 import MyLibrary from "./pages/User/MyLibrary/MyLibrary";
 import Profile from "./pages/User/Profile/Profile";
-import { PageEnum, AdminPageEnum, TechnicianPageEnum } from "./defination/enums/page.enum";
+import {
+  PageEnum,
+  AdminPageEnum,
+  TechnicianPageEnum,
+} from "./defination/enums/page.enum";
 import PrivateRoute from "./components/Common/PrivateRoute";
 import AuthLogin from "./pages/User/Auth/AuthLogin";
 import AuthSignUp from "./pages/User/Auth/AuthSignUp";
@@ -22,10 +26,28 @@ import UsersManagement from "./pages/Admin/Users/UsersManagement";
 import TechniciansManagement from "./pages/Admin/Technicians/TechniciansManagement";
 import DashboardTechnician from "./pages/Technician/Dashboard/Dashboard";
 import TaskManagement from "./pages/Technician/TaskManagement/TaskManagement";
+import { getUserRole, isAuthenticated } from "./utils/auth.util";
 const App: React.FC = () => {
+  const getDefaultHomePage = () => {
+    if (!isAuthenticated()) {
+      return PageEnum.LOGIN;
+    }
+    const role = getUserRole();
+    if (role === "admin") {
+      return AdminPageEnum.DASHBOARD;
+    } else if (role === "technical") {
+      return TechnicianPageEnum.DASHBOARD;
+    }
+    return PageEnum.HOME;
+  };
   return (
     <Router>
       <Routes>
+        {/* DEFAULT ROUTE */}
+        <Route
+          path="/"
+          element={<Navigate to={getDefaultHomePage()} replace />}
+        />
         {/* AUTH ROUTES */}
         <Route path={PageEnum.LOGIN} element={<AuthLogin />} />
         <Route path={PageEnum.SIGN_UP} element={<AuthSignUp />} />
@@ -33,12 +55,15 @@ const App: React.FC = () => {
         <Route path={PageEnum.FORGOT_PASSWORD} element={<AuthForgotPass />} />
 
         {/* PUBLIC ROUTES */}
-        <Route path={PageEnum.INDEX} element={<Navigate to={PageEnum.HOME} replace />} />
+        <Route
+          path={PageEnum.INDEX}
+          element={<Navigate to={PageEnum.HOME} replace />}
+        />
         <Route path={PageEnum.HOME} element={<Home />} />
         <Route path={PageEnum.PUBLIC_MAP} element={<PublicMap />} />
         <Route path={PageEnum.NOT_FOUND} element={<NotFound />} />
 
-       {/* USER ROUTES */}
+        {/* USER ROUTES */}
         <Route
           path={PageEnum.PROFILE}
           element={
