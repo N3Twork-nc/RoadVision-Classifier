@@ -129,8 +129,8 @@ class RoadService:
                 return JSONResponse(content={"status": "error", "message": "You don't have permission to access this feature"}, status_code=403)
             days= (30 if during=='monthly' else 365)*number
             db=Postgresql()
-            count_all=db.execute(f"SELECT level, count(level) FROM road where level <> 'Good' and level <> 'classifing' and created_at >= NOW() - INTERVAL '{days} days' group by level",fetch='all')
-            count_done=db.execute(f"SELECT level, count(level) FROM road where level <> 'Good' and level <> 'classifing' and status='Done' and created_at >= NOW() - INTERVAL '{days} days' group by level",fetch='all')
+            count_all=db.execute(f"SELECT level, count(level) FROM road where level <> 'Good' and level <> 'Classifing' and created_at >= NOW() - INTERVAL '{days} days' group by level",fetch='all')
+            count_done=db.execute(f"SELECT level, count(level) FROM road where level <> 'Good' and level <> 'Classifing' and status='Done' and created_at >= NOW() - INTERVAL '{days} days' group by level",fetch='all')
             db.close()
             data={
                 'Total':[f"'{level}': {count}" for level,count in  count_all],
