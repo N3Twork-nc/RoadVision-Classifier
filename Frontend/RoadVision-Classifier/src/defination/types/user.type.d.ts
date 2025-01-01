@@ -1,5 +1,7 @@
 export type UserType = Partial<{
+  avatar: string; 
   email: string;
-  id: string;
+  id: number;
   username: string;
+  role: string;
 }>;

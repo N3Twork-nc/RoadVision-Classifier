@@ -18,7 +18,7 @@ Gửi một JSON object với định dạng sau trong body:
 {
   "username": "string",
   "fullname": "string",
-  "birthday": "string",
+  "birthday": date, 
   "gender": "string",
   "phonenumber": "string",
   "location": "string",
@@ -128,7 +128,6 @@ POST api/uploadAvatar
 #### 3.2.1 Định dạng dữ liệu yêu cầu (Request)
 
 - Token xác thực danh tính người dùng.
-
 - File hình ảnh có các định dạng jpg, jpeg hoặc png (bắt buộc).
 
 #### 3.2.2. Định dạng dữ liệu phản hồi (Response)
@@ -181,12 +180,11 @@ API cho phép người dùng lấy ảnh avatar cá nhân.
 ### 4.2 Endpoint
 ```
 GET api/getAvatar
-
 ```
 
 #### 4.2.1 Định dạng dữ liệu yêu cầu (Request)
 
-API không yêu cầu body trong request. Token xác thực danh tính người dùng sẽ được gửi trong header.
+API không yêu cầu body trong request. Username xác thực danh tính người dùng sẽ được gửi trong header.
 
 #### 4.2.2. Định dạng dữ liệu phản hồi (Response)
 ##### 4.2.2.1 Yêu cầu thành công
@@ -214,5 +212,161 @@ Phản hồi sẽ trả về file hình ảnh đã lưu.
 - `message`: Thông điệp mô tả kết quả của yêu cầu.
 
 ### 4.3 Lưu ý
-- API yêu cầu token hợp lệ trong header để xác thực danh tính người dùng.
+- API yêu cầu username hợp lệ trong header để xác thực danh tính người dùng.
 - Đường dẫn file hình ảnh avatar là một đường dẫn tương đối lưu trữ trong cơ sở dữ liệu. Hệ thống sẽ tìm đường dẫn tới file từ server để phục vụ request.
+
+## 5. API thống kê danh sách thông tin user và technical (chỉ dành cho admin)
+### 5.1 Mục đích
+API cung cấp tính năng thống kê danh sách thông tin của tất cả user và technical. Chỉ các tài khoản có quyền admin mới được phép sử dụng API này.
+
+### 4.2 Endpoint
+```
+GET /api/getUserStatistics
+GET /api/getTechnicalStatistics
+```
+
+#### 5.2.1 Định dạng dữ liệu yêu cầu (Request)
+
+API không yêu cầu body trong request. Token xác thực danh tính người dùng sẽ được gửi trong header.
+
+#### 5.2.2. Định dạng dữ liệu phản hồi (Response)
+##### 5.2.2.1 Yêu cầu thành công
+Phản hồi sẽ trả về các thông tin của tất cả user và technical.
+- Định dạng phản hồi nếu lấy thông tin user:
+```json
+{
+  "status": "Success",
+  "data": {
+    "data": [
+      {
+        "user_id": 97,
+        "fullname": null,
+        "username": "hehehe",
+        "created": "2024-12-30 15:20:53",
+        "avatar": "/user/api/getAvatar?username=hehehe",
+        "contribution": 0
+      },
+      {
+        "user_id": 98,
+        "fullname": null,
+        "username": "1234",
+        "created": "2024-12-30 16:20:56",
+        "avatar": "/user/api/getAvatar?username=1234",
+        "contribution": 0
+      },
+      {
+        "user_id": 69,
+        "fullname": "Le Huynh Anh Thu",
+        "username": "baongan123",
+        "created": "2024-11-09 16:13:14",
+        "avatar": "/user/api/getAvatar?username=baongan123",
+        "contribution": 17
+      },
+      {
+        "user_id": 96,
+        "fullname": null,
+        "username": "hehe",
+        "created": "2024-12-30 14:44:26",
+        "avatar": "/user/api/getAvatar?username=hehe",
+        "contribution": 0
+      }
+    ]
+  },
+  "message": "User statistics retrieved successfully"
+}
+```
+- Định dạng phản hồi nếu lấy thông tin technical: 
+```json
+{
+  "status": "Success",
+  "data": {
+    "data": [
+      {
+        "user_id": 87,
+        "fullname": null,
+        "username": "thule",
+        "avatar": "/user/api/getAvatar?username=thule",
+        "created": "2024-12-29 00:42:57",
+        "tasks": [
+          {
+            "deadline": "2024-02-25 07:12:28",
+            "status": null,
+            "ward_name": "Phường Đa Kao",
+            "district_name": "Quận 1",
+            "province_name": "Thành phố Hồ Chí Minh"
+          },
+          {
+            "deadline": "2024-03-02 07:19:37",
+            "status": null,
+            "ward_name": "Phường 5",
+            "district_name": "Quận Phú Nhuận",
+            "province_name": "Thành phố Hồ Chí Minh"
+          },
+          {
+            "deadline": "2024-01-03 07:55:02",
+            "status": null,
+            "ward_name": "Phường Linh Trung",
+            "district_name": "Thành phố Thủ Đức",
+            "province_name": "Thành phố Hồ Chí Minh"
+          },
+          {
+            "deadline": "2024-03-02 07:19:37",
+            "status": null,
+            "ward_name": "Phường 9",
+            "district_name": "Quận Phú Nhuận",
+            "province_name": "Thành phố Hồ Chí Minh"
+          },
+          {
+            "deadline": "2024-12-30 15:00:47",
+            "status": "Not start",
+            "ward_name": "Phường An Bình",
+            "district_name": "Thành phố Dĩ An",
+            "province_name": "Bình Dương"
+          },
+          {
+            "deadline": "2024-12-30 15:00:47",
+            "status": "Not start",
+            "ward_name": "Phường Dĩ An",
+            "district_name": "Thành phố Dĩ An",
+            "province_name": "Bình Dương"
+          },
+          {
+            "deadline": "2025-12-01 16:00:00",
+            "status": "Done",
+            "ward_name": "Phường Tăng Nhơn Phú A",
+            "district_name": "Thành phố Thủ Đức",
+            "province_name": "Thành phố Hồ Chí Minh"
+          }
+        ]
+      }
+    ]
+  },
+  "message": "Technical statistics retrieved successfully"
+}
+```
+
+##### 5.2.2.2 Yêu cầu không thành công
+###### 5.2.2.2.1 Tài khoản không có quyền admin
+```json
+{
+    "status": "Failed",
+    "message": "Permission denied: Admin role required",
+    "status_code": 403
+}
+```
+###### 5.2.2.2.2 Không tìm thấy dữ liệu
+```json
+{
+    "status": "Error",
+    "message": "No technical statistics found",
+    "status_code": 404
+}
+```
+***Trong đó:***
+- `status`: Trạng thái của yêu cầu.
+- `message`: Thông điệp mô tả kết quả của yêu cầu.
+
+### 5.3 Lưu ý
+- API yêu cầu token hợp lệ trong header để xác thực danh tính người dùng.
+- Cần phải là tài khoản có quyền admin thì mới xem được các thông tin trả về từ API này.
+

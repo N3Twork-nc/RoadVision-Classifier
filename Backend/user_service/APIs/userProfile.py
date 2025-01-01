@@ -1,7 +1,7 @@
 from main import app
-from fastapi import Depends, File, UploadFile
+from fastapi import Depends, File, UploadFile, Query
 from schemas.user_schemas import User
-from services.editProfile_service import ProfileService
+from services.profile_service import ProfileService
 from services.auth_validate import validate_token
 
 @app.post('/api/editProfile')
@@ -17,5 +17,5 @@ def upload_avatar(file: UploadFile = File(...), username: str = Depends(validate
     return ProfileService.upload_avatar(username, file)
 
 @app.get("/api/getAvatar")
-def get_image(username: str = Depends(validate_token)):
-    return ProfileService.get_image_by_username(username)
+def get_image(uusername: str = Query(..., alias="username")):
+    return ProfileService.get_image_by_username(uusername)
