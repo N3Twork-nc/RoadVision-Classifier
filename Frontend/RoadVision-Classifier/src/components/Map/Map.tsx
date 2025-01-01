@@ -35,8 +35,8 @@ const Map: React.FC = () => {
   const [startMarker, setStartMarker] = useState<L.Marker | null>(null);
   const [endMarker, setEndMarker] = useState<L.Marker | null>(null);
   const [path, setPath] = useState<[number, number][][]>([]);
-  const [isBadRoutesVisible, setIsBadRoutesVisible] = useState(false); 
-  const [isViewBadRoutes, ] = useState(false); 
+  const [isBadRoutesVisible, setIsBadRoutesVisible] = useState(false);
+  const [isViewBadRoutes] = useState(false);
   const handleToggleBadRoutes = () => {
     setIsBadRoutesVisible((prev) => !prev);
   };
@@ -85,7 +85,19 @@ const Map: React.FC = () => {
         const { latitude, longitude } = position.coords;
         const currentLocation = L.latLng(latitude, longitude);
         map.setView(currentLocation, 14);
-        L.marker(currentLocation)
+        const currentLocationIcon = L.divIcon({
+          className: "current-location-icon",
+          html: `
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="pink">
+              <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="blue" />
+              <circle cx="12" cy="12" r="4" fill="white" />
+            </svg>
+          `,
+          iconSize: [35, 35],
+          iconAnchor: [15, 30],
+        });
+
+        L.marker(currentLocation, { icon: currentLocationIcon })
           .addTo(map)
           .bindPopup("Vị trí hiện tại của bạn")
           .openPopup();
@@ -300,7 +312,7 @@ const Map: React.FC = () => {
           })
         );
 
-        setPath(routes); 
+        setPath(routes);
       } else {
         alert("Dữ liệu không hợp lệ. Đảm bảo đúng định dạng mảng tọa độ.");
       }
@@ -317,9 +329,36 @@ const Map: React.FC = () => {
     }
 
     path.forEach((route) => {
-      const waypoints = Array.isArray(route) && route.every(point => Array.isArray(point) && point.length === 2) ? route.map((point: [number, number]) => L.latLng(point[0], point[1])) : [];
+      const waypoints =
+        Array.isArray(route) &&
+        route.every((point) => Array.isArray(point) && point.length === 2)
+          ? route.map((point: [number, number]) => L.latLng(point[0], point[1]))
+          : [];
+
+      // Vẽ các marker với SVG tùy chỉnh
+      route.forEach((point: [number, number]) => {
+        const blackMarkerIcon = L.divIcon({
+          className: "custom-marker-icon", // Tùy chọn thêm lớp CSS nếu cần
+          html: `
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="black">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 4.25 7 13 7 13s7-8.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+            </svg>
+          `,
+          iconSize: [30, 30], // Kích thước của biểu tượng
+        });
+
+        // Tạo marker tại từng tọa độ
+        L.marker([point[0], point[1]], { icon: blackMarkerIcon }).addTo(
+          leafletMap.current!
+        );
+      });
+      const plan = new L.Routing.Plan(waypoints, {
+        createMarker: () => {
+          return false;
+        },
+      });
       const newRoutingControl = L.Routing.control({
-        waypoints: waypoints,
+        plan: plan,
         routeWhileDragging: true,
       }).addTo(leafletMap.current!);
 
@@ -329,9 +368,8 @@ const Map: React.FC = () => {
 
   useEffect(() => {
     if (isViewBadRoutes) {
-      updatePath(); // Hiển thị các tuyến đường xấu
+      updatePath();
     } else {
-      // Ẩn các tuyến đường xấu và reset map
       if (routingControl) {
         routingControl.remove();
         setRoutingControl(null);
