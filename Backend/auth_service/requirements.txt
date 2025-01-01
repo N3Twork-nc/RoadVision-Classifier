@@ -1,5 +1,6 @@
-asyncpg
 python-dotenv
 fastapi
-psycopg2
 PyJWT
+uvicorn==0.32.0
+psycopg2-binary
+pydantic[Email]

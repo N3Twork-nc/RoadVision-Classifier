@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Select, DatePicker } from "antd";
 import { countryList } from "./country";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useRecoilState } from "recoil";
 import { profileState } from "../../atoms/profileState";
 import userProfileService from "../../services/userprofile.service";
 import { EditProfileDataType, UploadAvatarType } from "../../defination/types/profile.type";
+import { accountState } from "../../atoms/authState";
 
 dayjs.extend(customParseFormat);
 const { Option } = Select;
@@ -14,38 +15,45 @@ const dateFormatList = ["DD-MM-YYYY"];
 
 export default function EditProfile() {
   const profileData = useRecoilValue(profileState);
+  const userRecoilStateValue = useRecoilValue(accountState);
+  const [userRecoilState, setUserRecoilState] = useRecoilState(accountState);
 
-  const [selectedGender, setSelectedGender] = useState<string>(
-    profileData.gender || ""
-  );
+  const [selectedGender, setSelectedGender] = useState<string>(profileData.gender || "");
   const [fullname, setFullname] = useState(profileData.fullname || "");
   const [phonenumber, setPhonenumber] = useState(profileData.phonenumber || "");
   const [address, setAddress] = useState(profileData.location || "");
   const [selectedCountry, setSelectedCountry] = useState<string>(profileData.state || "");
   const [selectedBirthday, setSelectedBirthday] = useState<string>(profileData.birthday || "");
 
-  const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      const formData = new FormData();
-      formData.append("file", file);
-      try {
-        // Replace with actual token retrieval logic
-        const uploadData: UploadAvatarType = { file: file };
-        const response = await userProfileService.uploadAvatar(uploadData);
-        
-        if (response.status === 200) {
-          alert("Avatar updated successfully!");
-        } else {
-          alert("Failed to upload avatar. Please try again.");
-        }
-      } catch (error) {
-        console.error("Error uploading avatar:", error);
-        alert("Something went wrong while uploading avatar.");
-      }
-    }
-  };
+  // const handleAvatarChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const files = event.target.files;
+  //   if (files && files.length > 0) {
+  //     const file = files[0];
+  //     const formData = new FormData();
+  //     formData.append("file", file);
+  //     try {
+  //       // Replace with actual token retrieval logic
+  //       const uploadData: UploadAvatarType = { file: file };
+  //       const response = await userProfileService.uploadAvatar(uploadData);        
+  //       if (response.status.toString() === "Success") {
+  //         // Lấy URL avatar mới
+  //         const newAvatarUrl = response.data.avatarUrl;
+  
+  //         // Cập nhật Recoil state
+  //         setUserRecoilState((prevState) => ({
+  //           ...prevState,
+  //           avatar: newAvatarUrl,
+  //         }));
+  //         alert("Avatar uploaded successfully!");
+  //       } else {
+  //         alert("Failed to upload avatar.");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error uploading avatar:", error);
+  //       alert("Something went wrong while uploading avatar.");
+  //     }
+  //   }
+  // };
   
   const handleButtonClick = () => {
     const avatarInput = document.getElementById("avatar") as HTMLInputElement;
@@ -54,6 +62,8 @@ export default function EditProfile() {
     }
   };
 
+
+  
   const handleGenderChange = (value: string) => setSelectedGender(value);
   const handleBirthdayChange = (date: dayjs.Dayjs | null) => {
     if (date) {
@@ -92,14 +102,6 @@ export default function EditProfile() {
 
   return (
     <div className="flex flex-col items-center w-full h-72 text-center py-5 gap-10">
-      <button onClick={handleButtonClick}>Change Avatar</button>
-      <input
-        type="file"
-        id="avatar"
-        className="hidden"
-        accept="image/*"
-        onChange={handleAvatarChange}
-      />
       <div className="flex flex-row px-5 justify-between items-center w-[95%] gap-2">
         <div className="w-[30%]">
           <div className="text-left font-normal font-sm text-gray-700 text-sm">

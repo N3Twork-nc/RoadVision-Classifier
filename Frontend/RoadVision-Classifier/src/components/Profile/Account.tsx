@@ -29,7 +29,6 @@ export default function Account() {
         setLoading(false);
       }
     };
-
     fetchProfile();
   }, []);
 

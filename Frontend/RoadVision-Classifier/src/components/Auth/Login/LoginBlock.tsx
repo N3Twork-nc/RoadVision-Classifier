@@ -7,9 +7,10 @@ import { accountState } from "../../../atoms/authState";
 import authService from "../../../services/auth.service";
 import useNavigateTo from "../../../hooks/useNavigateTo";
 import { setStoredUserInfo } from "../../../utils/local-storage.util";
-import { saveAccessToken } from "../../../utils/auth.util";
+import { saveAccessToken, saveUserRole } from "../../../utils/auth.util";
 import { ERROR_MESSAGES } from "../../../defination/consts/messages.const";
 
+const api_url =  import.meta.env.VITE_BASE_URL;
 // Input validation schema using zod
 const signInSchema = z.object({
   username: z.string().min(6, ERROR_MESSAGES.auth.username),
@@ -22,8 +23,13 @@ type SignInData = z.infer<typeof signInSchema>;
 // Main SignInBlock component
 const SignInBlock = () => {
   // Custom navigation hooks
-  const { navigateForgotPassword, navigateHome, navigateToSignUp, navigateToDashboard, navigateToDashboardTechnician } =
-    useNavigateTo();
+  const {
+    navigateForgotPassword,
+    navigateHome,
+    navigateToSignUp,
+    navigateToDashboard,
+    navigateToDashboardTechnician,
+  } = useNavigateTo();
 
   // State for form input data
   const [formData, setFormData] = useState<SignInData>({
@@ -64,23 +70,28 @@ const SignInBlock = () => {
       const { info, token } = data; // Extract user info and token from response
 
       if (info && token) {
-          saveAccessToken(token); // Save token for future API calls
-          setStoredUserInfo(info); // Save user info to local storage
-          setAccountState(info); // Update Recoil user state
-          // Navigate to the home page after successful login
-          console.log(data.info.role);
-          if (data.info.role) {
-            localStorage.setItem("userRole", data.info.role); // Ensure role is defined
-            if (data.info.role === "user") {
-              navigateHome();
-            } else if (data.info.role === "admin") {
-              navigateToDashboard();
-            } else if (data.info.role === "technical") {
-              navigateToDashboardTechnician();
-            }
-          } else {
-            console.error("Role is undefined");
+        const user_avatar = `${api_url}/user/api/getAvatar?username=${info.username}`;
+        info.avatar = user_avatar; 
+        console.log(info);
+        saveAccessToken(token); // Save token for future API calls
+        setStoredUserInfo(info); // Save user info to local storage
+        setAccountState(info);
+
+
+        if (data.info.role) {
+          localStorage.setItem("userRole", data.info.role);
+          saveUserRole(data.info.role);
+          if (data.info.role === "user") {
+            navigateHome();
+          } else if (data.info.role === "admin") {
+            navigateToDashboard();
+          } else if (data.info.role === "technical") {
+            navigateToDashboardTechnician();
           }
+        } else {
+          console.error("Role is undefined");
+        }
+
       }
     } catch (err) {
       console.error(err);
