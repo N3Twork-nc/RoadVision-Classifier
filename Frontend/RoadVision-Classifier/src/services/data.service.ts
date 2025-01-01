@@ -1,13 +1,16 @@
 // Manage Auth API
 import { axiosRequest } from "../config/axios.config";
-import { GetInfoRoadsParams, UploadImgFormDataType } from "../defination/types/data.type";
+import {
+  GetInfoRoadsParams,
+  UploadImgFormDataType,
+} from "../defination/types/data.type";
 
 export default {
   uploadRoad: async (formData: UploadImgFormDataType) => {
     const url = `/datasvc/api/uploadRoad`;
     const data = await axiosRequest.post(url, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     return data;
   },
 
@@ -25,5 +28,16 @@ export default {
       params,
     });
     return data;
-  }  
+  },
+
+  getRouteMap: async () => {
+    try {
+      const url = "/datasvc/api/getRouteMap";
+      const response = await axiosRequest.get(url);
+      return response; // Đảm bảo trả về dữ liệu từ API
+    } catch (error) {
+      console.error("Error fetching route map:", error);
+      throw error; // Có thể throw để xử lý lỗi ở cấp cao hơn
+    }
+  },
 };
