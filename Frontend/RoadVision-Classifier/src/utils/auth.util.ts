@@ -18,9 +18,11 @@ export const removeUserRole = () => {
 
 export const saveAccessToken = (accessToken: string) => {
   Cookies.set(CookieKeyEnum.ACCESS_TOKEN, accessToken, {
-    path: "",
-    secure: true,
+    expires: 30,
+    path: "/",
+    secure: window.location.protocol === 'https:',
     sameSite: "Strict",
+    domain: window.location.hostname
   });
 };
 export const getAccessToken = () => {
