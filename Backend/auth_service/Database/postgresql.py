@@ -30,7 +30,7 @@ class Postgresql:
     
     def delete(self, table, where):
         query = f"DELETE FROM {table} WHERE {where}"
-        return self.execute(query)
+        return self.execute(query,'false')
     
     def execute(self, query, fetch='one'):
         self.cursor.execute(query)

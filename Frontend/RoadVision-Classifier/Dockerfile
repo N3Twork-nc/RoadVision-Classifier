@@ -7,6 +7,7 @@ COPY package*.json ./
 RUN npm config set cache /tmp/.npm --global
 
 RUN npm install
+RUN npm install @tanstack/react-query
 
 COPY . .
 
