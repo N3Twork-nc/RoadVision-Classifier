@@ -184,14 +184,15 @@ class User(BaseModel):
                 FROM "user" u
                 JOIN "account" a ON u.user_id = a.id
                 JOIN "role" r ON r.user_id = a.id
-                JOIN "assignment" s ON s.user_id = a.id
-                JOIN "ward" w ON s.ward_id = w.id
-                JOIN "district" d ON w.district_id = d.id
-                JOIN "province" p ON d.province_id = p.id
+                LEFT JOIN "assignment" s ON s.user_id = a.id
+                LEFT JOIN "ward" w ON s.ward_id = w.id
+                LEFT JOIN "district" d ON w.district_id = d.id
+                LEFT JOIN "province" p ON d.province_id = p.id
                 WHERE r.permission_id = 2
             '''
             
             user_results = db.execute(query, fetch='all')
+            print(user_results)
 
             if not user_results:
                 return {"data": []}
@@ -203,7 +204,7 @@ class User(BaseModel):
                 username = row[2]
                 avatar = f"/user/api/getAvatar?username={row[2]}"
                 created = row[3].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[3], datetime) else row[3]
-                deadline = row[4].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[4], datetime) else row[4]
+                deadline = row[4].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[4], datetime) else None
 
                 if user_id not in grouped_users:
                     grouped_users[user_id] = {
@@ -215,15 +216,18 @@ class User(BaseModel):
                         "tasks": []
                     }
 
-                grouped_users[user_id]["tasks"].append({
-                    "deadline": deadline,
-                    "status": row[5],
-                    "ward_name": row[6],
-                    "district_name": row[7],
-                    "province_name": row[8]
-                })
+                if deadline:
+                    grouped_users[user_id]["tasks"].append({
+                        "deadline": deadline,
+                        "status": row[5],
+                        "ward_name": row[6],
+                        "district_name": row[7],
+                        "province_name": row[8]
+                    })
 
-            users_data = list(grouped_users.values())
+            users_data = [
+                user for user in grouped_users.values()
+            ]
 
             return {"data": users_data}
         except Exception as e:
