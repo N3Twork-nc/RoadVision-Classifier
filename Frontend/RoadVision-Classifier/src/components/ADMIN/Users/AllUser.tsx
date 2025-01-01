@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
+import { Table, Modal, Button, Form, Input } from "antd";
 import manageAlluserService from "../../../services/manageAlluser.service";
-import { Button, Form, Input, Modal } from "antd";
 import { useRecoilState } from "recoil";
 import { userState } from "../../../atoms/admin/accountState";
-
+import { FaUser } from "react-icons/fa";
 interface DataType {
   key: React.Key;
   avatar: string;
@@ -16,6 +16,7 @@ interface DataType {
 interface AllUserProps {
   onViewUserInfo: (user: DataType) => void;
 }
+const api_url = import.meta.env.VITE_BASE_URL;
 
 export default function AllUser({ onViewUserInfo }: AllUserProps) {
   const [dataSource, setDataSource] = useState<DataType[]>([]);
@@ -28,9 +29,9 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
     setLoading(true);
     try {
       const response = await manageAlluserService.getAllUser({});
-      console.log("user",response);
       const users = response.data?.map((user: any, index: number) => ({
         key: index,
+        avatar: `${api_url}${user.avatar}`,
         user_id: user.user_id,
         username: user.username,
         fullname: user.fullname,
@@ -50,7 +51,6 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
     fetchAllUsers();
   }, []);
 
-  // ADD NEW USER
   const handleAddUser = async (values: {
     username: string;
     email: string;
@@ -72,8 +72,8 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
     form.resetFields();
     setIsModalVisible(false);
   };
+
   const handleDeleteUser = async (username: string) => {
-    // DELETE USER
     Modal.confirm({
       title: "Are you sure you want to delete this user?",
       content: "This action cannot be undone.",
@@ -88,76 +88,91 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
           console.log("Xóa tài khoản thất bại!");
         }
       },
-      onCancel: () => {
-        console.log("User deletion cancelled");
-      },
     });
   };
 
+  const columns = [
+    {
+      title: "User ID",
+      dataIndex: "user_id",
+      key: "user_id",
+      align: "center" as "center",
+    },
+    {
+      title: "Username",
+      dataIndex: "username",
+      key: "username",
+      align: "center" as "center",
+    },
+    {
+      title: "Fullname",
+      dataIndex: "fullname",
+      key: "fullname",
+      align: "center" as "center",
+    },
+    {
+      title: "Join Date",
+      dataIndex: "joindate",
+      key: "joindate",
+      align: "center" as "center",
+    },
+    {
+      title: "Contribution",
+      dataIndex: "contribution",
+      key: "contribution",
+      align: "center" as "center",
+      render: (contribution: number) => `${contribution} image(s)`,
+    },
+    {
+      title: "Action",
+      key: "action",
+      align: "center" as "center",
+      render: (_: any, record: DataType) => (
+        <div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDeleteUser(record.username);
+            }}
+            className="text-red-500"
+          >
+            <AiOutlineDelete className="w-5 h-5" />
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-row justify-between items-center">
-        <h1 className="text-2xl font-bold p-4">All Users</h1>
-        <button
-          className="bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg"
-          onClick={() => setIsModalVisible(true)}
-        >
-          Add new user
-        </button>
+    <div className="w-full h-screen flex flex-col gap-5 justify-start items-center overflow-y-auto">
+      <div className="w-full p-5 bg-white rounded-lg shadow-md">
+        <div className="flex flex-row justify-between items-center mb-4">
+          <div className="flex flex-row items-center gap-2">
+            <FaUser color="#3B82F6" size={20} />
+            <h1 className="text-2xl text-blue-500 font-bold">All Users</h1>
+          </div>
+
+          <button
+            className="bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg"
+            onClick={() => setIsModalVisible(true)}
+          >
+            Add new user
+          </button>
+        </div>
+        <Table
+          dataSource={dataSource}
+          columns={columns}
+          loading={loading}
+          onRow={(record) => ({
+            onClick: () => onViewUserInfo(record),
+          })}
+          rowClassName="cursor-pointer"
+        />
       </div>
-      {loading ? (
-        <p className="text-center">Loading...</p>
-      ) : (
-        <table className="w-full border-2 rounded-xl border-gray overflow-y-auto min-w-[1000px] text-center bg-white">
-          <thead>
-            <tr className="border-b rounded-sm text-base text-black">
-              <th scope="col" className="px-6 py-5 w-[20%]">
-                Username
-              </th>
-              <th scope="col" className="px-6 py-5 w-[35%]">
-                Fullname
-              </th>
-              <th scope="col" className="px-6 py-5 w-[20%]">
-                Join date
-              </th>
-              <th scope="col" className="px-6 py-5 w-[10%]">
-                Contribution
-              </th>
-              <th scope="col" className="px-6 py-5 w-[15%]">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {dataSource.map((user) => (
-              <tr
-                key={user.key}
-                className="cursor-pointer text-base py-3 text-[#0A0A0B] font-normal border-b border-gray-300"
-                onClick={() => onViewUserInfo(user)}
-              >
-                <td className="py-3">{user.username}</td>
-                <td className="py-3">{user.fullname}</td>
-                <td className="py-3">{user.joindate}</td>
-                <td className="py-3">{user.contribution} image(s)</td>
-                <td className="py-3">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation(); 
-                      handleDeleteUser(user.username);
-                    }}
-                    className="text-red-500"
-                  >
-                    <AiOutlineDelete className="w-5 h-5" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+
       <Modal
         title="Add New User"
-        visible={isModalVisible}
+        open={isModalVisible}
         onCancel={handleCancelModal}
         footer={null}
       >

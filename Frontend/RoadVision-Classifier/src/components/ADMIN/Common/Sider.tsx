@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FaHome, FaUser } from "react-icons/fa";
-import { GrUserWorker } from "react-icons/gr";
+import { MdEngineering } from "react-icons/md";
 import PropTypes from "prop-types";
 
 const Sider: React.FC = () => {
@@ -44,7 +44,7 @@ const Sider: React.FC = () => {
         <NavLink to="/user-management" icon={FaUser} text="Users" />
         <NavLink
           to="/technician-management"
-          icon={GrUserWorker}
+          icon={MdEngineering}
           text="Technicians"
         />
       </nav>
