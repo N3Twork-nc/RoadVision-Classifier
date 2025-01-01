@@ -35,8 +35,8 @@ const Map: React.FC = () => {
   const [startMarker, setStartMarker] = useState<L.Marker | null>(null);
   const [endMarker, setEndMarker] = useState<L.Marker | null>(null);
   const [path, setPath] = useState<[number, number][][]>([]);
-  const [isBadRoutesVisible, setIsBadRoutesVisible] = useState(false); 
-  const [isViewBadRoutes, ] = useState(false); 
+  const [isBadRoutesVisible, setIsBadRoutesVisible] = useState(false);
+  const [isViewBadRoutes] = useState(false);
   const handleToggleBadRoutes = () => {
     setIsBadRoutesVisible((prev) => !prev);
   };
@@ -300,7 +300,7 @@ const Map: React.FC = () => {
           })
         );
 
-        setPath(routes); 
+        setPath(routes);
       } else {
         alert("Dữ liệu không hợp lệ. Đảm bảo đúng định dạng mảng tọa độ.");
       }
@@ -317,7 +317,11 @@ const Map: React.FC = () => {
     }
 
     path.forEach((route) => {
-      const waypoints = Array.isArray(route) && route.every(point => Array.isArray(point) && point.length === 2) ? route.map((point: [number, number]) => L.latLng(point[0], point[1])) : [];
+      const waypoints =
+        Array.isArray(route) &&
+        route.every((point) => Array.isArray(point) && point.length === 2)
+          ? route.map((point: [number, number]) => L.latLng(point[0], point[1]))
+          : [];
       const newRoutingControl = L.Routing.control({
         waypoints: waypoints,
         routeWhileDragging: true,
@@ -342,18 +346,21 @@ const Map: React.FC = () => {
   return (
     <div className="container">
       <div className="sidebar">
-        <div className="header">
-          <h2>Tìm kiếm địa điểm</h2>
-          <div className="inputGroup toggleGroup">
-            <h1>View bad routes</h1>
+        <div className="header flex flex-col justify-between items-center  p-2">
+          <h2 className="text-2xl font-bold text-[#3749A6] ">
+            Tìm kiếm địa điểm
+          </h2>
+          <div className="flex flex-row font-medium items-center gap-1 ml-auto">
+            <p className="text-base">Bad routes</p>
             <img
               src={isBadRoutesVisible ? onButton : offButton}
               alt="Toggle View Bad Routes"
-              className="toggleIcon"
+              className="cursor-pointer w-14 h-14 transition-transform transform hover:scale-110"
               onClick={handleToggleBadRoutes}
             />
           </div>
         </div>
+
         {!isRouteInputVisible ? (
           <>
             <div className="inputGroup">
