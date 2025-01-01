@@ -11,6 +11,14 @@ services:
     restart: always
     networks:
       - app_network
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"  # Giới hạn sử dụng 50% CPU
+          memory: "128M"  # Giới hạn sử dụng 256 MB RAM
+        reservations:
+          cpus: "0.15"  # Đảm bảo ít nhất 25% CPU
+          memory: "64M"  # Đảm bảo ít nhất 128 MB RAM
 
 
   kafka:

@@ -79,3 +79,56 @@
   cursor: pointer;
   border-bottom: 1px solid #dee2e6;
 }
+
+.roadList {
+  margin-top: 20px;
+}
+
+.roadItems {
+  list-style-type: none;
+  padding: 0;
+}
+
+.roadItem {
+  margin-bottom: 10px;
+}
+
+.roadItem {
+  background-color: #fff;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.roadItem:hover {
+  background-color: #f1f1f1; 
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header h2 {
+  margin: 0;
+}
+
+.toggleGroup {
+  display: flex;        
+  align-items: center;       
+  gap: 10px;                  
+}
+
+.toggleIcon {
+  cursor: pointer;
+  width: 55px;
+  height: 55px;
+  vertical-align: middle;
+}
+
+

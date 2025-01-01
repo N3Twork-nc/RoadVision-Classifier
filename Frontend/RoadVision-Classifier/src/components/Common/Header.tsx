@@ -1,17 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { DownOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Dropdown, Space } from "antd";
 import search from "../../assets/img/search.png";
 import notification from "../../assets/img/notification.png";
-import { useRecoilValue } from "recoil";
-import { userState } from "../../atoms/authState";
+import { useRecoilState, useRecoilValue, } from "recoil";
+import { accountState } from "../../atoms/authState";
 import { Link } from "react-router-dom";
 import { PageEnum } from "../../defination/enums/page.enum";
 import { handleLogOut } from "../../utils/auth.util";
+import defaultAvatar from "../../assets/img/defaultAvatar.png";
+const api_url =  import.meta.env.VITE_BASE_URL;
+
 const Header: React.FC = () => {
-  const userRecoilStateValue = useRecoilValue(userState);
- 
+  const userRecoilStateValue = useRecoilValue(accountState);
+  const [userRecoilState, setUserRecoilState] = useRecoilState(accountState);
   const items: MenuProps["items"] = [
     {
       label: (
@@ -30,7 +33,22 @@ const Header: React.FC = () => {
       key: "1",
     },
   ];
+  useEffect(() => {
+    const fetchAvatar = async () => {
+      try {
+        const avatarUrl = `${api_url}/user/api/getAvatar?username=${userRecoilStateValue.username}`;;
+        setUserRecoilState((prevState) => ({
+          ...prevState,
+          avatar: avatarUrl,
+        }));
+      } catch (error) {
+        console.error("Failed to fetch avatar:", error);
+      }
+    };
 
+    fetchAvatar();
+  }, [setUserRecoilState]);
+  
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-[#F9F9F9]">
       <div className="flex items-center space-x-4 w-96 px-4 py-2 bg-slate-100 border rounded-3xl focus-within:ring focus-within:ring-blue-300">
@@ -60,7 +78,7 @@ const Header: React.FC = () => {
             >
               <Space>
                 <img
-                  src="https://via.placeholder.com/40"
+                  src={userRecoilState.avatar || defaultAvatar}
                   alt="User"
                   className="w-9 h-9 mr-1 rounded-full"
                 />
