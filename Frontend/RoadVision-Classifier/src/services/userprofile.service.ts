@@ -5,6 +5,7 @@ import {
   UploadAvatarType,
 } from "../defination/types/profile.type";
 import { getAccessToken } from "../utils/auth.util";
+const api_url = import.meta.env.VITE_BASE_API_URL;
 
 export default {
   getProfile: async ({}) => {
@@ -22,7 +23,7 @@ export default {
   
   getAvatar: async (username: string) => {
     const url = `/user/api/getAvatar`;
-    return `http://192.168.120.26${url}?username=${username}`; 
+    return `${api_url}${url}?username=${username}`; 
   },
   
   uploadAvatar: async (formData: UploadAvatarType) => {
