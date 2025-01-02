@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Modal, Button, Form, Input } from "antd";
+import { Table } from "antd";
 import { useRecoilState } from "recoil";
 import { userState } from "../../../atoms/admin/accountState";
 import { FaUser } from "react-icons/fa";

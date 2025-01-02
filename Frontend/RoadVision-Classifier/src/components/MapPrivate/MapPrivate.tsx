@@ -105,6 +105,10 @@ const MapPrivate: React.FC = () => {
     marker.on("click", (event) => {
       setImageData(road);
       const { lat, lng } = event.latlng;
+
+      setLatitude(lat);
+      setLongitude(lng);
+
       leafletMap.current?.setView([lat, lng], leafletMap.current.getZoom());
       marker.openPopup();
     });
@@ -300,6 +304,7 @@ const MapPrivate: React.FC = () => {
       try {
         const data = await dataService.getInfoRoads({
           user_id: userRecoilStateValue.id,
+          all: true,
         });
 
         if (Array.isArray(data)) {
@@ -335,7 +340,10 @@ const MapPrivate: React.FC = () => {
     }
 
     try {
-      await dataService.deleteRoad({ id_road: imageData.id });
+      await dataService.deleteRoad({
+        id_road: imageData.id,
+        all: false
+      });
       setRoadsData((prevRoads) =>
         prevRoads.filter((road) => road.id !== imageData.id)
       );
@@ -474,8 +482,6 @@ const MapPrivate: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* Edit Coordinates Modal */}
 
       {/* Edit Coordinates Modal */}
       {showEditModal && (

@@ -18,7 +18,6 @@ export const routesConfig = [
       { path: PageEnum.PUBLIC_MAP, element: {PublicMap} },
       { path: PageEnum.PROFILE, element: {Profile}},
       { path: PageEnum.MAPMANAGEMENT, element: {MapManagement} },
-      { path: PageEnum.LIBRARY, element: {MyLibrary} },
     ],
   },
   // Routes for admin role
