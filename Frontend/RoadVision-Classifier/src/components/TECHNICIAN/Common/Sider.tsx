@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FaHome, FaMap, FaTasks } from "react-icons/fa";
+import { FaMap, FaTasks } from "react-icons/fa";
 import PropTypes from "prop-types";
 
 const Sider: React.FC = () => {

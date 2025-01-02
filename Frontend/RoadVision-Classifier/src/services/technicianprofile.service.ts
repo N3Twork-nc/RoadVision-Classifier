@@ -1,5 +1,3 @@
-import { axiosRequest } from "../config/axios.config";
-
 export default {
   getAllTask: async ({}) => {
     // const url = `/datasvc/api/statisticsRoad`;
