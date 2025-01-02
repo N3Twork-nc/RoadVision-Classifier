@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { wardIdState } from "../../../atoms/technicianTask/tasksState";
 import technicianService from "../../../services/technicianprofile.service";
-import { Table, Tag, Breadcrumb, Input } from "antd";
-import { AiOutlineDelete } from "react-icons/ai";
+import { Table, Tag, Breadcrumb, Input, Modal} from "antd";
+import { AiOutlinePlus } from "react-icons/ai";
 
 interface TaskManagementComponentProps {
   road: any;
@@ -19,6 +19,16 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredDataSource, setFilteredDataSource] = useState<any[]>([]);
+
+  // Modal states
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [report, setReport] = useState({
+    cost: "",
+    totalCost: "",
+    deviation: "",
+    difficulty: "",
+    improvement: "",
+  });
 
   const fetchTasksAndRoads = async () => {
     if (wardId !== null) {
@@ -58,7 +68,7 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
       );
       setFilteredDataSource(filteredData);
     } else {
-      setFilteredDataSource(dataSource); 
+      setFilteredDataSource(dataSource);
     }
   };
 
@@ -127,16 +137,43 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
       },
     },
     {
-      title: "Action",
+      title: "Report",
       align: "center" as "center",
       render: () => (
-        <button className="text-red-500">
-          <AiOutlineDelete className="w-5 h-5" />
+        <button
+          className="text-green-500"
+          onClick={() => setIsModalVisible(true)}
+        >
+          <AiOutlinePlus className="w-5 h-5" />
         </button>
       ),
       width: 80,
     },
   ];
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+    setReport({
+      cost: "",
+      totalCost: "",
+      deviation: "",
+      difficulty: "",
+      improvement: "",
+    }); // Reset the report input fields
+  };
+
+  const handleModalOk = () => {
+    // Handle the submission of the report here (e.g., send to API)
+    console.log("Report submitted:", report);
+    setIsModalVisible(false);
+    setReport({
+      cost: "",
+      totalCost: "",
+      deviation: "",
+      difficulty: "",
+      improvement: "",
+    }); // Clear report fields after submission
+  };
 
   return (
     <div className="w-full min-h-screen bg-[#F9F9F9] flex flex-col gap-5 justify-start items-center overflow-y-auto">
@@ -155,13 +192,46 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
         style={{ width: "80%", margin: "10px 0" }}
       />
       <Table
-        dataSource={filteredDataSource} 
+        dataSource={filteredDataSource}
         columns={columns}
         loading={loading}
         pagination={{ pageSize: 5 }}
         rowKey="road_id"
         className="w-[95%] bg-white p-5 rounded-2xl shadow-md"
       />
+
+      {/* Modal for report */}
+      <Modal
+        title="Write Report"
+        visible={isModalVisible}
+        onCancel={handleModalCancel}
+        onOk={handleModalOk}
+        okText="Submit"
+        cancelText="Cancel"
+      >
+        <div className="flex flex-col gap-3">
+          <Input
+            placeholder="Tổng chi phí"
+            value={report.totalCost}
+            onChange={(e) => setReport({ ...report, totalCost: e.target.value })}
+          />
+          <Input
+            placeholder="Phát sinh so với thực tế"
+            value={report.deviation}
+            onChange={(e) => setReport({ ...report, deviation: e.target.value })}
+          />
+          <Input
+            placeholder="Khó khăn gặp phải"
+            value={report.difficulty}
+            onChange={(e) => setReport({ ...report, difficulty: e.target.value })}
+          />
+          <Input
+            placeholder="Đề xuất cải thiện (Nếu có)"
+            value={report.improvement}
+            onChange={(e) => setReport({ ...report, improvement: e.target.value })}
+          />
+        </div>
+      </Modal>
     </div>
   );
 };

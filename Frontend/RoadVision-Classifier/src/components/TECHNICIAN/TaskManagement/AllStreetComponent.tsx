@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Progress } from "antd";
+import { Table, Progress, Tag } from "antd"; // Import Tag from Ant Design
 import { FaUser } from "react-icons/fa";
 import technicianprofileService from "../../../services/technicianprofile.service";
 import { useSetRecoilState } from "recoil";
@@ -22,7 +22,7 @@ interface AllUserProps {
 export default function AllStreetComponent({ onViewUserInfo }: AllUserProps) {
   const [dataSource, setDataSource] = useState<DataType[]>([]);
   const [loading, setLoading] = useState(false);
-  const setWardId = useSetRecoilState(wardIdState); 
+  const setWardId = useSetRecoilState(wardIdState);
 
   const fetchAllRoadsTask = async () => {
     setLoading(true);
@@ -52,7 +52,26 @@ export default function AllStreetComponent({ onViewUserInfo }: AllUserProps) {
     fetchAllRoadsTask();
   }, []);
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Not Start":
+        return "gray";
+      case "Done":
+        return "green";
+      case "In Progress":
+        return "yellow";
+      default:
+        return "default";
+    }
+  };
+
   const columns = [
+    {
+      title: "Ward ID",
+      dataIndex: "ward_id",
+      key: "ward_id",
+      align: "center" as "center",
+    },
     {
       title: "Address",
       dataIndex: "location",
@@ -64,6 +83,9 @@ export default function AllStreetComponent({ onViewUserInfo }: AllUserProps) {
       dataIndex: "status",
       key: "status",
       align: "center" as "center",
+      render: (status: string) => {
+        return <Tag color={getStatusColor(status)}>{status}</Tag>;
+      },
     },
     {
       title: "Due Date",
@@ -85,13 +107,7 @@ export default function AllStreetComponent({ onViewUserInfo }: AllUserProps) {
           </div>
         );
       },
-    },
-    {
-      title: "Ward ID",
-      dataIndex: "ward_id",
-      key: "ward_id",
-      align: "center" as "center",
-    },
+    }
   ];
 
   return (
