@@ -36,7 +36,7 @@ const Map: React.FC = () => {
   const [endMarker, setEndMarker] = useState<L.Marker | null>(null);
   const [path, setPath] = useState<[number, number][][]>([]);
   const [isBadRoutesVisible, setIsBadRoutesVisible] = useState(false);
-  const [isViewBadRoutes] = useState(false);
+
 
   const handleToggleBadRoutes = () => {
     setIsBadRoutesVisible((prev) => !prev);
