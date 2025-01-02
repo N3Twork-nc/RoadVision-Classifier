@@ -1,9 +1,9 @@
-import Map from "../../../components/Map/Map.tsx";
-import map from "../../../assets/img/map.png";
-import mask from "../../../assets/img/mask.png";
-import AppLayout from "../../../components/Common/AppLayout.tsx";
+import AppLayout from "../../../components/Common/AppLayout";
+import mask from "../../../assets/img/mask.png"; // Adjust the path as necessary
+import homeheader from "../../../assets/img/history.png";
+import History from "../../../components/MyHistory/MyHistory";
 
-export default function PublicMap() {
+export default function MyHistory() {
   return (
     <AppLayout>
       <div className="w-full min-h-screen bg-[#F9F9F9] flex flex-col p-5 gap-5 justify-start items-center overflow-y-auto">
@@ -18,20 +18,18 @@ export default function PublicMap() {
             <div className="flex flex-col p-10 justify-between">
               <div>
                 <p className="text-4xl font-bold text-white">
-                  Map for everyone!
+                  Your upload history!
                 </p>
-                <p className="text-white">
-                  Upload an image to classify the road condition
-                </p>
+                <p className="text-white">---------------------</p>
               </div>
             </div>
             {/* image */}
-            <img src={map} className="p-2 mr-10 h-full" />
+            <img src={homeheader} className="p-2 mr-10 h-full" />
           </div>
         </div>
         {/* BODY */}
         <div className="bg-white w-[95%] h-full rounded-2xl">
-          <Map />
+          <History />
         </div>
       </div>
     </AppLayout>

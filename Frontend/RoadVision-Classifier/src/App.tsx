@@ -8,7 +8,7 @@ import {
 import Home from "./pages/User/Home/Home";
 import PublicMap from "./pages/User/PublicMap/PublicMap";
 import MapManagement from "./pages/User/MapManagement/MapManagement";
-import MyLibrary from "./pages/User/MyLibrary/MyLibrary";
+import MyLibrary from "./pages/User/MyHistory/MyHistory";
 import Profile from "./pages/User/Profile/Profile";
 import {
   PageEnum,
@@ -83,7 +83,7 @@ const App: React.FC = () => {
           }
         />
         <Route
-          path={PageEnum.LIBRARY}
+          path={PageEnum.HISTORY}
           element={
             <PrivateRoute allowedRoles={["user"]}>
               <MyLibrary />

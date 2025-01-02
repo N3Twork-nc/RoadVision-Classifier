@@ -1,7 +1,7 @@
 import { useRecoilValue } from "recoil";
 import avatar from "../../../assets/img/defaultAvatar.png";
 import { accountState } from "../../../atoms/authState";
-import { Table, Tag } from "antd";
+import { Breadcrumb, Table, Tag } from "antd";
 import { AiOutlineDelete } from "react-icons/ai";
 const dataSource = [
   {
@@ -38,19 +38,25 @@ const columns = [
     width: 250,
     align: "center" as "center",
     render: (text: string) => (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-      <img
-        src={text}
-        alt="Road"
+      <div
         style={{
-          width: "200px",
-          height: "200px",
-          objectFit: "cover",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100%",
         }}
-      />
-    </div>
+      >
+        <img
+          src={text}
+          alt="Road"
+          style={{
+            width: "200px",
+            height: "200px",
+            objectFit: "cover",
+          }}
+        />
+      </div>
     ),
-
   },
   {
     title: "Street",
@@ -75,9 +81,8 @@ const columns = [
     render: (text: string) => {
       const colorMap: { [key: string]: string } = {
         "In progress": "blue",
-        "Done": "green",
+        Done: "green",
         "Not start": "gray",
-       
       };
       return <Tag color={colorMap[text] || "default"}>{text}</Tag>;
     },
@@ -102,10 +107,36 @@ const columns = [
     width: 80,
   },
 ];
-export default function TaskManagementComponent() {
+
+interface RoadDetailsProps {
+  road: any;
+  onBack: () => void;
+  onViewRoadDetails: (road: any) => void;
+}
+
+const TaskManagementComponent: React.FC<RoadDetailsProps> = ({
+  onBack,
+  onViewRoadDetails,
+}) => {
   const technicianInfo = useRecoilValue(accountState);
   return (
     <div className="w-full min-h-screen bg-[#F9F9F9] flex flex-col gap-5 justify-start items-center overflow-y-auto">
+      <Breadcrumb
+        className="w-full justify-start px-10"
+        separator=">"
+        items={[
+          {
+            title: "All Users",
+            onClick: onBack,
+            className: "cursor-pointer",
+          },
+          {
+            title: "User Info",
+            onClick: onViewRoadDetails,
+            className: "cursor-pointer",
+          },
+        ]}
+      />
       <div className="relative flex flex-row gap-5 w-[95%] h-48 px-10 rounded-2xl bg-[#3749A6] justify-between items-center">
         <div className="relative flex flex-row gap-5 w-[95%] h-48 px-10 rounded-2xl bg-[#3749A6] justify-between items-center">
           <div className="absolute bg-white rounded-full w-36 h-36 flex justify-center items-center">
@@ -134,4 +165,6 @@ export default function TaskManagementComponent() {
       />
     </div>
   );
-}
+};
+
+export default TaskManagementComponent;

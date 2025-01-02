@@ -38,10 +38,13 @@ const Map: React.FC = () => {
   const [isBadRoutesVisible, setIsBadRoutesVisible] = useState(false);
   const api_url = import.meta.env.VITE_BASE_URL;
   const handleToggleBadRoutes = () => {
+    if (routingControl) {
+      routingControl.remove();
+      setRoutingControl(null);
+    }
     setIsBadRoutesVisible((prev) => !prev);
   };
 
-  // Determine marker color based on road level
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -51,19 +54,10 @@ const Map: React.FC = () => {
     });
 
     leafletMap.current = map;
-
-    const key = "9CPtNtP8hRSOoBHJXppf";
-    L.tileLayer(
-      `https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}`,
-      {
-        tileSize: 512,
-        zoomOffset: -1,
-        attribution:
-          '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> ' +
-          '<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
-        crossOrigin: true,
-      }
-    ).addTo(map);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
@@ -90,7 +84,9 @@ const Map: React.FC = () => {
     }
     const fetchRoadsData = async () => {
       try {
-        const data = await dataService.getInfoRoads({});
+        const data = await dataService.getInfoRoads({
+          all: false
+        });
 
         if (Array.isArray(data)) {
           if (data.length > 0) {
@@ -274,6 +270,7 @@ const Map: React.FC = () => {
       const response = await dataService.getRouteMap();
       console.error("Dữ liệu tọa độ:", response);
       const parsedCoordinates = response;
+
       if (
         Array.isArray(parsedCoordinates) &&
         parsedCoordinates.every(
@@ -286,18 +283,21 @@ const Map: React.FC = () => {
             )
         )
       ) {
-        // Chuyển đổi chuỗi tọa độ thành mảng [latitude, longitude]
         const routes = parsedCoordinates.map((group) =>
           group.map((point: string) => {
             const [lat, lng] = point
               .slice(1, -1)
               .split(",")
-              .map((coord) => parseFloat(coord.trim())); // Chuyển chuỗi thành số
+              .map((coord) => parseFloat(coord.trim()));
             return [lat, lng];
           })
         );
 
-        setPath(routes);
+        const sortedRoutes = routes.map((route) => {
+          return route.reverse();
+        });
+
+        setPath(sortedRoutes);
       } else {
         alert("Dữ liệu không hợp lệ. Đảm bảo đúng định dạng mảng tọa độ.");
       }
@@ -320,51 +320,26 @@ const Map: React.FC = () => {
           ? route.map((point: [number, number]) => L.latLng(point[0], point[1]))
           : [];
 
-      // Vẽ các marker với SVG tùy chỉnh
-      route.forEach((point: [number, number]) => {
-        const blackMarkerIcon = L.divIcon({
-          className: "custom-marker-icon", // Tùy chọn thêm lớp CSS nếu cần
-          html: `
-            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="black">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 4.25 7 13 7 13s7-8.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
-            </svg>
-          `,
-          iconSize: [30, 30], // Kích thước của biểu tượng
-        });
-
-        // Tạo marker tại từng tọa độ
-        L.marker([point[0], point[1]], { icon: blackMarkerIcon }).addTo(
-          leafletMap.current!
-        );
-      });
-      const plan = new L.Routing.Plan(waypoints, {
-        createMarker: () => {
-          return false;
-        },
-      });
-      const newRoutingControl = L.Routing.control({
-        plan: plan,
-        routeWhileDragging: true,
+      const polyline = L.polyline(waypoints, {
+        color: "red",
+        weight: 4,
       }).addTo(leafletMap.current!);
 
-      setRoutingControl(newRoutingControl);
+      leafletMap.current?.fitBounds(polyline.getBounds());
     });
   }, [path]);
 
   useEffect(() => {
     if (!leafletMap.current) return;
-  
-    // Nếu hiển thị tuyến đường xấu
+
     if (isBadRoutesVisible) {
-      updatePath(); // Gọi hàm để vẽ tuyến đường
+      updatePath();
     } else {
-      // Xóa tất cả các tuyến đường nếu tắt
       if (routingControl) {
         routingControl.remove();
         setRoutingControl(null);
       }
-  
-      // Loại bỏ tất cả các polyline trên bản đồ
+
       if (leafletMap.current) {
         leafletMap.current.eachLayer((layer) => {
           if (layer instanceof L.Polyline && !(layer instanceof L.Marker)) {
@@ -375,7 +350,6 @@ const Map: React.FC = () => {
     }
   }, [isBadRoutesVisible]);
 
-  
   return (
     <div className="container">
       <div className="sidebar">

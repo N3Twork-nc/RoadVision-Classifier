@@ -26,8 +26,8 @@ const MapPrivate: React.FC = () => {
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [latitude, setLatitude] = useState<number>(12.333);
-  const [longitude, setLongitude] = useState<number>(45.87);
+  const [latitude, setLatitude] = useState<number>(0);
+  const [longitude, setLongitude] = useState<number>(0);
   const [, setRoadsData] = useState<any[]>([]);
   const markersRef = useRef<L.Marker[]>([]);
   // const [currentMarkerdClick, setCurrentMarkerdClick] = useState<LatLng>();
@@ -105,6 +105,10 @@ const MapPrivate: React.FC = () => {
     marker.on("click", (event) => {
       setImageData(road);
       const { lat, lng } = event.latlng;
+
+      setLatitude(lat);
+      setLongitude(lng);
+
       leafletMap.current?.setView([lat, lng], leafletMap.current.getZoom());
       marker.openPopup();
     });
@@ -283,19 +287,10 @@ const MapPrivate: React.FC = () => {
     });
 
     leafletMap.current = map;
-
-    const key = "9CPtNtP8hRSOoBHJXppf";
-    L.tileLayer(
-      `https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}`,
-      {
-        tileSize: 512,
-        zoomOffset: -1,
-        attribution:
-          '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> ' +
-          '<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
-        crossOrigin: true,
-      }
-    ).addTo(map);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution:
+        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map);
 
     return () => {
       map.remove();
@@ -309,6 +304,7 @@ const MapPrivate: React.FC = () => {
       try {
         const data = await dataService.getInfoRoads({
           user_id: userRecoilStateValue.id,
+          all: true,
         });
 
         if (Array.isArray(data)) {
@@ -344,7 +340,10 @@ const MapPrivate: React.FC = () => {
     }
 
     try {
-      await dataService.deleteRoad({ id_road: imageData.id });
+      await dataService.deleteRoad({
+        id_road: imageData.id,
+        all: false
+      });
       setRoadsData((prevRoads) =>
         prevRoads.filter((road) => road.id !== imageData.id)
       );
@@ -483,8 +482,6 @@ const MapPrivate: React.FC = () => {
           </div>
         </div>
       )}
-
-      {/* Edit Coordinates Modal */}
 
       {/* Edit Coordinates Modal */}
       {showEditModal && (

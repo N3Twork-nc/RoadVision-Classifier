@@ -12,4 +12,5 @@ export type GetImageFormDataType = {
 export type GetInfoRoadsParams = {
   user_id?: number;
   id_road?: number;
+  all: boolean;
 };
