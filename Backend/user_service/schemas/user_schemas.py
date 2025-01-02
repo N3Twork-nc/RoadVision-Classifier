@@ -180,7 +180,7 @@ class User(BaseModel):
         db = Postgresql()
         try:
             query = '''
-                SELECT u.user_id, u.fullname, a.username, a.created, s.deadline, s.status, w.name, d.name, p.name
+                SELECT u.user_id, u.fullname, a.username, a.created, s.id, s.deadline, s.status, w.name, d.name, p.name, w.id, d.id, p.id
                 FROM "user" u
                 JOIN "account" a ON u.user_id = a.id
                 JOIN "role" r ON r.user_id = a.id
@@ -203,7 +203,7 @@ class User(BaseModel):
                 username = row[2]
                 avatar = f"/user/api/getAvatar?username={row[2]}"
                 created = row[3].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[3], datetime) else None
-                deadline = row[4].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[4], datetime) else None
+                deadline = row[5].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[5], datetime) else None
 
                 if user_id not in grouped_users:
                     grouped_users[user_id] = {
@@ -217,11 +217,15 @@ class User(BaseModel):
 
                 if deadline:
                     grouped_users[user_id]["tasks"].append({
+                        "task_id": row[4],
                         "deadline": deadline,
-                        "status": row[5],
-                        "ward_name": row[6],
-                        "district_name": row[7],
-                        "province_name": row[8]
+                        "status": row[6],
+                        "ward_name": row[7],
+                        "ward_id": row[10],
+                        "district_name": row[8],
+                        "district_id": row[11],
+                        "province_name": row[9],
+                        "province_id": row[12]
                     })
 
             users_data = list(grouped_users.values())
@@ -230,6 +234,43 @@ class User(BaseModel):
         except Exception as e:
             print(f"Error getting users: {e}")
             return {"data": []}
+        finally:
+            db.close()
+
+    def get_valid_wards(self) -> dict:
+        db = Postgresql()
+        try:
+            query = """
+                SELECT w.name, d.name, p.name
+                FROM "road" r
+                JOIN "ward" w ON r.ward_id = w.id
+                JOIN "district" d ON w.district_id = d.id
+                JOIN "province" p ON d.province_id = p.id
+            """
+            ward_results = db.execute(query, fetch='all')
+
+            if not ward_results:
+                return {}
+
+            locations = {}
+            for ward_name, district_name, province_name in ward_results:
+                if province_name not in locations:
+                    locations[province_name] = {}
+                if district_name not in locations[province_name]:
+                    locations[province_name][district_name] = set()
+                locations[province_name][district_name].add(ward_name)  
+
+            formatted_locations = {
+                province: {
+                    district: list(wards) for district, wards in districts.items()
+                }
+                for province, districts in locations.items()
+            }
+
+            return formatted_locations
+        except Exception as e:
+            print(f"Error getting valid wards: {e}")
+            return {}
         finally:
             db.close()
 
@@ -302,7 +343,6 @@ class Task(BaseModel):
             return False, None, None, None, None
         finally:
             db.close()
-
 
     def update_status(self, status: str, user_id: int = None, road_id: int = None, ward_id: int = None) -> bool:
         db = Postgresql()

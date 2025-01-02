@@ -376,6 +376,7 @@ const Map: React.FC = () => {
       updatePath(); // Gọi hàm để vẽ tuyến đường
     } else {
       // Xóa tất cả các tuyến đường nếu tắt
+
       if (routingControl) {
         routingControl.remove();
         setRoutingControl(null);

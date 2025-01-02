@@ -222,6 +222,7 @@ API cung cấp tính năng thống kê danh sách thông tin của tất cả us
 ### 4.2 Endpoint
 ```
 GET /api/getUserStatistics
+
 GET /api/getTechnicalStatistics
 ```
 
@@ -245,22 +246,6 @@ Phản hồi sẽ trả về các thông tin của tất cả user và technical
         "created": "2024-12-30 15:20:53",
         "avatar": "/user/api/getAvatar?username=hehehe",
         "contribution": 0
-      },
-      {
-        "user_id": 98,
-        "fullname": null,
-        "username": "1234",
-        "created": "2024-12-30 16:20:56",
-        "avatar": "/user/api/getAvatar?username=1234",
-        "contribution": 0
-      },
-      {
-        "user_id": 69,
-        "fullname": "Le Huynh Anh Thu",
-        "username": "baongan123",
-        "created": "2024-11-09 16:13:14",
-        "avatar": "/user/api/getAvatar?username=baongan123",
-        "contribution": 17
       },
       {
         "user_id": 96,
@@ -296,41 +281,6 @@ Phản hồi sẽ trả về các thông tin của tất cả user và technical
             "province_name": "Thành phố Hồ Chí Minh"
           },
           {
-            "deadline": "2024-03-02 07:19:37",
-            "status": null,
-            "ward_name": "Phường 5",
-            "district_name": "Quận Phú Nhuận",
-            "province_name": "Thành phố Hồ Chí Minh"
-          },
-          {
-            "deadline": "2024-01-03 07:55:02",
-            "status": null,
-            "ward_name": "Phường Linh Trung",
-            "district_name": "Thành phố Thủ Đức",
-            "province_name": "Thành phố Hồ Chí Minh"
-          },
-          {
-            "deadline": "2024-03-02 07:19:37",
-            "status": null,
-            "ward_name": "Phường 9",
-            "district_name": "Quận Phú Nhuận",
-            "province_name": "Thành phố Hồ Chí Minh"
-          },
-          {
-            "deadline": "2024-12-30 15:00:47",
-            "status": "Not start",
-            "ward_name": "Phường An Bình",
-            "district_name": "Thành phố Dĩ An",
-            "province_name": "Bình Dương"
-          },
-          {
-            "deadline": "2024-12-30 15:00:47",
-            "status": "Not start",
-            "ward_name": "Phường Dĩ An",
-            "district_name": "Thành phố Dĩ An",
-            "province_name": "Bình Dương"
-          },
-          {
             "deadline": "2025-12-01 16:00:00",
             "status": "Done",
             "ward_name": "Phường Tăng Nhơn Phú A",
@@ -338,6 +288,14 @@ Phản hồi sẽ trả về các thông tin của tất cả user và technical
             "province_name": "Thành phố Hồ Chí Minh"
           }
         ]
+      },
+      {
+        "user_id": 110,
+        "fullname": null,
+        "username": "hihi",
+        "avatar": "/user/api/getAvatar?username=hihi",
+        "created": "2025-01-01 08:37:45",
+        "tasks": []
       }
     ]
   },
@@ -370,3 +328,137 @@ Phản hồi sẽ trả về các thông tin của tất cả user và technical
 - API yêu cầu token hợp lệ trong header để xác thực danh tính người dùng.
 - Cần phải là tài khoản có quyền admin thì mới xem được các thông tin trả về từ API này.
 
+## 6. API giao công việc sửa đường cho technical
+### 6.1 Mục đích
+API này cho phép công việc sửa đường cho technical, bao gồm việc xác thực danh tính và kiểm tra quyền truy cập.
+
+### 6.2 Endpoint
+```
+POST /api/assignTask
+```
+
+#### 6.2.1 Định dạng dữ liệu yêu cầu (Request)
+
+Gửi một JSON object với định dạng sau trong body:
+
+```json
+{
+  "username": "string",
+  "province_name": "string",
+  "district_name": "string",
+  "ward_name": "string",
+  "deadline": "datetime"
+}
+```
+**Các trường:**
+- `username`: Tên người dùng cần gán nhiệm vụ.
+- `province_name`: Tên tỉnh của khu vực.
+- `district_name`: Tên quận/huyện của khu vực.
+- `ward_name`: Tên xã/phường của khu vực.
+- `deadline`: Thời gian phải hoàn thành nhiệm vụ, định dạng YYYY-MM-DD HH:MM:SS.
+
+#### 6.2.2. Định dạng dữ liệu phản hồi (Response)
+##### 6.2.2.1 Yêu cầu thành công
+```json
+{
+  "status": "Success",
+  "data": {
+    "username": "hihi",
+    "fullname": "N/A",
+    "ward_name": "Phường 5",
+    "district_name": "Quận 3",
+    "province_name": "Thành phố Hồ Chí Minh",
+    "deadline": "01-02-2025 08:50:31"
+  },
+  "message": "Task assigned successfully."
+}
+```
+
+##### 6.2.2.2 Yêu cầu không thành công
+```json
+{
+  "status": "Error",
+  "data": null,
+  "message": "Task assignment failed.",
+  "status_code": 403
+}
+```
+***Trong đó:***
+- `status`: Trạng thái của yêu cầu.
+- `message`: Thông điệp mô tả kết quả của yêu cầu.
+
+### 6.3 Lưu ý
+- API yêu cầu quyền admin để thực hiện tính năng này.
+- Deadline của nhiệm vụ là bắt buộc.
+
+## 7. API cập nhật trạng thái hoàn thành công việc
+### 7.1 Mục đích
+API này cho phép người dùng có quyền cập nhật trạng thái của nhiệm vụ hoặc tình trạng sửa chữa các tuyến đường.
+
+### 7.2 Endpoint
+```
+POST /api/updateStatus
+```
+
+#### 7.2.1 Định dạng dữ liệu yêu cầu (Request)
+Gửi một JSON object với định dạng sau trong body:
+
+```json
+{
+  "status": "string",
+  "user_id": "integer",
+  "road_id": "integer",
+  "ward_id": "integer"
+}
+
+```
+**Các trường:**
+- `status`: Trạng thái cần cập nhật ("On progress", "Done").
+- `user_id`: ID người dùng cần cập nhật (chỉ nhập khi muốn cập nhật trạng thái của công việc đã giao).
+- `road_id`: ID tuyến đường cần cập nhật (chỉ nhập khi muốn update tình trạng sữa chữa của đường, cả technical và admin đều có quyền thực hiện tính năng này).
+- `ward_id`: ID xã/phường (chỉ nhập khi muốn cập nhật trạng thái của công việc đã giao, chỉ admin có quyền thực hiện tính năng này).
+
+#### 7.2.2. Định dạng dữ liệu phản hồi (Response)
+##### 7.2.2.1 Yêu cầu thành công
+- Update hoàn thành nhiệm vụ được giao
+```json
+{
+  "status": "Success",
+  "data": {
+    "status": "Done ",
+    "updated_at": "2025-01-01 09:03:15",
+    "user_id": 110,
+    "ward_id": 49
+  },
+  "message": "Status updated successfully"
+}
+```
+- Update hoàn thành việc sửa chữa đường
+```json
+{
+  "status": "Success",
+  "data": {
+    "status": "Done ",
+    "updated_at": "2025-01-01 09:05:24",
+    "road_id": 458
+  },
+  "message": "Status updated successfully"
+}
+```
+
+##### 7.2.2.2 Yêu cầu không thành công
+```json
+{
+  "status": "Error",
+  "data": null,
+  "message": "You do not have permission to update status",
+  "status_code": 403
+}
+```
+***Trong đó:***
+- `status`: Trạng thái của yêu cầu.
+- `message`: Thông điệp mô tả kết quả của yêu cầu.
+
+### 7.3 Lưu ý
+- Người dùng cần có quyền admin hoặc technical để cập nhật trạng thái của các nhiệm vụ hoặc tuyến đường.
+- Các tham số `user_id`, `ward_id` và `road_id` cần phải được cung cấp chính xác để thực hiện thao tác cập nhật.

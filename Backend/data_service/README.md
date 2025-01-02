@@ -42,16 +42,19 @@ Body in `multipart/form-data` format:
 ## công dụng
 Lấy thông tin đường đã upload của tất cả user
 
-## Request Parameters
 
+##  Cách sử dụng
+### Request Parameters
+`Query`
 | Parameter | Type   | Required | Description                              |
 |-----------|--------|----------|------------------------------------------|
-| `user_id` |  INT   |  No      | Lấy thông tin đường đã upload của user có id là `user_id`              |
+| `user_id` |  INT   |  No      | Lấy thông tin đường đã upload của user có id là `user_id`|
 | `id_road` | INT    |  No      | Lây thông tin đường có id là `id_road`   |
+| `ward_id` | INT    |  No      | Lây thông tin đường của phường có id là `ward_id`   |
 
 Nếu không có parameter thì sẽ lấy toàn bộ thông tin của tất cả các đường của tất cả user
 
-## Responses
+### Responses
 
 | Status Code | Message                   | Description                             |
 |-------------|---------------------------|-----------------------------------------|
@@ -194,4 +197,56 @@ Body in `multipart/form-data` format:
 | `404`       | Road not found                     |  id đường không tồn tại                | 
 | `500`       | Internal Server Error               | Lỗi từ server                        | 
 
+</details>
+
+
+<details>
+
+<summary><strong>ENPOINT GET /api/statisticsRoad<strong></summary>
+
+## Công dụng </br>
+Thông kê đường hư đã được upload và số đường đã được sửa chữa (trong một khoảng thời gian được chỉ định).
+
+## Cách sử dụng
+### Headers
+
+| Key            | Value                    | Description                                         |
+|----------------|--------------------------|-----------------------------------------------------|
+| `accept`       | `application/json`       | Chấp nhận kiểu dữ liệu trả về        |
+| `Authorization`| `Bearer <token>`         | Token của user                       |
+
+### Request Parameters
+
+`Query`
+
+| Parameter  | Type   | Required | Description                              |
+|------------|--------|----------|------------------------------------------|
+| `during`   | STRING (monthly/yearly)    | No    | Đơn vị thời gian              |
+| `number` | INT  | No      | Số lượng cho đợn vị thời gian đã chọn            |
+
+Mặc định sẽ lấy trong một tháng gần đây
+
+### Responses
+
+| Status Code | Message                   | Description                          |
+|-------------|---------------------------|--------------------------------------|
+| `200`       | Get statistics road successfully     | Lấy thống kê thành công |
+| `403`       | You don't have permission to access this feature                   | User không có quyền               | 
+| `500`       | Internal Server Error               | Lỗi từ server                        | 
+
+Ví dụ response trả về nếu lấy thống kê thành công.
+```
+{
+  "status": "success",
+  "data": {
+    "Total": [
+      "'Poor': 1",
+      "'Satisfactory': 30",
+      "'Very poor': 11"
+    ],
+    "Done": []
+  },
+  "message": "Get statistics road successfully"
+}
+```
 </details>
