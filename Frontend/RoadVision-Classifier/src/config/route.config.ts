@@ -3,7 +3,6 @@ import Home from "../pages/User/Home/Home";
 import PublicMap from "../pages/User/PublicMap/PublicMap";
 import Profile from "../pages/User/Profile/Profile";
 import MapManagement from "../pages/User/MapManagement/MapManagement";
-import MyLibrary from "../pages/User/MyHistory/MyHistory";
 import Dashboard from "../pages/Admin/Dashboard/Dashboard";
 import UsersManagement from "../pages/Admin/Users/UsersManagement";
 import TechniciansManagement from "../pages/Admin/Technicians/TechniciansManagement";

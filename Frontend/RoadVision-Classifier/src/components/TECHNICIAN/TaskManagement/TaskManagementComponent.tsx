@@ -1,65 +1,85 @@
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
-import avatar from "../../../assets/img/defaultAvatar.png";
-import { accountState } from "../../../atoms/authState";
-import { Breadcrumb, Table, Tag } from "antd";
-import { AiOutlineDelete } from "react-icons/ai";
+import { wardIdState } from "../../../atoms/technicianTask/tasksState";
 import technicianService from "../../../services/technicianprofile.service";
+import { Table, Tag, Breadcrumb, Input } from "antd";
+import { AiOutlineDelete } from "react-icons/ai";
 
-interface RoadDetailsProps {
+interface TaskManagementComponentProps {
   road: any;
   onBack: () => void;
   onViewRoadDetails: (road: any) => void;
 }
 
-const TaskManagementComponent: React.FC<RoadDetailsProps> = ({
+const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
   onBack,
-  onViewRoadDetails,
 }) => {
-  const technicianInfo = useRecoilValue(accountState);
+  const wardId = useRecoilValue(wardIdState);
   const [dataSource, setDataSource] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredDataSource, setFilteredDataSource] = useState<any[]>([]);
 
   const fetchTasksAndRoads = async () => {
-    setLoading(true);
-    try {
-      const tasksResponse = await technicianService.getAllTask({});
-      const tasks = Array.isArray(tasksResponse) ? tasksResponse : tasksResponse.data;
-  
-      const data = await Promise.all(
-        tasks.map(async (task: any) => {
-          const roadResponse = await technicianService.getAllRoad(task.ward_id);
-          const roadArray = Array.isArray(roadResponse) ? roadResponse : roadResponse.data;
-          
-          const roads = roadArray.map((road: string) => JSON.parse(road));
-          console.log(roads)
-  
-          return roads.map((road: any) => ({
-            key: task.task_id,
-            road_id: road.id,
-            road_image: `http://192.168.120.26${road.filepath}`,
-            location: road.location, 
-            task_deadline: task.deadline,  
-            task_status: road.status, 
-            task_notes: road.notes,  
-            ward_id: road.ward_id,  
-          }));
-        })
-      );
-  
-      const flattenedData = data.flat();
-  
-      setDataSource(flattenedData);
-    } catch (error) {
-      console.error("Error fetching tasks and roads:", error);
-    } finally {
-      setLoading(false);
+    if (wardId !== null) {
+      setLoading(true);
+      try {
+        const response = await technicianService.getAllRoad(wardId);
+        const roads = Array.isArray(response) ? response : response.data;
+
+        const parsedRoads = roads.map((road: string) => {
+          const roadData = JSON.parse(road);
+          return {
+            road_id: roadData.id,
+            location: roadData.location,
+            level: roadData.level,
+            road_image: roadData.filepath,
+            task_deadline: roadData.created_at,
+          };
+        });
+
+        setDataSource(parsedRoads);
+        setFilteredDataSource(parsedRoads);
+      } catch (error) {
+        console.error("Error fetching road data:", error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
-    
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (query) {
+      const filteredData = dataSource.filter((item) =>
+        item.location.toLowerCase().includes(query.toLowerCase())
+      );
+      setFilteredDataSource(filteredData);
+    } else {
+      setFilteredDataSource(dataSource); 
+    }
+  };
+
   useEffect(() => {
     fetchTasksAndRoads();
-  }, []);
+  }, [wardId]);
+
+  const getLevelColor = (level: string) => {
+    switch (level) {
+      case "Very poor":
+        return "red";
+      case "Poor":
+        return "yellow";
+      case "Satisfactory":
+        return "blue";
+      case "Done":
+        return "green";
+      default:
+        return "default";
+    }
+  };
 
   const columns = [
     {
@@ -70,33 +90,6 @@ const TaskManagementComponent: React.FC<RoadDetailsProps> = ({
       align: "center" as "center",
     },
     {
-      title: "Image",
-      dataIndex: "road_image",
-      key: "road_image",
-      width: 250,
-      align: "center" as "center",
-      render: (text: string) => (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100%",
-          }}
-        >
-          <img
-            src={text}
-            alt="Road"
-            style={{
-              width: "200px",
-              height: "200px",
-              objectFit: "cover",
-            }}
-          />
-        </div>
-      ),
-    },
-    {
       title: "Location",
       dataIndex: "location",
       key: "location",
@@ -104,43 +97,42 @@ const TaskManagementComponent: React.FC<RoadDetailsProps> = ({
       align: "center" as "center",
     },
     {
-      title: "Due date",
-      dataIndex: "task_deadline",
-      key: "task_deadline",
+      title: "Level",
+      dataIndex: "level",
+      key: "level",
       width: 100,
       align: "center" as "center",
+      render: (text: string) => <Tag color={getLevelColor(text)}>{text}</Tag>,
     },
     {
-      title: "Status",
-      dataIndex: "task_status",
-      key: "task_status",
-      width: 100,
+      title: "Road Image",
+      dataIndex: "road_image",
+      key: "road_image",
+      width: 250,
       align: "center" as "center",
-      render: (text: string) => {
-        const colorMap: { [key: string]: string } = {
-          "In progress": "blue",
-          Done: "green",
-          "Not start": "gray",
-        };
-        return <Tag color={colorMap[text] || "default"}>{text}</Tag>;
+      render: (image: string) => {
+        const fullImageUrl = `http://192.168.120.26/${image}`;
+        return (
+          <img
+            src={fullImageUrl}
+            alt="Road"
+            style={{
+              width: 150,
+              height: 100,
+              objectFit: "cover",
+              borderRadius: "8px",
+            }}
+          />
+        );
       },
-    },
-    {
-      title: "Note",
-      dataIndex: "task_note",
-      key: "task_note",
-      width: 100,
-      align: "center" as "center",
     },
     {
       title: "Action",
       align: "center" as "center",
       render: () => (
-        <div>
-          <button className="text-red-500">
-            <AiOutlineDelete className="w-5 h-5" />
-          </button>
-        </div>
+        <button className="text-red-500">
+          <AiOutlineDelete className="w-5 h-5" />
+        </button>
       ),
       width: 80,
     },
@@ -152,43 +144,22 @@ const TaskManagementComponent: React.FC<RoadDetailsProps> = ({
         className="w-full justify-start px-10"
         separator=">"
         items={[
-          {
-            title: "All Users",
-            onClick: onBack,
-            className: "cursor-pointer",
-          },
-          {
-            title: "User Info",
-            onClick: onViewRoadDetails,
-            className: "cursor-pointer",
-          },
+          { title: "All Users", onClick: onBack, className: "cursor-pointer" },
+          { title: "Task Management", className: "cursor-pointer" },
         ]}
       />
-      <div className="relative flex flex-row gap-5 w-[95%] h-48 px-10 rounded-2xl bg-[#3749A6] justify-between items-center">
-        <div className="relative flex flex-row gap-5 w-[95%] h-48 px-10 rounded-2xl bg-[#3749A6] justify-between items-center">
-          <div className="absolute bg-white rounded-full w-36 h-36 flex justify-center items-center">
-            <img
-              src={technicianInfo.avatar || avatar}
-              alt="Avatar"
-              className="w-[95%] h-[95%] object-cover rounded-full"
-            />
-          </div>
-          <div className="flex flex-col justify-between ml-40">
-            <div className="text-white font-bold text-2xl">
-              {`Username: ${technicianInfo.username || ""}`}
-            </div>
-            <div className="text-white font-normal text-base">
-              {`ID: ${technicianInfo.id || ""}`}
-            </div>
-          </div>
-        </div>
-      </div>
+      <Input
+        placeholder="Search by Road Name"
+        value={searchQuery}
+        onChange={handleSearch}
+        style={{ width: "80%", margin: "10px 0" }}
+      />
       <Table
-        dataSource={dataSource}
+        dataSource={filteredDataSource} 
         columns={columns}
         loading={loading}
         pagination={{ pageSize: 5 }}
-        rowKey="task_id"
+        rowKey="road_id"
         className="w-[95%] bg-white p-5 rounded-2xl shadow-md"
       />
     </div>
