@@ -1,5 +1,5 @@
 import { axiosRequest } from "../config/axios.config";
-import { AllTechnicianType } from "../defination/types/alltechnician.type";
+import { AllTechnicianType, TechiniciansTaskType } from "../defination/types/alltechnician.type";
 import { getAccessToken } from "../utils/auth.util";
 
 export default {
@@ -30,6 +30,22 @@ export default {
         catch (error)
         {
             console.error("Error adding new user:", error);
+            throw error;
+        }
+    },
+
+    assignTask: async (formData: TechiniciansTaskType) => {
+        const url = `/user/api/assignTask`;
+        const token = getAccessToken();
+        const requestUrl = `${url}?token=${token}`;
+        try
+        {
+            const data = await axiosRequest.post(requestUrl, formData);
+            return data;
+        }
+        catch (error)
+        {
+            console.error("Error assigning task:", error);
             throw error;
         }
     }

@@ -176,7 +176,7 @@ export default function UserInfo({
           onRow={(record) => ({
             onClick: () => {
               if (onViewRoadDetails) {
-                onViewRoadDetails(record); // Gọi hàm khi nhấp vào hàng
+                onViewRoadDetails(record); 
               } else {
                 console.error("onViewRoadDetails is not defined");
               }
