@@ -23,6 +23,7 @@ def get_location(lat, lon):
             district = location_part[-4]
             ward = location_part[-5]
             location=", ".join(location_part[:-2])
+            print(location, [ward, district, province])
             return location,[ward, district, province]
         else:
             return None, []
