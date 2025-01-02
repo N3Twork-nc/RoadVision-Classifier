@@ -34,10 +34,22 @@ export default {
     try {
       const url = "/datasvc/api/getRouteMap";
       const response = await axiosRequest.get(url);
-      return response; // Đảm bảo trả về dữ liệu từ API
+      return response; 
     } catch (error) {
       console.error("Error fetching route map:", error);
-      throw error; // Có thể throw để xử lý lỗi ở cấp cao hơn
+      throw error; 
     }
+  },
+
+  updateLocationRoad: async (id: number, latitude: number, longitude: number) => {
+    const url = `/datasvc/api/updateLocationRoad`;
+    const data = await axiosRequest.patch(
+      url,
+      null,
+      {
+        params: { id, latitude, longitude },
+      }
+    );
+    return data;
   },
 };
