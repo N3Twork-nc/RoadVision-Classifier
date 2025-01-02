@@ -77,7 +77,6 @@ const SignInBlock = () => {
         setStoredUserInfo(info); // Save user info to local storage
         setAccountState(info);
 
-
         if (data.info.role) {
           localStorage.setItem("userRole", data.info.role);
           saveUserRole(data.info.role);

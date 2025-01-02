@@ -10,7 +10,7 @@ import dataService from "../../services/data.service";
 import "leaflet";
 import onButton from "../../assets/img/onButton.png";
 import offButton from "../../assets/img/offButton.png";
-
+const api_url = import.meta.env.VITE_BASE_API_URL;
 declare module "leaflet" {
   namespace Control {
     class CustomGeocoder {
@@ -37,6 +37,7 @@ const Map: React.FC = () => {
   const [path, setPath] = useState<[number, number][][]>([]);
   const [isBadRoutesVisible, setIsBadRoutesVisible] = useState(false);
   const [isViewBadRoutes] = useState(false);
+
   const handleToggleBadRoutes = () => {
     setIsBadRoutesVisible((prev) => !prev);
   };
@@ -55,6 +56,7 @@ const Map: React.FC = () => {
       }
     }
   }, [isBadRoutesVisible]);
+
 
   // Determine marker color based on road level
   useEffect(() => {
@@ -106,7 +108,7 @@ const Map: React.FC = () => {
     const fetchRoadsData = async () => {
       try {
         const data = await dataService.getInfoRoads({});
-
+        
         if (Array.isArray(data)) {
           if (data.length > 0) {
             const roads = data.map((item: string) => JSON.parse(item));
@@ -143,7 +145,7 @@ const Map: React.FC = () => {
                 iconSize: [30, 30],
                 iconAnchor: [15, 30],
               });
-              const fullImageUrl = `http://192.168.120.26/${filepath}`;
+              const fullImageUrl = `${api_url}${filepath}`;
               try {
                 const marker = L.marker([latitude, longitude], {
                   icon: customIcon,
@@ -367,31 +369,48 @@ const Map: React.FC = () => {
   }, [path]);
 
   useEffect(() => {
-    if (isViewBadRoutes) {
-      updatePath();
+    if (!leafletMap.current) return;
+  
+    // Nếu hiển thị tuyến đường xấu
+    if (isBadRoutesVisible) {
+      updatePath(); // Gọi hàm để vẽ tuyến đường
     } else {
+      // Xóa tất cả các tuyến đường nếu tắt
+
       if (routingControl) {
         routingControl.remove();
         setRoutingControl(null);
       }
+  
+      // Loại bỏ tất cả các polyline trên bản đồ
+      if (leafletMap.current) {
+        leafletMap.current.eachLayer((layer) => {
+          if (layer instanceof L.Polyline && !(layer instanceof L.Marker)) {
+            leafletMap.current?.removeLayer(layer);
+          }
+        });
+      }
     }
-  }, [isViewBadRoutes]);
+  }, [isBadRoutesVisible]);
 
   return (
     <div className="container">
       <div className="sidebar">
-        <div className="header">
-          <h2>Tìm kiếm địa điểm</h2>
-          <div className="inputGroup toggleGroup">
-            <h1>View bad routes</h1>
+        <div className="header flex flex-col justify-between items-center  p-2">
+          <h2 className="text-2xl font-bold text-[#3749A6] ">
+            Tìm kiếm địa điểm
+          </h2>
+          <div className="flex flex-row font-medium items-center gap-1 ml-auto">
+            <p className="text-base">Bad routes</p>
             <img
               src={isBadRoutesVisible ? onButton : offButton}
               alt="Toggle View Bad Routes"
-              className="toggleIcon"
+              className="cursor-pointer w-14 h-14 transition-transform transform hover:scale-110"
               onClick={handleToggleBadRoutes}
             />
           </div>
         </div>
+
         {!isRouteInputVisible ? (
           <>
             <div className="inputGroup">

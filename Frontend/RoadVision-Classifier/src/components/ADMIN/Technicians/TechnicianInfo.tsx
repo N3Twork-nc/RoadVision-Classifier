@@ -1,19 +1,72 @@
-import { Breadcrumb } from "antd";
-import avt from "../../../assets/img/defaultAvatar.png"
+import { Breadcrumb, Table } from "antd";
+import avt from "../../../assets/img/defaultAvatar.png";
+
+interface TaskType {
+  task_id: number;
+  description: string;
+}
 
 interface DataType {
   key: React.Key;
   username: string;
   fullname: string;
   joindate: string;
-  avatar: string,
+  avatar: string;
+  tasks: TaskType[]; // Thêm danh sách tasks
 }
-interface AllTechniciansProps {
-    technician: DataType;
-    onBack: () => void;
-  }
 
-export default function TechnicianInfo({ technician, onBack }: AllTechniciansProps) {
+interface AllTechniciansProps {
+  technician: DataType;
+  onBack: () => void;
+}
+
+export default function TechnicianInfo({
+  technician,
+  onBack,
+}: AllTechniciansProps) {
+  const technicianInfo = technician.tasks.map(
+    (technicianInfo: any, index: number) => ({
+      key: index,
+      ward: technicianInfo.ward_name,
+      status: technicianInfo.status,
+      province: technicianInfo.province_name,
+      district: technicianInfo.district_name,
+      deadline: technicianInfo.deadline,
+    })
+  );
+  const columns = [
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      align: "center" as "center",
+    },
+    {
+      title: "Ward",
+      dataIndex: "ward",
+      key: "deadline",
+      align: "center" as "center",
+    },
+    {
+      title: "District",
+      dataIndex: "district",
+      key: "district",
+      align: "center" as "center",
+    },
+    {
+      title: "Province",
+      dataIndex: "province",
+      key: "province",
+      align: "center" as "center",
+    },
+    {
+      title: "Deadline",
+      dataIndex: "deadline",
+      key: "deadline",
+      align: "center" as "center",
+    },
+
+  ];
   return (
     <div className="w-full min-h-screen bg-[#F9F9F9] flex flex-col gap-5 justify-start items-center overflow-y-auto">
       <Breadcrumb
@@ -49,6 +102,21 @@ export default function TechnicianInfo({ technician, onBack }: AllTechniciansPro
             {technician.joindate || ""}
           </div>
         </div>
+      </div>
+
+      {/* Danh sách tasks */}
+      <div className="w-[95%] bg-white rounded-2xl shadow-md p-6">
+        <h3 className="text-lg font-bold mb-4">Assigned Tasks</h3>
+        {technician.tasks && technician.tasks.length > 0 ? (
+          <Table
+          dataSource={technicianInfo}
+          columns={columns}
+          rowClassName="cursor-pointer"          
+          pagination={{ pageSize: 10 }}
+        />
+        ) : (
+          <p className="text-gray-500">No tasks assigned.</p>
+        )}
       </div>
     </div>
   );
