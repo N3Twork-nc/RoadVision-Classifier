@@ -344,6 +344,63 @@ class Task(BaseModel):
         finally:
             db.close()
 
+    def get_task(self, role: str, user_id: int = None) -> list:
+        db = Postgresql()
+        try:
+            query = f'''
+                SELECT s.id, s.deadline, s.status, w.name, d.name, p.name, w.id, d.id, p.id
+                FROM "assignment" s
+                JOIN "ward" w ON s.ward_id = w.id
+                JOIN "district" d ON w.district_id = d.id
+                JOIN "province" p ON d.province_id = p.id
+                JOIN "account" a ON s.user_id = a.id
+            '''
+            
+            if role == "admin" and user_id is not None:
+                query += f"WHERE s.user_id = {user_id}"
+            else:
+                query += f"WHERE s.user_id = (SELECT id FROM account WHERE username = '{self.username}')"
+
+            task_results = db.execute(query, fetch='all')
+
+            tasks = []
+            for row in task_results:
+                road_done_query = f'''
+                    SELECT COUNT(*)
+                    FROM "road"
+                    WHERE ward_id = {row[6]} AND status = 'Done'
+                '''
+                road_count = db.execute(road_done_query, fetch='one')[0]
+
+                all_road_query = f'''
+                    SELECT COUNT(*)
+                    FROM "road"
+                    WHERE ward_id = {row[6]}
+                '''
+                all_road_count = db.execute(all_road_query, fetch='one')[0]
+
+                deadline = row[1].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[1], datetime) else None
+                location = f"{row[3]}, {row[4]}, {row[5]}"
+
+                tasks.append({
+                    "task_id": row[0],
+                    "deadline": deadline,
+                    "status": row[2],
+                    "location": location,
+                    "ward_id": row[6],
+                    "district_id": row[7],
+                    "province_id": row[8],
+                    "road_done": road_count,
+                    "all_road": all_road_count
+                })
+
+            return tasks
+        except Exception as e:
+            print(f"Error getting tasks: {e}")
+            return []
+        finally:
+            db.close()
+
     def update_status(self, status: str, user_id: int = None, road_id: int = None, ward_id: int = None) -> bool:
         db = Postgresql()
         try:
