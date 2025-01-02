@@ -11,7 +11,7 @@ def validate_token(token=Depends(reusable_oauth2)):
     try:
         response = requests.get(API_AUTHORIZATION_URL, headers=headers)
         if response.status_code == 200:
-            return response.json().get("data", {}).get("username")
+            return response.json().get("data", {})
         else:
             raise HTTPException(
                 status_code=response.status_code, 

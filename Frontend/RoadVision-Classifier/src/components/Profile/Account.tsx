@@ -29,7 +29,6 @@ export default function Account() {
         setLoading(false);
       }
     };
-
     fetchProfile();
   }, []);
 
@@ -94,7 +93,7 @@ export default function Account() {
           </div>
         </div>
         <div className="w-[30%]">
-          <div className="text-left font-normal font-sm text-gray-700 text-sm">Gender</div>
+          <div className="text-left font-normal font-sm text-gray-700 text-sm">Contribution</div>
           <div className="text-left text-black font-medium text-base">
             {profileData.gender || "N/A"}
           </div>
@@ -108,9 +107,9 @@ export default function Account() {
       </div>
 
       <div>
-        <button className="w-fit bg-[#3749A6] text-white font-semibold p-2 px-5 rounded-full hover:ring-4 hover:ring-blue-300">
+        {/* <button className="w-fit bg-[#3749A6] text-white font-semibold p-2 px-5 rounded-full hover:ring-4 hover:ring-blue-300">
           Delete Account
-        </button>
+        </button> */}
       </div>
     </div>
   );

@@ -21,6 +21,8 @@ class RoadSchema(BaseModel):
     ward_id: int = Field(None, description="District id")
     location: str = Field("unknow", description="Location")
     location_part: list = Field([], description="Address raw")
+    update_at: datetime = Field(None, description="Update at")
+    status: str = Field(None, description="Status of road")
     
     @root_validator(pre=True)
     def resolve_user_id(cls, values):
@@ -45,7 +47,7 @@ class RoadSchema(BaseModel):
         file_path = f"roadImages/{self.user_id}_{time.time()}.jpg"
         if self.location !=None:
             self.ward_id=db.execute(f"SELECT w.id FROM ward w JOIN district d on w.district_id=d.id JOIN province p on d.province_id=p.id WHERE w.name ilike'%{self.location_part[0]}%' and d.name ilike'%{self.location_part[1]}%' and p.name ilike'%{self.location_part[2]}%'")[0]
-        id=db.execute(f"INSERT INTO road (user_id,image_path,latitude,longitude,level,ward_id,location) VALUES ({self.user_id},'{file_path}',{self.latitude},{self.longitude},'classifing',{self.ward_id},'{self.location}') RETURNING id")
+        id=db.execute(f"INSERT INTO road (user_id,image_path,latitude,longitude,level,ward_id,location) VALUES ({self.user_id},'{file_path}',{self.latitude},{self.longitude},'Classifing',{self.ward_id},'{self.location}') RETURNING id")
         db.commit()
         db.close()
         with open(file_path , "wb") as f:
@@ -55,7 +57,8 @@ class RoadSchema(BaseModel):
     def deleteRoad(self):
         try:
             db = Postgresql()
-            os.remove(self.filepath)
+            file_path = db.execute(f"SELECT image_path FROM road WHERE id={self.id}")[0]
+            os.remove(file_path)
             db.execute(f"DELETE FROM road WHERE id={self.id}",fetch='none')
             db.commit()
             db.close()
@@ -66,4 +69,47 @@ class RoadSchema(BaseModel):
     
     def reformat(self):
         self.filepath = f"/datasvc/api/getImage?imagePath={self.filepath}"
+        attributes_to_remove = ['file', 'location_part', 'username',]
+        for attr in attributes_to_remove:
+            if hasattr(self, attr):
+                delattr(self, attr)
+        
         return self
+        return self
+
+    def update(self):
+        fields_can_update = ['latitude', 'longitude', 'location', 'ward_id','status','user_id']
+        try:
+            db = Postgresql()
+            old_values=db.execute(f"SELECT * FROM road WHERE id={self.id}",fetch='one')
+            if self.location_part:
+                ward_id = db.execute(f"SELECT w.id FROM ward w JOIN district d on w.district_id=d.id JOIN province p on d.province_id=p.id WHERE w.name ilike'%{self.location_part[0]}%' and d.name ilike'%{self.location_part[1]}%' and p.name ilike'%{self.location_part[2]}%'")[0]
+                self.ward_id = ward_id
+            fields = {field: getattr(self, field) for field in fields_can_update if getattr(self, field) is not None}
+            set_clause = ", ".join([f"{field} = '{fields[field]}'" for field in fields])
+            db.execute(f"UPDATE road SET {set_clause} WHERE id={self.id}",fetch='none')
+            db.commit()
+            new_values=db.execute(f"SELECT * FROM road WHERE id={self.id}",fetch='one')
+            db.close()
+            return old_values,new_values
+        except Exception as e:
+            print(current_file_path, e)
+            return None,None
+
+    def checkPermission(self):
+        db = Postgresql()
+        permission=db.execute(f"SELECT 1 FROM road join account on road.user_id=account.id join role on role.user_id=account.id WHERE (road.id={self.id} and account.username='{self.username}') or (role.permission_id=1 and account.username='{self.username}')")
+        db.close()
+        return True if permission else False
+
+    def checkExist(self):
+        db = Postgresql()
+        result = db.execute(f"SELECT 1 FROM road WHERE id={self.id}")
+        db.close()
+        return True if result else False
+    
+    def getinfoRoad(self,fields:str):
+        db = Postgresql()
+        ward_id = db.execute(f"SELECT {fields} FROM road WHERE id={self.id}")
+        db.close()
+        return ward_id[0] if ward_id else None

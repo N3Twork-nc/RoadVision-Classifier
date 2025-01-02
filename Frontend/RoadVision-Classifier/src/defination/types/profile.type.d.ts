@@ -3,6 +3,7 @@ import { UserType } from "./user.type";
 //Define type data of API respone
 export type ProfileDataType = {
   user_id: int;
+  avatar: string;
   username: string;
   email: string;
   location: string;
@@ -12,6 +13,7 @@ export type ProfileDataType = {
   fullname: string;
   gender: string;
   state: string;
+  contribution: int;
 };
 
 export type EditProfileDataType = {
@@ -22,6 +24,9 @@ export type EditProfileDataType = {
   gender: string;
   location: string;
   state: string;
+}
+export type UploadAvatarType = {  
+  file: File;
 }
 
 export type ChangePasswordDataType = {
