@@ -2,13 +2,11 @@ import React from "react";
 import { DownOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Dropdown, Space } from "antd";
-import search from "../../../assets/img/search.png";
 import admin_avt from "../../../assets/img/ADMIN.png";
 import notification from "../../../assets/img/notification.png";
 import { Link } from "react-router-dom";
 import { handleLogOut } from "../../../utils/auth.util";
 const Header: React.FC = () => {
- 
   const items: MenuProps["items"] = [
     {
       label: (
@@ -30,14 +28,7 @@ const Header: React.FC = () => {
 
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-[#F9F9F9]">
-      <div className="flex items-center space-x-4 w-96 px-4 py-2 bg-slate-100 border rounded-3xl focus-within:ring focus-within:ring-blue-300">
-        <input
-          type="text"
-          placeholder="Search your..."
-          className="flex-1 bg-slate-100 outline-none"
-        />
-        <img className="w-5 h-5" src={search} />
-      </div>
+      <div className="flex items-center space-x-4 w-96 px-4 py-2"></div>
 
       <div className="flex items-center space-x-4">
         {/* notification */}
@@ -61,9 +52,7 @@ const Header: React.FC = () => {
                   alt="Admin"
                   className="w-9 h-9 mr-1 rounded-full"
                 />
-                <span className="flex font-medium text-center">
-                  ADMIN
-                </span>
+                <span className="flex font-medium text-center">ADMIN</span>
                 <DownOutlined />
               </Space>
             </a>

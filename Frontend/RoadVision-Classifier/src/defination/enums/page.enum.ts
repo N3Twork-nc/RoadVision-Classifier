@@ -4,7 +4,7 @@ export enum PageEnum {
   SIGN_UP = "/sign-up",
   HOME = "/home",
   MAPMANAGEMENT = "/map-management",
-  LIBRARY = "/library",
+  HISTORY = "/history",
   FORGOT_PASSWORD = "/forgot-password",
   PROFILE = "/profile",
   PUBLIC_MAP = "/public-map",
