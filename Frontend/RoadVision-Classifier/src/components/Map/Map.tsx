@@ -392,10 +392,6 @@ const Map: React.FC = () => {
     }
   }, [isBadRoutesVisible]);
 
-  const handleToggleBadRoutes = () => {
-    setIsBadRoutesVisible((prev) => !prev); 
-  };
-  
   return (
     <div className="container">
       <div className="sidebar">
