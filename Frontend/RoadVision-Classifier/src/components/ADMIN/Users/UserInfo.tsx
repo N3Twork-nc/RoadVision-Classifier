@@ -70,7 +70,6 @@ const columns = [
   },
   {
     title: "Action",
-    key: "road_location",
     align: "center" as "center",
     render: () => (
       <div>
