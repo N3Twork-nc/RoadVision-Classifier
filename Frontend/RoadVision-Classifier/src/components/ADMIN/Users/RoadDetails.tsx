@@ -40,11 +40,14 @@ const RoadDetails: React.FC<RoadDetailsProps> = ({
         ]}
       />
 
-      <div className="flex flex-col gap-5 w-full px-10 py-5 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl text-[#23038C] font-bold text-center">
-          Road Details
-        </h2>
-        <div className="w-full px-10">
+      <div className="flex flex-col gap-5 w-full  bg-white rounded-lg shadow-md">
+        <div className="w-full bg-[#23038C] text-white py-4 px-10 rounded-lg shadow-md flex justify-between items-center">
+          <h2 className="text-3xl font-bold">Road Details</h2>
+          <p className="text-lg font-light">
+            Comprehensive information about the selected road
+          </p>
+        </div>
+        <div className="w-full px-20">
           <p>
             <strong className="text-[#23038C]">Road ID:</strong> {road.road_id}
           </p>
@@ -72,7 +75,7 @@ const RoadDetails: React.FC<RoadDetailsProps> = ({
             {road.road_time}
           </p>
         </div>
-        <div className="w-full flex flex-col lg:flex-row gap-5">
+        <div className="w-full flex px-20 py-5 flex-col lg:flex-row gap-5">
           <div className="flex-1">
             <img
               src={road.road_image}

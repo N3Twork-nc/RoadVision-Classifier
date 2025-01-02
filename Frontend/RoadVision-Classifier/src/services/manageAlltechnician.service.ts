@@ -11,7 +11,6 @@ export default {
         try
         {
             const allTechnician = await axiosRequest.get(requestUrl);
-            console.log("All technician:", allTechnician);
             return allTechnician;
         }
         catch (error)
