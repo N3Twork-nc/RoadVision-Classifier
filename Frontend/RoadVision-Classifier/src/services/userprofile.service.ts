@@ -5,7 +5,7 @@ import {
   UploadAvatarType,
 } from "../defination/types/profile.type";
 import { getAccessToken } from "../utils/auth.util";
-const api_url = import.meta.env.VITE_BASE_API_URL;
+const api_url = import.meta.env.VITE_BASE_URL;
 
 export default {
   getProfile: async ({}) => {

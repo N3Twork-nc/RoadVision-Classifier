@@ -36,7 +36,7 @@ const Map: React.FC = () => {
   const [endMarker, setEndMarker] = useState<L.Marker | null>(null);
   const [path, setPath] = useState<[number, number][][]>([]);
   const [isBadRoutesVisible, setIsBadRoutesVisible] = useState(false);
-
+  const api_url = import.meta.env.VITE_BASE_URL;
   const handleToggleBadRoutes = () => {
     if (routingControl) {
       routingControl.remove();
@@ -124,7 +124,7 @@ const Map: React.FC = () => {
                 iconSize: [30, 30],
                 iconAnchor: [15, 30],
               });
-              const fullImageUrl = `http://192.168.120.26/${filepath}`;
+              const fullImageUrl = `${api_url}/${filepath}`;
               try {
                 const marker = L.marker([latitude, longitude], {
                   icon: customIcon,
