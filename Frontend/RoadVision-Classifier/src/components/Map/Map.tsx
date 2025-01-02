@@ -37,26 +37,9 @@ const Map: React.FC = () => {
   const [path, setPath] = useState<[number, number][][]>([]);
   const [isBadRoutesVisible, setIsBadRoutesVisible] = useState(false);
 
-
   const handleToggleBadRoutes = () => {
     setIsBadRoutesVisible((prev) => !prev);
   };
-
-  useEffect(() => {
-    if (!leafletMap.current) return;
-
-    if (isBadRoutesVisible) {
-      // Hiển thị các tuyến đường xấu
-      updatePath(); // Gọi hàm cập nhật path khi bật switch
-    } else {
-      // Xóa các tuyến đường xấu khỏi bản đồ
-      if (routingControl) {
-        routingControl.remove();
-        setRoutingControl(null);
-      }
-    }
-  }, [isBadRoutesVisible]);
-
 
   // Determine marker color based on road level
   useEffect(() => {
@@ -393,6 +376,7 @@ const Map: React.FC = () => {
     }
   }, [isBadRoutesVisible]);
 
+  
   return (
     <div className="container">
       <div className="sidebar">
