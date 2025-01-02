@@ -66,7 +66,7 @@ const SignInBlock = () => {
     try {
       // Call the API for sign-in
       const data = await authService.signIn(formData);
-
+      console.log(data);
       const { info, token } = data; // Extract user info and token from response
 
       if (info && token) {
