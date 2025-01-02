@@ -41,7 +41,7 @@ const Sider: React.FC = () => {
         <NavLink to="/home" icon={FaHome} text="Home" />
         <NavLink to="/public-map" icon={FaMap} text="Public map" />
         <NavLink to="/map-management" icon={FaTasks} text="Map management" />
-        <NavLink to="/library" icon={FaBook} text="My library" />
+        <NavLink to="/history" icon={FaBook} text="My history" />
       </nav>
     </aside>
   );

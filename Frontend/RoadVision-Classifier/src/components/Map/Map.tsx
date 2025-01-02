@@ -323,7 +323,7 @@ const Map: React.FC = () => {
           : [];
 
       const polyline = L.polyline(waypoints, {
-        color: "blue", // Tùy chỉnh màu sắc
+        color: "red", 
         weight: 4,
       }).addTo(leafletMap.current!);
 

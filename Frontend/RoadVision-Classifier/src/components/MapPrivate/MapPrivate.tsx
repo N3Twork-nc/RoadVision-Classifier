@@ -26,8 +26,8 @@ const MapPrivate: React.FC = () => {
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [latitude, setLatitude] = useState<number>(12.333);
-  const [longitude, setLongitude] = useState<number>(45.87);
+  const [latitude, setLatitude] = useState<number>(0);
+  const [longitude, setLongitude] = useState<number>(0);
   const [, setRoadsData] = useState<any[]>([]);
   const markersRef = useRef<L.Marker[]>([]);
   // const [currentMarkerdClick, setCurrentMarkerdClick] = useState<LatLng>();
@@ -281,21 +281,6 @@ const MapPrivate: React.FC = () => {
       center: [10.762622, 106.660172],
       zoom: 14,
     });
-
-    leafletMap.current = map;
-
-    // const key = "9CPtNtP8hRSOoBHJXppf";
-    // L.tileLayer(
-    //   `https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}`,
-    //   {
-    //     tileSize: 512,
-    //     zoomOffset: -1,
-    //     attribution:
-    //       '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> ' +
-    //       '<a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
-    //     crossOrigin: true,
-    //   }
-    // ).addTo(map);
 
     leafletMap.current = map;
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {

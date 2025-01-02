@@ -1,10 +1,10 @@
 import AppLayout from "../../../components/Common/AppLayout";
 
-export default function MyLibrary() {
+export default function MyHistory() {
   return (
     <AppLayout>
       <div className="w-full min-h-screen bg-[#F9F9F9] flex flex-col p-5 gap-5 justify-start items-center overflow-y-auto">
-        MyLibrary
+        MyHistory
       </div>
     </AppLayout>
   );
