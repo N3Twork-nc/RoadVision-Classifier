@@ -61,7 +61,7 @@ class RoadService:
     def getlistRoad(user_id=None,id_road=None,ward_id=None):
         try:
             db=Postgresql()
-            roads=db.execute(f"SELECT id, user_id,latitude,longitude,level,image_path,created_at,location FROM road where ({not id_road} or id={id_road if id_road else -1}) and ({not user_id} or user_id='{user_id if user_id else -1}') and ({not ward_id} or ward_id='{ward_id if ward_id else -1}')",fetch='all')
+            roads=db.execute(f"SELECT id, user_id,latitude,longitude,level,image_path,created_at,location FROM road where level <> 'Good' and level <> 'Classifying' and status <> 'Done' and ({not id_road} or id={id_road if id_road else -1}) and ({not user_id} or user_id='{user_id if user_id else -1}') and ({not ward_id} or ward_id='{ward_id if ward_id else -1}') ",fetch='all')
             db.close()
             road_schemas = [
                 RoadSchema(
@@ -129,8 +129,8 @@ class RoadService:
                 return JSONResponse(content={"status": "error", "message": "You don't have permission to access this feature"}, status_code=403)
             days= (30 if during=='monthly' else 365)*number
             db=Postgresql()
-            count_all=db.execute(f"SELECT level, count(level) FROM road where level <> 'Good' and level <> 'classifing' and created_at >= NOW() - INTERVAL '{days} days' group by level",fetch='all')
-            count_done=db.execute(f"SELECT level, count(level) FROM road where level <> 'Good' and level <> 'classifing' and status='Done' and created_at >= NOW() - INTERVAL '{days} days' group by level",fetch='all')
+            count_all=db.execute(f"SELECT level, count(level) FROM road where level <> 'Good' and level <> 'Classifing' and created_at >= NOW() - INTERVAL '{days} days' group by level",fetch='all')
+            count_done=db.execute(f"SELECT level, count(level) FROM road where level <> 'Good' and level <> 'Classifing' and status='Done' and created_at >= NOW() - INTERVAL '{days} days' group by level",fetch='all')
             db.close()
             data={
                 'Total':[f"'{level}': {count}" for level,count in  count_all],

@@ -10,7 +10,7 @@ import dataService from "../../services/data.service";
 import "leaflet";
 import onButton from "../../assets/img/onButton.png";
 import offButton from "../../assets/img/offButton.png";
-
+const api_url = import.meta.env.VITE_BASE_API_URL;
 declare module "leaflet" {
   namespace Control {
     class CustomGeocoder {
@@ -91,7 +91,7 @@ const Map: React.FC = () => {
     const fetchRoadsData = async () => {
       try {
         const data = await dataService.getInfoRoads({});
-
+        
         if (Array.isArray(data)) {
           if (data.length > 0) {
             const roads = data.map((item: string) => JSON.parse(item));
@@ -128,7 +128,7 @@ const Map: React.FC = () => {
                 iconSize: [30, 30],
                 iconAnchor: [15, 30],
               });
-              const fullImageUrl = `http://192.168.120.26/${filepath}`;
+              const fullImageUrl = `${api_url}${filepath}`;
               try {
                 const marker = L.marker([latitude, longitude], {
                   icon: customIcon,
@@ -359,6 +359,7 @@ const Map: React.FC = () => {
       updatePath(); // Gọi hàm để vẽ tuyến đường
     } else {
       // Xóa tất cả các tuyến đường nếu tắt
+
       if (routingControl) {
         routingControl.remove();
         setRoutingControl(null);

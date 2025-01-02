@@ -54,3 +54,29 @@ class StatisticsService:
             message="Technical statistics retrieved successfully",
             status_code=200
         )
+    
+    @staticmethod
+    def get_valid_wards(user_data: dict):
+        username = user_data.get("username")
+        role = user_data.get("role")
+
+        if role != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Permission denied: Admin role required"
+            )
+
+        user = User(username=username)
+        data = user.get_valid_wards()
+        if not data:
+            return format_response(
+                status="Error",
+                message="No valid ward found",
+                status_code=404
+            )
+        return format_response(
+            status="Success",
+            data=data,
+            message="Valid ward retrieved successfully",
+            status_code=200
+        )
