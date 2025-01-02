@@ -184,8 +184,8 @@ Body in `multipart/form-data` format:
 | Parameter  | Type   | Required | Description                              |
 |------------|--------|----------|------------------------------------------|
 | `id`       | INT    | Yes      | id của đường muốn cập nhật                |
-| `latitude` | Float  | Yes      | Vĩ độ mớimới              |
-| `longitude`| Float  | Yes      | Kinh đọ mớimới      |
+| `latitude` | Float  | Yes      | Vĩ độ mới              |
+| `longitude`| Float  | Yes      | Kinh đọ mới     |
 
 ### Responses
 
