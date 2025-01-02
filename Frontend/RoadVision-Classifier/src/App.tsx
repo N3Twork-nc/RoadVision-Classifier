@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Route,
@@ -26,21 +26,22 @@ import UsersManagement from "./pages/Admin/Users/UsersManagement";
 import TechniciansManagement from "./pages/Admin/Technicians/TechniciansManagement";
 import DashboardTechnician from "./pages/Technician/Dashboard/Dashboard";
 import TaskManagement from "./pages/Technician/TaskManagement/TaskManagement";
-import { getUserRole, isAuthenticated } from "./utils/auth.util";
+import { getDefaultHomePage } from "./utils/auth.util";
 import MapTechnician from "./pages/Technician/MapTechnician/MapTechnician";
 const App: React.FC = () => {
-  const getDefaultHomePage = () => {
-    if (!isAuthenticated()) {
-      return PageEnum.LOGIN;
-    }
-    const role = getUserRole();
-    if (role === "admin") {
-      return AdminPageEnum.DASHBOARD;
-    } else if (role === "technical") {
-      return TechnicianPageEnum.DASHBOARD;
-    }
-    return PageEnum.HOME;
-  };
+  const [defaultPage, setDefaultPage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const initializeDefaultPage = () => {
+      const page = getDefaultHomePage();
+      setDefaultPage(page);
+    };
+    initializeDefaultPage();
+  }, []);
+
+  if (defaultPage === null) {
+    return <div>Loading...</div>; // Hiển thị trạng thái tải trong khi xác định trang mặc định
+  }
   return (
     <Router>
       <Routes>

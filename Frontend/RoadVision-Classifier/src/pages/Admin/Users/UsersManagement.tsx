@@ -5,8 +5,6 @@ import UserInfo from "../../../components/ADMIN/Users/UserInfo";
 import RoadDetails from "../../../components/ADMIN/Users/RoadDetails";
 import { useRecoilState } from "recoil";
 import { userState } from "../../../atoms/admin/accountState";
-import homeheader from "../../../assets/img/USER-header.png";
-import mask from "../../../assets/img/mask.png";
 
 const UsersManagement: React.FC = () => {
   const [currentView, setCurrentView] = useState<
@@ -40,30 +38,7 @@ const UsersManagement: React.FC = () => {
   return (
     <AppLayout>
       <div className="w-full min-h-screen bg-[#F9F9F9] flex flex-col p-5 gap-5 justify-start items-center overflow-y-auto">
-        <div className="flex flex-row w-[100%] h-44 rounded-2xl bg-[#2D82C6] justify-between relative">
-          <img
-            src={mask}
-            className="absolute top-0 left-0 w-full h-full object-cover rounded-2xl"
-          />
-
-          <div className="relative z-100 w-full flex xl:flex-row justify-between">
-            {/* content */}
-            <div className="flex flex-col p-10 justify-between">
-              <div>
-                <p className="text-4xl font-bold text-white">All Users management</p>
-                <p className="text-white">
-                  Thanks to the community of contributors!
-                </p>
-              </div>
-              <div className="flex flex-row gap-4"></div>
-            </div>
-            {/* image */}
-            <img
-              src={homeheader}
-              className="xl:h-full xl:block hidden mt-5 mr-10 "
-            />
-          </div>
-        </div>
+        
         {currentView === "allUsers" && (
           <AllUser onViewUserInfo={handleViewUserInfo} />
         )}

@@ -1,18 +1,28 @@
+import { useEffect, useState } from "react";
 import { Breadcrumb, Table } from "antd";
 import avt from "../../../assets/img/defaultAvatar.png";
+import manageStatisticInfoService from "../../../services/manageStatisticInfo.service";
 
 interface TaskType {
   task_id: number;
-  description: string;
+  status: string;
+  ward_id: number;
+  district_id: number;
+  province_id: number;
+  all_road: number;
+  road_done: number;
+  location: string;
+  deadline: string;
 }
 
 interface DataType {
   key: React.Key;
+  user_id: number;
   username: string;
   fullname: string;
   joindate: string;
   avatar: string;
-  tasks: TaskType[]; // Thêm danh sách tasks
+  tasks: TaskType[];
 }
 
 interface AllTechniciansProps {
@@ -24,17 +34,57 @@ export default function TechnicianInfo({
   technician,
   onBack,
 }: AllTechniciansProps) {
-  const technicianInfo = technician.tasks.map(
-    (technicianInfo: any, index: number) => ({
-      key: index,
-      ward: technicianInfo.ward_name,
-      status: technicianInfo.status,
-      province: technicianInfo.province_name,
-      district: technicianInfo.district_name,
-      deadline: technicianInfo.deadline,
-    })
-  );
+  const [loading, setLoading] = useState(false);
+  const [tasks, setTasks] = useState<TaskType[]>([]);
+
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      const response = await manageStatisticInfoService.getTask({
+        user_id: technician.user_id,
+      });
+      if (Array.isArray(response)) {
+        setTasks(response);
+      } else {
+        console.log("Is not array!:");
+      }
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, [technician.user_id]);
+
   const columns = [
+    {
+      title: "Task ID",
+      dataIndex: "task_id",
+      key: "task_id",
+      align: "center" as "center",
+    },
+
+    {
+      title: "Location",
+      dataIndex: "location",
+      key: "location",
+      align: "center" as "center",
+    },
+    {
+      title: "Total",
+      dataIndex: "all_road",
+      key: "all_road",
+      align: "center" as "center",
+    },
+    {
+      title: "Done",
+      dataIndex: "road_done",
+      key: "road_done",
+      align: "center" as "center",
+    },
     {
       title: "Status",
       dataIndex: "status",
@@ -42,35 +92,18 @@ export default function TechnicianInfo({
       align: "center" as "center",
     },
     {
-      title: "Ward",
-      dataIndex: "ward",
-      key: "deadline",
-      align: "center" as "center",
-    },
-    {
-      title: "District",
-      dataIndex: "district",
-      key: "district",
-      align: "center" as "center",
-    },
-    {
-      title: "Province",
-      dataIndex: "province",
-      key: "province",
-      align: "center" as "center",
-    },
-    {
       title: "Deadline",
       dataIndex: "deadline",
       key: "deadline",
       align: "center" as "center",
+      render: (text: string) => new Date(text).toLocaleString(),
     },
-
   ];
+
   return (
     <div className="w-full min-h-screen bg-[#F9F9F9] flex flex-col gap-5 justify-start items-center overflow-y-auto">
       <Breadcrumb
-        className="w-full justify-start px-10"
+        className="w-full justify-start "
         separator=">"
         items={[
           {
@@ -83,7 +116,7 @@ export default function TechnicianInfo({
           },
         ]}
       />
-      <div className="relative flex flex-row gap-5 w-[95%] h-48 px-10 rounded-2xl bg-[#3749A6] justify-between items-center">
+      <div className="relative flex flex-row gap-5 w-[100%] h-48 px-10 rounded-2xl bg-[#3749A6] justify-between items-center">
         <div className="absolute bg-white rounded-full w-36 h-36 flex justify-center items-center">
           <img
             src={technician.avatar || avt}
@@ -104,16 +137,18 @@ export default function TechnicianInfo({
         </div>
       </div>
 
-      {/* Danh sách tasks */}
-      <div className="w-[95%] bg-white rounded-2xl shadow-md p-6">
+      {/* Task Table */}
+      <div className="w-[100%] bg-white rounded-2xl shadow-md p-6">
         <h3 className="text-lg font-bold mb-4">Assigned Tasks</h3>
-        {technician.tasks && technician.tasks.length > 0 ? (
+        {loading ? (
+          <p className="text-gray-500">Loading...</p>
+        ) : tasks.length > 0 ? (
           <Table
-          dataSource={technicianInfo}
-          columns={columns}
-          rowClassName="cursor-pointer"          
-          pagination={{ pageSize: 10 }}
-        />
+            dataSource={tasks.map((task) => ({ ...task, key: task.task_id }))}
+            columns={columns}
+            rowClassName="cursor-pointer"
+            pagination={{ pageSize: 10 }}
+          />
         ) : (
           <p className="text-gray-500">No tasks assigned.</p>
         )}
@@ -121,3 +156,4 @@ export default function TechnicianInfo({
     </div>
   );
 }
+
