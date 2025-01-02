@@ -38,6 +38,26 @@ const Map: React.FC = () => {
   const [isBadRoutesVisible, setIsBadRoutesVisible] = useState(false);
   const [isViewBadRoutes] = useState(false);
 
+  const handleToggleBadRoutes = () => {
+    setIsBadRoutesVisible((prev) => !prev);
+  };
+
+  useEffect(() => {
+    if (!leafletMap.current) return;
+
+    if (isBadRoutesVisible) {
+      // Hiển thị các tuyến đường xấu
+      updatePath(); // Gọi hàm cập nhật path khi bật switch
+    } else {
+      // Xóa các tuyến đường xấu khỏi bản đồ
+      if (routingControl) {
+        routingControl.remove();
+        setRoutingControl(null);
+      }
+    }
+  }, [isBadRoutesVisible]);
+
+
   // Determine marker color based on road level
   useEffect(() => {
     if (!mapRef.current) return;
@@ -379,18 +399,21 @@ const Map: React.FC = () => {
   return (
     <div className="container">
       <div className="sidebar">
-        <div className="header">
-          <h2>Tìm kiếm địa điểm</h2>
-          <div className="inputGroup toggleGroup">
-            <h1>View bad routes</h1>
+        <div className="header flex flex-col justify-between items-center  p-2">
+          <h2 className="text-2xl font-bold text-[#3749A6] ">
+            Tìm kiếm địa điểm
+          </h2>
+          <div className="flex flex-row font-medium items-center gap-1 ml-auto">
+            <p className="text-base">Bad routes</p>
             <img
               src={isBadRoutesVisible ? onButton : offButton}
               alt="Toggle View Bad Routes"
-              className="toggleIcon"
+              className="cursor-pointer w-14 h-14 transition-transform transform hover:scale-110"
               onClick={handleToggleBadRoutes}
             />
           </div>
         </div>
+
         {!isRouteInputVisible ? (
           <>
             <div className="inputGroup">

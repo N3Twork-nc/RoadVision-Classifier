@@ -15,8 +15,10 @@ export const userState = atom({
 export const technicianState = atom({
   key: "allTechnicianState",
   default: {
-    username:"",
-    fullname:"",
-    created:"",
+    username: "",
+    fullname: "",
+    joindate: "",
+    role: "",
+    tasks: [],
   } as AllTechnicianType,
 })

@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Select, DatePicker } from "antd";
 import { countryList } from "./country";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import { useRecoilValue, useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { profileState } from "../../atoms/profileState";
 import userProfileService from "../../services/userprofile.service";
-import { EditProfileDataType, UploadAvatarType } from "../../defination/types/profile.type";
-import { accountState } from "../../atoms/authState";
+import { EditProfileDataType } from "../../defination/types/profile.type";
 
 dayjs.extend(customParseFormat);
 const { Option } = Select;
@@ -15,8 +14,6 @@ const dateFormatList = ["DD-MM-YYYY"];
 
 export default function EditProfile() {
   const profileData = useRecoilValue(profileState);
-  const userRecoilStateValue = useRecoilValue(accountState);
-  const [userRecoilState, setUserRecoilState] = useRecoilState(accountState);
 
   const [selectedGender, setSelectedGender] = useState<string>(profileData.gender || "");
   const [fullname, setFullname] = useState(profileData.fullname || "");
@@ -55,12 +52,12 @@ export default function EditProfile() {
   //   }
   // };
   
-  const handleButtonClick = () => {
-    const avatarInput = document.getElementById("avatar") as HTMLInputElement;
-    if (avatarInput) {
-      avatarInput.click();
-    }
-  };
+  // const handleButtonClick = () => {
+  //   const avatarInput = document.getElementById("avatar") as HTMLInputElement;
+  //   if (avatarInput) {
+  //     avatarInput.click();
+  //   }
+  // };
 
 
   

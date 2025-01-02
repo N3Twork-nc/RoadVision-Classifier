@@ -38,6 +38,7 @@ export default function AllTechnicians({
           username: technician.username,
           fullname: technician.fullname,
           joindate: technician.created,
+          tasks: technician.tasks,
         })
       );
       setDataSource(technician);
