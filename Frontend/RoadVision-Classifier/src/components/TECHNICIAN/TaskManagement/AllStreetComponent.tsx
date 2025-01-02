@@ -7,15 +7,15 @@ import technicianprofileService from "../../../services/technicianprofile.servic
 
 interface DataType {
   key: React.Key;
-  avatar: string;
-  username: string;
-  fullname: string;
-  joindate: string;
+  location: string;
+  status: string;
+  deadline: string;
+  ward_id: number;
 }
+
 interface AllUserProps {
   onViewUserInfo: (user: DataType) => void;
 }
-const api_url = import.meta.env.VITE_BASE_URL;
 
 export default function AllStreetComponent({ onViewUserInfo }: AllUserProps) {
   const [dataSource, setDataSource] = useState<DataType[]>([]);
@@ -26,20 +26,27 @@ export default function AllStreetComponent({ onViewUserInfo }: AllUserProps) {
     setLoading(true);
     try {
       const response = await technicianprofileService.getAllTask({});
-      const tasks = response.data?.map((user: any, index: number) => ({
-        key: index,
-        user_id: user.user_id,
-        location: user.location,
+      const taskArray = Array.isArray(response) ? response : response.data;
+  
+      const tasks = taskArray.map((task: any) => ({
+        key: task.task_id,  
+        ward_id: task.ward_id,
+        location: task.location, 
+        status: task.status,     
+        deadline: task.deadline,
+        summary: `Fixed ${task.road_done}/${task.all_road} roads`,
       }));
-      setDataSource(tasks);
-      setRecoilProfile(tasks);
+  
+      console.log(tasks); 
+      setDataSource(tasks); 
+      setRecoilProfile(tasks); 
     } catch (error) {
-      console.log("Không thể lấy danh sách task của technician!");
+      console.error("Không thể lấy danh sách task của technician!", error);
     } finally {
       setLoading(false);
     }
   };
-
+      
   useEffect(() => {
     fetchAllRoadsTask();
   }, []);
@@ -47,35 +54,30 @@ export default function AllStreetComponent({ onViewUserInfo }: AllUserProps) {
   const columns = [
     {
       title: "Address",
-      dataIndex: "address",
+      dataIndex: "location", 
       key: "location",
       align: "center" as "center",
     },
     {
       title: "Status",
-      dataIndex: "status",
+      dataIndex: "status", 
       key: "status",
       align: "center" as "center",
     },
     {
       title: "Due Date",
-      dataIndex: "duedate",
-      key: "duedate",
-      align: "center" as "center",
-    },
-    {
-      title: "Join Date",
-      dataIndex: "joindate",
-      key: "joindate",
+      dataIndex: "deadline", 
+      key: "deadline",
       align: "center" as "center",
     },
     {
       title: "Summary",
-      dataIndex: "summary",
+      dataIndex: "summary", 
       key: "summary",
       align: "center" as "center",
     },
   ];
+
   return (
     <div className="w-full h-screen flex flex-col gap-5 justify-start items-center overflow-y-auto">
       <div className="w-full p-5 bg-white rounded-lg shadow-md">
