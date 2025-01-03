@@ -277,6 +277,11 @@ const MapPrivate: React.FC = () => {
       );
       alert("Image uploaded successfully!");
       closeUploadWithLocationModal();
+      handleAddMarker(latitude, longitude, {
+        filepath:
+          "https://images4.alphacoders.com/115/thumb-1920-115716.jpg",
+      });
+      window.location.reload();
     } catch (error: any) {
       console.error(
         "Error uploading image:",
