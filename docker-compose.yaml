@@ -137,5 +137,3 @@ services:
     ports:
       - "80:80"
     restart: always
-    networks:
-      - app_network
