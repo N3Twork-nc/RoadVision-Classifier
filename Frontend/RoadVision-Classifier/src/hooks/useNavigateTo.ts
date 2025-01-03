@@ -44,7 +44,7 @@ const useNavigateTo = () => {
   }
 //---------- TECHNICIAN ------------
 const navigateToDashboardTechnician = () => {
-  navigateTo(TechnicianPageEnum.DASHBOARD, { replace: true });
+  navigateTo(TechnicianPageEnum.MAP, { replace: true });
 }
 const navigateToTaskManagement = () => {
   navigateTo(TechnicianPageEnum.TASK_MANAGEMENT, { replace: true });
