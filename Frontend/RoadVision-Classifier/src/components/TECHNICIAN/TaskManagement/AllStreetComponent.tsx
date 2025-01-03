@@ -1,40 +1,48 @@
 import React, { useEffect, useState } from "react";
-import { Table } from "antd";
-import { useRecoilState } from "recoil";
-import { userState } from "../../../atoms/admin/accountState";
+import { Table, Progress, Tag } from "antd"; // Import Tag from Ant Design
 import { FaUser } from "react-icons/fa";
 import technicianprofileService from "../../../services/technicianprofile.service";
+import { useSetRecoilState } from "recoil";
+import { wardIdState } from "../../../atoms/technicianTask/tasksState";
 
 interface DataType {
   key: React.Key;
-  avatar: string;
-  username: string;
-  fullname: string;
-  joindate: string;
+  location: string;
+  status: string;
+  deadline: string;
+  ward_id: number;
+  road_done: number;
+  all_road: number;
 }
+
 interface AllUserProps {
   onViewUserInfo: (user: DataType) => void;
 }
-const api_url = import.meta.env.VITE_BASE_URL;
 
 export default function AllStreetComponent({ onViewUserInfo }: AllUserProps) {
   const [dataSource, setDataSource] = useState<DataType[]>([]);
   const [loading, setLoading] = useState(false);
-  const [, setRecoilProfile] = useRecoilState<any>(userState);
+  const setWardId = useSetRecoilState(wardIdState);
 
   const fetchAllRoadsTask = async () => {
     setLoading(true);
     try {
       const response = await technicianprofileService.getAllTask({});
-      const tasks = response.data?.map((user: any, index: number) => ({
-        key: index,
-        user_id: user.user_id,
-        location: user.location,
+      const taskArray = Array.isArray(response) ? response : response.data;
+
+      const tasks = taskArray.map((task: any) => ({
+        key: task.task_id,
+        ward_id: task.ward_id,
+        location: task.location,
+        status: task.status,
+        deadline: task.deadline,
+        road_done: task.road_done,
+        all_road: task.all_road,
       }));
+
       setDataSource(tasks);
-      setRecoilProfile(tasks);
     } catch (error) {
-      console.log("Không thể lấy danh sách task của technician!");
+      console.error("Không thể lấy danh sách task của technician!", error);
     } finally {
       setLoading(false);
     }
@@ -44,10 +52,29 @@ export default function AllStreetComponent({ onViewUserInfo }: AllUserProps) {
     fetchAllRoadsTask();
   }, []);
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Not Start":
+        return "gray";
+      case "Done":
+        return "green";
+      case "In Progress":
+        return "yellow";
+      default:
+        return "default";
+    }
+  };
+
   const columns = [
     {
+      title: "Ward ID",
+      dataIndex: "ward_id",
+      key: "ward_id",
+      align: "center" as "center",
+    },
+    {
       title: "Address",
-      dataIndex: "address",
+      dataIndex: "location",
       key: "location",
       align: "center" as "center",
     },
@@ -56,26 +83,33 @@ export default function AllStreetComponent({ onViewUserInfo }: AllUserProps) {
       dataIndex: "status",
       key: "status",
       align: "center" as "center",
+      render: (status: string) => {
+        return <Tag color={getStatusColor(status)}>{status}</Tag>;
+      },
     },
     {
       title: "Due Date",
-      dataIndex: "duedate",
-      key: "duedate",
+      dataIndex: "deadline",
+      key: "deadline",
       align: "center" as "center",
     },
     {
-      title: "Join Date",
-      dataIndex: "joindate",
-      key: "joindate",
+      title: "Progress",
+      dataIndex: "road_done",
+      key: "road_done",
       align: "center" as "center",
-    },
-    {
-      title: "Summary",
-      dataIndex: "summary",
-      key: "summary",
-      align: "center" as "center",
-    },
+      render: (_text: number, record: any) => {
+        const percentage = Math.round((record.road_done / record.all_road) * 100);
+        return (
+          <div>
+            <Progress percent={percentage} status="active" />
+            <span>{record.road_done}/{record.all_road}</span>
+          </div>
+        );
+      },
+    }
   ];
+
   return (
     <div className="w-full h-screen flex flex-col gap-5 justify-start items-center overflow-y-auto">
       <div className="w-full p-5 bg-white rounded-lg shadow-md">
@@ -90,7 +124,10 @@ export default function AllStreetComponent({ onViewUserInfo }: AllUserProps) {
           columns={columns}
           loading={loading}
           onRow={(record) => ({
-            onClick: () => onViewUserInfo(record),
+            onClick: () => {
+              setWardId(record.ward_id);
+              onViewUserInfo(record);
+            },
           })}
           rowClassName="cursor-pointer"
         />

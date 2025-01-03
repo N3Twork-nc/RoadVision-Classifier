@@ -180,57 +180,50 @@ class User(BaseModel):
         db = Postgresql()
         try:
             query = '''
-                SELECT u.user_id, u.fullname, a.username, a.created, s.id, s.deadline, s.status, w.name, d.name, p.name, w.id, d.id, p.id
+                SELECT u.user_id, u.fullname, a.username, a.created
                 FROM "user" u
                 JOIN "account" a ON u.user_id = a.id
                 JOIN "role" r ON r.user_id = a.id
-                LEFT JOIN "assignment" s ON s.user_id = a.id
-                LEFT JOIN "ward" w ON s.ward_id = w.id
-                LEFT JOIN "district" d ON w.district_id = d.id
-                LEFT JOIN "province" p ON d.province_id = p.id
                 WHERE r.permission_id = 2
             '''
-            
+
             user_results = db.execute(query, fetch='all')
 
             if not user_results:
                 return {"data": []}
 
-            grouped_users = {}
+            users_data = []
+
             for row in user_results:
-                user_id = row[0]
-                fullname = row[1]
-                username = row[2]
+                task_done_query = f'''
+                    SELECT COUNT(*)
+                    FROM "assignment"
+                    WHERE user_id = {row[0]} AND status = 'Done'
+                '''
+                task_done = db.execute(task_done_query, fetch='one')[0]
+
+                all_task_query = f'''
+                    SELECT COUNT(*)
+                    FROM "assignment"
+                    WHERE user_id = {row[0]}
+                '''
+                all_task = db.execute(all_task_query, fetch='one')[0]
+
+                created = row[3].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[3], datetime) else row[3]
                 avatar = f"/user/api/getAvatar?username={row[2]}"
-                created = row[3].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[3], datetime) else None
-                deadline = row[5].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[5], datetime) else None
+                
+                users_data.append({
+                    "user_id": row[0],
+                    "fullname": row[1],
+                    "username": row[2],
+                    "created": created,
+                    "avatar": avatar,
+                    "task_done": task_done,
+                    "all_task": all_task
+                })
 
-                if user_id not in grouped_users:
-                    grouped_users[user_id] = {
-                        "user_id": user_id,
-                        "fullname": fullname,
-                        "username": username,
-                        "avatar": avatar,
-                        "created": created,
-                        "tasks": []
-                    }
-
-                if deadline:
-                    grouped_users[user_id]["tasks"].append({
-                        "task_id": row[4],
-                        "deadline": deadline,
-                        "status": row[6],
-                        "ward_name": row[7],
-                        "ward_id": row[10],
-                        "district_name": row[8],
-                        "district_id": row[11],
-                        "province_name": row[9],
-                        "province_id": row[12]
-                    })
-
-            users_data = list(grouped_users.values())
-            
             return {"data": users_data}
+
         except Exception as e:
             print(f"Error getting users: {e}")
             return {"data": []}
@@ -341,6 +334,63 @@ class Task(BaseModel):
         except Exception as e:
             print(f"Error assigning task: {e}")
             return False, None, None, None, None
+        finally:
+            db.close()
+
+    def get_task(self, role: str, user_id: int = None) -> list:
+        db = Postgresql()
+        try:
+            query = f'''
+                SELECT s.id, s.deadline, s.status, w.name, d.name, p.name, w.id, d.id, p.id
+                FROM "assignment" s
+                JOIN "ward" w ON s.ward_id = w.id
+                JOIN "district" d ON w.district_id = d.id
+                JOIN "province" p ON d.province_id = p.id
+                JOIN "account" a ON s.user_id = a.id
+            '''
+            
+            if role == "admin" and user_id is not None:
+                query += f"WHERE s.user_id = {user_id}"
+            else:
+                query += f"WHERE s.user_id = (SELECT id FROM account WHERE username = '{self.username}')"
+
+            task_results = db.execute(query, fetch='all')
+
+            tasks = []
+            for row in task_results:
+                road_done_query = f'''
+                    SELECT COUNT(*)
+                    FROM "road"
+                    WHERE ward_id = {row[6]} AND status = 'Done'
+                '''
+                road_count = db.execute(road_done_query, fetch='one')[0]
+
+                all_road_query = f'''
+                    SELECT COUNT(*)
+                    FROM "road"
+                    WHERE ward_id = {row[6]}
+                '''
+                all_road_count = db.execute(all_road_query, fetch='one')[0]
+
+                deadline = row[1].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[1], datetime) else None
+                location = f"{row[3]}, {row[4]}, {row[5]}"
+
+                tasks.append({
+                    "task_id": row[0],
+                    "deadline": deadline,
+                    "status": row[2],
+                    "location": location,
+                    "ward_id": row[6],
+                    "district_id": row[7],
+                    "province_id": row[8],
+                    "road_done": road_count,
+                    "all_road": all_road_count
+                })
+
+            return tasks
+        except Exception as e:
+            print(f"Error getting tasks: {e}")
+            return []
         finally:
             db.close()
 
