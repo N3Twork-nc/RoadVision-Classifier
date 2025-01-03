@@ -9,6 +9,7 @@ reusable_oauth2 = HTTPBearer(scheme_name='Authorization')
 
 
 API_AUTHORIZATION_URL = f"http://{os.getenv('SERVER_AUTH')}/auth/api/authorization"
+print(API_AUTHORIZATION_URL)
 
 def validate_token(token=Depends(reusable_oauth2)):
     headers = {"Authorization": f"Bearer {token.credentials}"}
