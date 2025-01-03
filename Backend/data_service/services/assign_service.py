@@ -216,3 +216,47 @@ class AssignService:
                 message="An error occurred while deleting task",
                 status_code=500
             )
+    @staticmethod
+    def get_report_task(user_info: dict, road_id: int = None):
+        username = user_info.get("username")
+        role = user_info.get("role")
+
+        if role not in ["technical", "admin"]:
+            raise HTTPException(
+                status_code=403,
+                detail="You do not have permission to access tasks"
+            )
+
+        try:
+            task = Task(username=username)
+            report_results = task.get_report_task(road_id=road_id)
+
+            if not tasks:
+                return format_response(
+                    status="Success",
+                    data=[],
+                    message="No tasks found",
+                    status_code=200
+                )
+
+            return format_response(
+                status="Success",
+                data=tasks,
+                message="Get report task successfully",
+                status_code=200
+            )
+        except HTTPException as e:
+            return format_response(
+                status="Error",
+                data=None,
+                message=e.detail,
+                status_code=e.status_code
+            )
+        except Exception as e:
+            print(f"Error getting tasks: {e}")
+            return format_response(
+                status="Error",
+                data=None,
+                message="An error occurred while retrieving tasks",
+                status_code=500
+            )
