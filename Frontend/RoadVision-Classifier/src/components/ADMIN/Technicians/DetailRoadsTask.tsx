@@ -162,7 +162,7 @@ const DetailRoadsTask = ({
       width: 250,
       align: "center" as "center",
       render: (image: string) => {
-        const fullImageUrl = `${api_url}/${image}`;
+        const fullImageUrl = `${api_url}${image}`;
         return (
           <div
             style={{
