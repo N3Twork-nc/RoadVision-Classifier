@@ -4,6 +4,7 @@ import { wardIdState } from "../../../atoms/technicianTask/tasksState";
 import technicianService from "../../../services/technicianprofile.service";
 import { Table, Tag, Breadcrumb, Input, Modal } from "antd";
 import { AiOutlinePlus } from "react-icons/ai";
+import manageStatisticInfoService from "../../../services/manageStatisticInfo.service";
 const api_url = import.meta.env.VITE_BASE_URL;
 
 interface TaskManagementComponentProps {
@@ -23,6 +24,7 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
 
   // Modal states
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedRoadId, setSelectedRoadId] = useState<string | null>(null);
   const [report, setReport] = useState({
     cost: "",
     totalCost: "",
@@ -148,10 +150,13 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
     {
       title: "Report",
       align: "center" as "center",
-      render: () => (
+      render: (_text: any, record: any) => (
         <button
           className="text-green-500"
-          onClick={() => setIsModalVisible(true)}
+          onClick={() => {
+            setSelectedRoadId(record.road_id);
+            setIsModalVisible(true);
+          }}
         >
           <AiOutlinePlus className="w-5 h-5" />
         </button>
@@ -171,19 +176,40 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
     }); // Reset the report input fields
   };
 
-  const handleModalOk = () => {
-    // Handle the submission of the report here (e.g., send to API)
-    console.log("Report submitted:", report);
-    setIsModalVisible(false);
-    setReport({
-      cost: "",
-      totalCost: "",
-      deviation: "",
-      difficulty: "",
-      improvement: "",
-    }); // Clear report fields after submission
-  };
+  const handleModalOk = async () => {
+    if (!selectedRoadId) {
+      console.error("No road selected.");
+      return;
+    }
 
+    const requestBody = {
+      total_cost: report.totalCost,
+      incidental_costs: report.deviation,
+      difficult: report.difficulty,
+      propose: report.improvement,
+    };
+
+    try {
+      await manageStatisticInfoService.uploadReport(
+        selectedRoadId,
+        "active",
+        requestBody
+      );
+      console.log("Report submitted successfully:", requestBody);
+
+      setIsModalVisible(false);
+      setReport({
+        cost: "",
+        totalCost: "",
+        deviation: "",
+        difficulty: "",
+        improvement: "",
+      });
+      fetchTasksAndRoads(); // Reload data
+    } catch (error) {
+      console.error("Error submitting report:", error);
+    }
+  };
   return (
     <div className="w-full min-h-screen bg-[#F9F9F9] flex flex-col gap-5 justify-start items-center overflow-y-auto">
       <Breadcrumb
@@ -227,7 +253,7 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
             }
           />
           <Input
-            placeholder="Phát sinh so với thực tế"
+            placeholder="Phát sinh so với dự kiến"
             value={report.deviation}
             onChange={(e) =>
               setReport({ ...report, deviation: e.target.value })

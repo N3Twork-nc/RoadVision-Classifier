@@ -2,7 +2,13 @@ import { axiosRequest } from "../config/axios.config";
 import { getAccessToken } from "../utils/auth.util";
 
 export default {
-  getStatistic: async ({ during, number }: { during: "monthly" | "yearly"; number: number }) => {
+  getStatistic: async ({
+    during,
+    number,
+  }: {
+    during: "monthly" | "yearly";
+    number: number;
+  }) => {
     const url = `/datasvc/api/statisticsRoad`;
     const requestUrl = `${url}?during=${during}&number=${number}`;
     try {
@@ -13,8 +19,8 @@ export default {
       throw error;
     }
   },
-  
-  getTask: async ({user_id} : {user_id: any}) => {
+
+  getTask: async ({ user_id }: { user_id: any }) => {
     const token = getAccessToken();
     const url = `/datasvc/api/getTask`;
     const requestUrl = `${url}?user_id=${user_id}&token=${token}`;
@@ -25,5 +31,22 @@ export default {
       console.error("Error fetching tasks:", error);
       throw error;
     }
-  }
+  },
+
+  uploadReport: async (roadId: string, status: string, requestBody: object) => {
+    const url = `/datasvc/api/updateStatus`;
+    const token = getAccessToken();
+    const requestUrl = `${url}?status=${status}&road_id=${roadId}&token=${token}`;
+    try {
+      const data = await axiosRequest.post(requestUrl, requestBody, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return data;
+    } catch (error) {
+      console.error("Error updating road status:", error);
+      throw error;
+    }
+  },
 };
