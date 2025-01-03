@@ -86,12 +86,12 @@ const UserAndContributionCharts: React.FC = () => {
       <div className="flex gap-4">
         {/* Biểu đồ cột */}
         <div className="w-1/3">
-          <ReactECharts option={barChartOption} style={{ height: "100%", width: "100%" }} />
+          <ReactECharts option={barChartOption} style={{ height: "450px", width: "100%" }} />
         </div>
 
         {/* Biểu đồ tròn */}
         <div className="w-2/3">
-          <ReactECharts option={pieChartOption} style={{ height: "100%", width: "100%" }} />
+          <ReactECharts option={pieChartOption} style={{ height: "450px", width: "100%" }} />
         </div>
       </div>
     </div>
