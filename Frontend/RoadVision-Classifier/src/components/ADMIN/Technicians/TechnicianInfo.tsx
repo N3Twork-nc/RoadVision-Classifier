@@ -11,8 +11,10 @@ import dayjs, { Dayjs } from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import manageAlltechnicianService from "../../../services/manageAlltechnician.service";
 import { TechiniciansTaskType } from "../../../defination/types/alltechnician.type";
+
 import { useSetRecoilState } from "recoil";
 import { wardIdState } from "../../../atoms/technicianTask/tasksState";
+
 
 // Select Date Time
 type RangePickerProps = GetProps<typeof DatePicker.RangePicker>;
@@ -64,7 +66,9 @@ export default function TechnicianInfo({
   const [selectedDistrict, setSelectedDistrict] = useState<string>();
   const [selectedWard, setSelectedWard] = useState<string>();
   const [selectedDeadline, setSelectedDeadline] = useState<string>();
+
   const setWardId = useSetRecoilState(wardIdState);
+
 
   const handleDateChange = (
     _value: Dayjs | null,

@@ -47,7 +47,7 @@ class RoadSchema(BaseModel):
         file_path = f"roadImages/{self.user_id}_{time.time()}.jpg"
         if self.location !=None:
             self.ward_id=db.execute(f"SELECT w.id FROM ward w JOIN district d on w.district_id=d.id JOIN province p on d.province_id=p.id WHERE w.name ilike'%{self.location_part[0]}%' and d.name ilike'%{self.location_part[1]}%' and p.name ilike'%{self.location_part[2]}%'")[0]
-        id=db.execute(f"INSERT INTO road (user_id,image_path,latitude,longitude,level,ward_id,location) VALUES ({self.user_id},'{file_path}',{self.latitude},{self.longitude},'Classifing',{self.ward_id},'{self.location}') RETURNING id")
+        id=db.execute(f"INSERT INTO road (user_id,image_path,latitude,longitude,level,ward_id,location) VALUES ({self.user_id},'{file_path}',{self.latitude},{self.longitude},'Classifying',{self.ward_id},'{self.location}') RETURNING id")
         db.commit()
         db.close()
         with open(file_path , "wb") as f:

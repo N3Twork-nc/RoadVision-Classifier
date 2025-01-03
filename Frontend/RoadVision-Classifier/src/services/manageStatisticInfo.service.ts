@@ -18,7 +18,7 @@ export default {
     const url = `/user/api/getTask`;
     const requestUrl = `${url}?user_id=${user_id}&token=${token}`;
     try {
-      const taskInfo = await axiosRequest.post(requestUrl);
+      const taskInfo = await axiosRequest.get(requestUrl);
       return taskInfo;
     } catch (error) {
       console.error("Error fetching tasks:", error);
