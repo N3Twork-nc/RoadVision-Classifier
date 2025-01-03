@@ -2,6 +2,7 @@ from datetime import date, datetime
 from typing import Tuple
 from Database import Postgresql
 from pydantic import BaseModel
+import json
 
 class User(BaseModel):
     username: str
@@ -416,7 +417,7 @@ class Task(BaseModel):
         finally:
             db.close()
 
-    def update_status(self, status: str, road_id: int = None, ward_id: int = None) -> bool:
+    def update_status(self, status: str, road_id: int = None, ward_id: int = None,report=None) -> bool:
         db = Postgresql()
         try:
             user_result = db.select(
@@ -474,13 +475,13 @@ class Task(BaseModel):
                 if status == 'Done':
                     db.update(
                         '"road"',
-                        f"status = '{status}', update_at = '{updated_at}', level = 'Good'",
+                        f"status = '{status}', update_at = '{updated_at}', level = 'Good', report='{report.json()}'",
                         f"id = {road_id}"
                     )
                 else:
                     db.update(
                         '"road"',
-                        f"status = '{status}', update_at = '{updated_at}'",
+                        f"status = '{status}', update_at = '{updated_at}', report='{report.json()}'",
                         f"id = {road_id}"
                     )
 
