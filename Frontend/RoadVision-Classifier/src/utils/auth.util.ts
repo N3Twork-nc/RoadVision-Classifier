@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
-import { removeStoredAdminInfo, removeStoredTechnicianInfo, removeStoredUserInfo } from "./local-storage.util";
-import { PageEnum } from "../defination/enums/page.enum";
+import { getStoredUserInfo, removeStoredAdminInfo, removeStoredTechnicianInfo, removeStoredUserInfo } from "./local-storage.util";
+import { AdminPageEnum, PageEnum, TechnicianPageEnum } from "../defination/enums/page.enum";
 import { CookieKeyEnum } from "../defination/enums/key.enum";
 
 //save role 
@@ -34,8 +34,29 @@ export const removeAccessToken = () => {
 }; // when u logout you need to remove all datas
 
 export const isAuthenticated = () => {
-  return !!Cookies.get(CookieKeyEnum.ACCESS_TOKEN); // check token
+  const token = Cookies.get(CookieKeyEnum.ACCESS_TOKEN); // check token
+  if (!token) return false;
+ // if have token check user info
+  const userInfo = getStoredUserInfo();
+  return !!userInfo; 
 };
+export const getDefaultHomePage = (): string => {
+  if (!isAuthenticated()) {
+    return PageEnum.LOGIN;
+  }
+
+  const role = getUserRole();
+  if (role === "admin") {
+    return AdminPageEnum.DASHBOARD;
+  } else if (role === "technical") {
+    return TechnicianPageEnum.DASHBOARD;
+  } else if (role === "user") {
+    return PageEnum.HOME;
+  }
+
+  return PageEnum.LOGIN;
+};
+
 export const handleLogOut = () => {
   removeAccessToken();
   removeStoredUserInfo();

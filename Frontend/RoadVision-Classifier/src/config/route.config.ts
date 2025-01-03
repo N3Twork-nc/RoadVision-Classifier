@@ -3,7 +3,7 @@ import Home from "../pages/User/Home/Home";
 import PublicMap from "../pages/User/PublicMap/PublicMap";
 import Profile from "../pages/User/Profile/Profile";
 import MapManagement from "../pages/User/MapManagement/MapManagement";
-import MyLibrary from "../pages/User/MyLibrary/MyLibrary";
+import MyLibrary from "../pages/User/MyHistory/MyHistory";
 import Dashboard from "../pages/Admin/Dashboard/Dashboard";
 import UsersManagement from "../pages/Admin/Users/UsersManagement";
 import TechniciansManagement from "../pages/Admin/Technicians/TechniciansManagement";
@@ -18,7 +18,7 @@ export const routesConfig = [
       { path: PageEnum.PUBLIC_MAP, element: {PublicMap} },
       { path: PageEnum.PROFILE, element: {Profile}},
       { path: PageEnum.MAPMANAGEMENT, element: {MapManagement} },
-      { path: PageEnum.LIBRARY, element: {MyLibrary} },
+      { path: PageEnum.HISTORY, element: {MyLibrary} },
     ],
   },
   // Routes for admin role

@@ -36,16 +36,15 @@ const Map: React.FC = () => {
   const [endMarker, setEndMarker] = useState<L.Marker | null>(null);
   const [path, setPath] = useState<[number, number][][]>([]);
   const [isBadRoutesVisible, setIsBadRoutesVisible] = useState(false);
-
+  const api_url = import.meta.env.VITE_BASE_URL;
   const handleToggleBadRoutes = () => {
     if (routingControl) {
-      routingControl.remove(); // Xóa bảng chỉ dẫn hiện tại
-      setRoutingControl(null); // Đặt lại state của routingControl
+      routingControl.remove();
+      setRoutingControl(null);
     }
     setIsBadRoutesVisible((prev) => !prev);
   };
 
-  // Determine marker color based on road level
   useEffect(() => {
     if (!mapRef.current) return;
 
@@ -85,7 +84,9 @@ const Map: React.FC = () => {
     }
     const fetchRoadsData = async () => {
       try {
-        const data = await dataService.getInfoRoads({});
+        const data = await dataService.getInfoRoads({
+          all: false
+        });
 
         if (Array.isArray(data)) {
           if (data.length > 0) {
@@ -123,7 +124,7 @@ const Map: React.FC = () => {
                 iconSize: [30, 30],
                 iconAnchor: [15, 30],
               });
-              const fullImageUrl = `http://192.168.120.26/${filepath}`;
+              const fullImageUrl = `${api_url}/${filepath}`;
               try {
                 const marker = L.marker([latitude, longitude], {
                   icon: customIcon,
@@ -282,20 +283,17 @@ const Map: React.FC = () => {
             )
         )
       ) {
-        // Chuyển đổi chuỗi tọa độ thành mảng [latitude, longitude]
         const routes = parsedCoordinates.map((group) =>
           group.map((point: string) => {
             const [lat, lng] = point
               .slice(1, -1)
               .split(",")
-              .map((coord) => parseFloat(coord.trim())); // Chuyển chuỗi thành số
+              .map((coord) => parseFloat(coord.trim()));
             return [lat, lng];
           })
         );
 
-        // **Sắp xếp hoặc tùy chỉnh thứ tự điểm ở đây**
         const sortedRoutes = routes.map((route) => {
-          // Ví dụ: Đảo ngược thứ tự các điểm trong mỗi tuyến
           return route.reverse();
         });
 
@@ -323,7 +321,7 @@ const Map: React.FC = () => {
           : [];
 
       const polyline = L.polyline(waypoints, {
-        color: "blue", // Tùy chỉnh màu sắc
+        color: "red",
         weight: 4,
       }).addTo(leafletMap.current!);
 

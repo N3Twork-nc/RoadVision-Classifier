@@ -5,6 +5,9 @@ import manageAlluserService from "../../../services/manageAlluser.service";
 import { useRecoilState } from "recoil";
 import { userState } from "../../../atoms/admin/accountState";
 import { FaUser } from "react-icons/fa";
+import homeheader from "../../../assets/img/USER-header.png";
+import mask from "../../../assets/img/mask.png";
+
 interface DataType {
   key: React.Key;
   avatar: string;
@@ -145,6 +148,30 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
 
   return (
     <div className="w-full h-screen flex flex-col gap-5 justify-start items-center overflow-y-auto">
+      <div className="flex flex-row w-[100%] h-44 rounded-2xl bg-[#2D82C6] justify-between relative">
+          <img
+            src={mask}
+            className="absolute top-0 left-0 w-full h-full object-cover rounded-2xl"
+          />
+
+          <div className="relative z-100 w-full flex xl:flex-row justify-between">
+            {/* content */}
+            <div className="flex flex-col p-10 justify-between">
+              <div>
+                <p className="text-4xl font-bold text-white">All Users management</p>
+                <p className="text-white">
+                  Thanks to the community of contributors!
+                </p>
+              </div>
+              <div className="flex flex-row gap-4"></div>
+            </div>
+            {/* image */}
+            <img
+              src={homeheader}
+              className="xl:h-full xl:block hidden mt-5 mr-10 "
+            />
+          </div>
+        </div>
       <div className="w-full p-5 bg-white rounded-lg shadow-md">
         <div className="flex flex-row justify-between items-center mb-4">
           <div className="flex flex-row items-center gap-2">
