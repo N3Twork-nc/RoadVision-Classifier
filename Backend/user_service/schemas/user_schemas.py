@@ -240,11 +240,7 @@ class User(BaseModel):
                 JOIN "ward" w ON r.ward_id = w.id
                 JOIN "district" d ON w.district_id = d.id
                 JOIN "province" p ON d.province_id = p.id
-                WHERE NOT EXISTS (
-                    SELECT 1 
-                    FROM "assignment" a 
-                    WHERE a.ward_id = w.id
-                )
+                WHERE r.level != 'Good' and NOT EXISTS (SELECT 1 FROM "assignment" a WHERE a.ward_id = w.id)
             """
             ward_results = db.execute(query, fetch='all')
 
