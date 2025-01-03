@@ -234,3 +234,20 @@ class Task(BaseModel):
             return False
         finally:
             db.close()
+
+    def get_report_task(self, road_id: int) -> list:
+        db = Postgresql()
+        try:
+            query = f'''
+                SELECT report
+                FROM road r
+                WHERE id = {road_id}
+            '''
+            report_results = db.execute(query, fetch='all')
+
+            return report_results
+        except Exception as e:
+            print(f"Error getting reports: {e}")
+            return ""
+        finally:
+            db.close()
