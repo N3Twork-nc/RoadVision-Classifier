@@ -278,7 +278,7 @@ class Task(BaseModel):
     province_name: str = None
     district_name: str = None
     ward_name: str = None
-    deadline: datetime = None  # Định dạng: 'YYYY-MM-DD HH:MM:SS'
+    deadline: datetime = None 
 
     def assign_task(self) -> Tuple[bool, str, str, str, str]:
         db = Postgresql()
@@ -298,7 +298,7 @@ class Task(BaseModel):
                 'permission_id',
                 f"user_id = {user_id}"
             )
-            if not role_result or role_result[0] != 2:  # 2 là vai trò 'technical'
+            if not role_result or role_result[0] != 2: 
                 print(f"User not found or does not have 'technical' role.")
                 return False, None, None, None, None
 
@@ -465,20 +465,29 @@ class Task(BaseModel):
                 return True
 
             if road_id:
-                if user_role not in [1, 2]:  # Admin or technical
+                if user_role not in [1, 2]:  
                     print(f"User '{self.username}' is not authorized to update road status.")
                     return False
 
                 updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-                db.update(
-                    '"road"',
-                    f"status = '{status}', update_at = '{updated_at}'",
-                    f"id = {road_id}"
-                )
+                if status == 'Done':
+                    db.update(
+                        '"road"',
+                        f"status = '{status}', update_at = '{updated_at}', level = 'Good'",
+                        f"id = {road_id}"
+                    )
+                else:
+                    db.update(
+                        '"road"',
+                        f"status = '{status}', update_at = '{updated_at}'",
+                        f"id = {road_id}"
+                    )
+
                 db.commit()
                 print(f"Road status updated to '{status}' for road_id '{road_id}' successfully.")
                 return True
+
 
             print("Invalid parameters for updating status.")
             return False
