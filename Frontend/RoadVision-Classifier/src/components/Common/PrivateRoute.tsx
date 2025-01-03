@@ -1,14 +1,18 @@
 // components/PrivateRoute.tsx Private route use for user who already have an account can access.
 import React from "react";
-import useInitializeUser from "../../hooks/useInitializeUser";
+import { Navigate } from "react-router-dom";
+import { useRecoilValue } from "recoil";
+import { accountState } from "../../atoms/authState";
 import { getAccessToken, handleLogOut } from "../../utils/auth.util";
 
 interface PrivateRouteProps {
   children: React.ReactNode;
+  allowedRoles: string[];
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ children, allowedRoles }) => {
   const accessToken = getAccessToken();
+  const account = useRecoilValue(accountState);
 
   React.useEffect(() => {
     if (!accessToken) {
@@ -16,12 +20,18 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
     }
   }, [accessToken]);
 
-  if (!accessToken) {
-    return null;
+  const role = account?.role || localStorage.getItem("userRole");
+
+  if (!role) {
+    return null; // Hiển thị spinner hoặc component loading
   }
 
-  useInitializeUser();
-  return children;
+  if (!allowedRoles.includes(role)) {
+    return <Navigate to="/not-authorized" replace />;
+  }
+
+  return <>{children}</>;
 };
+
 
 export default PrivateRoute;

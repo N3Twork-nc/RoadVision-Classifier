@@ -3,13 +3,14 @@ import gg from "../../../assets/img/gg.png";
 import { z } from "zod";
 import { useState } from "react";
 import { useRecoilState } from "recoil";
-import { userState } from "../../../atoms/authState";
+import { accountState } from "../../../atoms/authState";
 import authService from "../../../services/auth.service";
 import useNavigateTo from "../../../hooks/useNavigateTo";
 import { setStoredUserInfo } from "../../../utils/local-storage.util";
-import { saveAccessToken } from "../../../utils/auth.util";
+import { saveAccessToken, saveUserRole } from "../../../utils/auth.util";
 import { ERROR_MESSAGES } from "../../../defination/consts/messages.const";
 
+const api_url =  import.meta.env.VITE_BASE_URL;
 // Input validation schema using zod
 const signInSchema = z.object({
   username: z.string().min(6, ERROR_MESSAGES.auth.username),
@@ -22,8 +23,13 @@ type SignInData = z.infer<typeof signInSchema>;
 // Main SignInBlock component
 const SignInBlock = () => {
   // Custom navigation hooks
-  const { navigateForgotPassword, navigateHome, navigateToSignUp } =
-    useNavigateTo();
+  const {
+    navigateForgotPassword,
+    navigateHome,
+    navigateToSignUp,
+    navigateToDashboard,
+    navigateToDashboardTechnician,
+  } = useNavigateTo();
 
   // State for form input data
   const [formData, setFormData] = useState<SignInData>({
@@ -35,25 +41,24 @@ const SignInBlock = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Recoil state for user information
-  const [, setUserState] = useRecoilState(userState);
-
+  const [, setAccountState] = useRecoilState(accountState);
   // Handle input field changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target; // Extract field name and value
     setFormData((prev) => ({
-      ...prev, 
-      [name]: value, 
+      ...prev,
+      [name]: value,
     }));
   };
 
   // Handle sign-in button click
   const handleSignInClick = async () => {
-    setError(null); 
+    setError(null);
 
     // Validate input data using zod schema
     const parseResult = signInSchema.safeParse(formData);
     if (!parseResult.success) {
-      const errorMessage = parseResult.error.errors[0].message; 
+      const errorMessage = parseResult.error.errors[0].message;
       setError(errorMessage);
       return;
     }
@@ -61,16 +66,31 @@ const SignInBlock = () => {
     try {
       // Call the API for sign-in
       const data = await authService.signIn(formData);
-
+      console.log(data);
       const { info, token } = data; // Extract user info and token from response
 
       if (info && token) {
+        const user_avatar = `${api_url}/user/api/getAvatar?username=${info.username}`;
+        info.avatar = user_avatar; 
+        console.log(info);
         saveAccessToken(token); // Save token for future API calls
         setStoredUserInfo(info); // Save user info to local storage
-        setUserState(info); // Update Recoil user state
+        setAccountState(info);
 
-        // Navigate to the home page after successful login
-        navigateHome();
+        if (data.info.role) {
+          localStorage.setItem("userRole", data.info.role);
+          saveUserRole(data.info.role);
+          if (data.info.role === "user") {
+            navigateHome();
+          } else if (data.info.role === "admin") {
+            navigateToDashboard();
+          } else if (data.info.role === "technical") {
+            navigateToDashboardTechnician();
+          }
+        } else {
+          console.error("Role is undefined");
+        }
+
       }
     } catch (err) {
       console.error(err);

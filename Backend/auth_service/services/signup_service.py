@@ -26,6 +26,8 @@ class SignupService:
 
     @staticmethod
     def verify_email(account: Account):
+        if not account.existenceUsername():
+            return format_response("Error", message="Username is not registered", status_code=400)
         if account.verifyEmail():
             return format_response("Success", message="Email verified successfully")
         return format_response("Error", message="Email verification failed", status_code=400)

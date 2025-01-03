@@ -16,7 +16,7 @@ export default {
   },
 
   signIn: async (formData: LoginFormDataType) => {
-    const url = `/auth/api/signin`;
+    const url = `auth/api/signin`;
     const data: LoginDataType = await axiosRequest.post(url, formData);
     return data;
   },
@@ -26,5 +26,11 @@ export default {
     const data: LoginDataType = await axiosRequest.post(url, formData);
     return data;
   },
+
+  // changePass: async (formData: ForgotFormDataType) => {
+  //   const url = `/auth/api/changePassword`;
+  //   const data: LoginDataType = await axiosRequest.post(url, formData);
+  //   return data;
+  // },
 
 };

@@ -25,6 +25,7 @@ services:
       - ./init_db/:/docker-entrypoint-initdb.d/
     networks:
       - app_network
+    restart: always 
   adminer:
     image: adminer:latest  # Use the latest Adminer image
     restart: always  # Always restart Adminer if it stops

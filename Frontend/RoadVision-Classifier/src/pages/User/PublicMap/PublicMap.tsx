@@ -1,5 +1,5 @@
 import Map from "../../../components/Map/Map.tsx";
-import homeheader from "../../../assets/img/home-header.png";
+import map from "../../../assets/img/map.png";
 import mask from "../../../assets/img/mask.png";
 import AppLayout from "../../../components/Common/AppLayout.tsx";
 
@@ -26,7 +26,7 @@ export default function PublicMap() {
               </div>
             </div>
             {/* image */}
-            <img src={homeheader} className="p-2 mr-10 h-full" />
+            <img src={map} className="p-2 mr-10 h-full" />
           </div>
         </div>
         {/* BODY */}

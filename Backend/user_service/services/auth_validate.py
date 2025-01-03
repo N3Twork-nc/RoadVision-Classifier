@@ -8,7 +8,15 @@ def validate_token(token: str):
     try:
         response = requests.get(API_AUTHORIZATION_URL, headers=headers)
         if response.status_code == 200:
-            return response.json().get("data", {}).get("username")
+            data = response.json().get("data", {})
+            username = data.get("username")
+            role = data.get("role")
+            if not username or not role:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid token data: username or role missing"
+                )
+            return {"username": username, "role": role}
         else:
             raise HTTPException(
                 status_code=response.status_code, 

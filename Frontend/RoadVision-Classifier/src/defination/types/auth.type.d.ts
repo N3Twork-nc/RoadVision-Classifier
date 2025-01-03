@@ -8,6 +8,7 @@ export type LoginFormDataType = {
 export type LoginDataType = {
   info: UserType;
   token: string;
+  role: "user" | "admin" | "technical";
 };
 export type VerifyFormDataType = Partial<{
   username: string;
@@ -18,3 +19,9 @@ export type VerifyFormDataType = Partial<{
 export type ForgotFormDataType = {
   email: string;
 };
+
+// export type ChangePassFormDataType = {
+//   current_password: string;
+//   new_password: string;
+//   confirm_password: string;
+// };
