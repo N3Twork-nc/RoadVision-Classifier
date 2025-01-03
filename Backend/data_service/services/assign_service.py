@@ -104,6 +104,7 @@ class AssignService:
                 db=Postgresql()
                 ward_id = db.execute(f"SELECT ward_id FROM road WHERE id={road_id}")[0]
                 db.close()
+            print(ward_id)
             threading.Thread(target=RouteMap,args=([ward_id],)).start()
 
             return format_response(
