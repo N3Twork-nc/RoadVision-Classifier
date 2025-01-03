@@ -55,9 +55,9 @@ def classifier_road(img):
     if max_id==0:
         return 'Good'
     elif max_id==1:
-        return 'Satisfactory'
-    elif max_id==2:
         return 'Poor'
+    elif max_id==2:
+        return 'Satisfactory'
     else:
         return 'Very poor'
 
