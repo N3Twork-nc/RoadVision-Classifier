@@ -26,7 +26,7 @@ services:
     ports:
       - '27017:27017'
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USERNAME}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
       MONGO_INITDB_DATABASE: ${POSTGRESQL_DB}
     volumes:
@@ -41,8 +41,6 @@ services:
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
     restart: always
-    networks:
-      - app_network
 
   kafka:
     image: "bitnami/kafka:latest"
