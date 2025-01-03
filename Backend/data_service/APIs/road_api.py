@@ -36,9 +36,9 @@ def delete_imageRoad(id_road: int, uservalidate = Depends(validate_token)):
         return JSONResponse(content={"status": "error", "message": "Internal server error"}, status_code=500)
 
 @app.get("/api/getInfoRoads")
-def get_roads(user_id: int=None, id_road: int=None, ward_id=None, all: bool=False):
+def get_roads(user_id: int=None, id_road: int=None, ward_id=None, all: bool=False, getDone: bool=False):
     try: 
-        return RoadService.getlistRoad(user_id, id_road, ward_id, all)
+        return RoadService.getlistRoad(user_id, id_road, ward_id, all,getDone)
     except Exception as e:
         print(current_file_path, e)
         return JSONResponse(content={"status": "error", "message": "Internal server error"}, status_code=500)
