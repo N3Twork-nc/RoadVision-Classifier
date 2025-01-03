@@ -98,7 +98,7 @@ class RoadSchema(BaseModel):
 
     def checkPermission(self):
         db = Postgresql()
-        permission=db.execute(f"SELECT 1 FROM road join account on road.user_id=account.id join role on role.user_id=account.id WHERE (road.id={self.id} and account.username='{self.username}') or (role.permission_id=1 and account.username='{self.username}')")
+        permission=db.execute(f"SELECT 1 FROM road full join account on road.user_id=account.id full join role on role.user_id=account.id WHERE (road.id={self.id} and account.username='{self.username}') or (role.permission_id=1 and account.username='{self.username}')")
         db.close()
         return True if permission else False
 
