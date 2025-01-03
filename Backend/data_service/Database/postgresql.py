@@ -27,6 +27,24 @@ class Postgresql:
         except Exception as e:
             print(current_file_path, e)
             return None
+
+    def select(self, table, columns='*', where=None):
+        query = f"SELECT {columns} FROM {table}"
+        if where:
+            query += f" WHERE {where}"
+        return self.execute(query)
+    
+    def insert(self, table, columns, values):
+        query = f"INSERT INTO {table} ({columns}) VALUES ({values})"
+        return self.execute(query,'false')
+    
+    def update(self, table, set, where):
+        query = f"UPDATE {table} SET {set} WHERE {where}"
+        return self.execute(query,'false')
+    
+    def delete(self, table, where):
+        query = f"DELETE FROM {table} WHERE {where}"
+        return self.execute(query)
             
     def commit(self):
         self.connection.commit()
