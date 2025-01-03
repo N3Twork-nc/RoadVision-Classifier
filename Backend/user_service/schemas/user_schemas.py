@@ -475,13 +475,20 @@ class Task(BaseModel):
                 if status == 'Done':
                     db.update(
                         '"road"',
-                        f"status = '{status}', update_at = '{updated_at}', level = 'Good', report='{report.json()}'",
+                        f"status = '{status}', update_at = '{updated_at}', level = 'Good'",
                         f"id = {road_id}"
                     )
                 else:
                     db.update(
                         '"road"',
-                        f"status = '{status}', update_at = '{updated_at}', report='{report.json()}'",
+                        f"status = '{status}', update_at = '{updated_at}'",
+                        f"id = {road_id}"
+                    )
+                if report:
+                    report = json.dumps(report.dict())
+                    db.update(
+                        '"road"',
+                        f"report = '{report}'",
                         f"id = {road_id}"
                     )
 
