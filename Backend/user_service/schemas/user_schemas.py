@@ -416,7 +416,7 @@ class Task(BaseModel):
         finally:
             db.close()
 
-    def update_status(self, status: str, user_id: int = None, road_id: int = None, ward_id: int = None) -> bool:
+    def update_status(self, status: str, road_id: int = None, ward_id: int = None) -> bool:
         db = Postgresql()
         try:
             user_result = db.select(
@@ -439,7 +439,7 @@ class Task(BaseModel):
                 return False
             user_role = role_result[0]
 
-            if user_id and ward_id:
+            if ward_id:
                 if user_role != 1:  
                     print(f"User '{self.username}' is not an admin.")
                     return False
@@ -447,10 +447,10 @@ class Task(BaseModel):
                 assignment_result = db.select(
                     '"assignment"',
                     'id',
-                    f"user_id = {user_id} AND ward_id = {ward_id}"
+                    f"ward_id = {ward_id}"
                 )
                 if not assignment_result:
-                    print(f"No assignment found for user_id '{user_id}' and ward_id '{ward_id}'.")
+                    print(f"No assignment found.")
                     return False
 
                 updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -458,10 +458,10 @@ class Task(BaseModel):
                 db.update(
                     '"assignment"',
                     f"status = '{status}', updated_at = '{updated_at}'",
-                    f"user_id = {user_id} AND ward_id = {ward_id}"
+                    f"ward_id = {ward_id}"
                 )
                 db.commit()
-                print(f"Assignment status updated to '{status}' for user_id '{user_id}' successfully.")
+                print(f"Assignment status updated successfully.")
                 return True
 
             if road_id:

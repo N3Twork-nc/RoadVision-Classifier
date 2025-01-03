@@ -9,8 +9,8 @@ def assign_task(task: Task, user_info: dict = Depends(validate_token)):
     return AssignService.assign_task_service(task, user_info)
 
 @app.post('/api/updateStatus')
-def update_status(user_info: dict = Depends(validate_token), status: str = Query(...), user_id: int = None, road_id: int = None, ward_id: int = None):
-    return AssignService.update_status_service(user_info, status, user_id, road_id, ward_id)
+def update_status(user_info: dict = Depends(validate_token), status: str = Query(...), road_id: int = None, ward_id: int = None):
+    return AssignService.update_status_service(user_info, status, road_id, ward_id)
 
 @app.get('/api/getTask')
 def get_task(user_info: dict = Depends(validate_token), user_id: int = None):

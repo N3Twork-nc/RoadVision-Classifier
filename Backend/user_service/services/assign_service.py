@@ -64,7 +64,7 @@ class AssignService:
             )
         
     @staticmethod
-    def update_status_service(user_info: dict, status: str, user_id: int = None, road_id: int = None, ward_id: int = None):
+    def update_status_service(user_info: dict, status: str, road_id: int = None, ward_id: int = None):
         role = user_info.get("role")
         username = user_info.get("username")
 
@@ -74,7 +74,7 @@ class AssignService:
                 detail="You do not have permission to update road status"
             )
 
-        if user_id and ward_id and role != "admin":
+        if ward_id and role != "admin":
             raise HTTPException(
                 status_code=403,
                 detail="You do not have permission to update assignment status"
@@ -82,7 +82,7 @@ class AssignService:
 
         try:
             task = Task(username=username)
-            success = task.update_status(status, user_id, road_id, ward_id)
+            success = task.update_status(status, road_id, ward_id)
 
             if not success:
                 raise HTTPException(
@@ -94,8 +94,8 @@ class AssignService:
                 "status": status,
                 "updated_at": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             }
-            if user_id and ward_id:
-                data.update({"user_id": user_id, "ward_id": ward_id})
+            if ward_id:
+                data.update({"ward_id": ward_id})
             if road_id:
                 data.update({"road_id": road_id})
 
