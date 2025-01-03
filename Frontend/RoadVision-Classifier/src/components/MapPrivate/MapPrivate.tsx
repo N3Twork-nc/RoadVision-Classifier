@@ -529,21 +529,11 @@ const MapPrivate: React.FC = () => {
           <button className="uploadButton" onClick={openUploadModal}>
             Upload current image
           </button>
-          <span
-            style={{
-              alignSelf: "center",
-              fontSize: "16px",
-              padding: "25px",
-              fontWeight: "bold",
-            }}
-          >
-            Or
-          </span>{" "}
           <button
             className="modalButtonLibrary"
             onClick={openUploadWithLocationModal}
           >
-            Upload with location
+            Upload with location      
           </button>
         </div>
       </div>

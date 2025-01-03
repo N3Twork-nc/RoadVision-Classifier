@@ -107,6 +107,8 @@
   font-size: 16px;
   cursor: pointer;
   gap: 5px;
+  margin-bottom: 20px;
+  margin-right: 50px;
 }
 
 .imageDetails {
