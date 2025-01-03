@@ -46,11 +46,13 @@ interface DataType {
 interface AllTechniciansProps {
   technician: DataType;
   onBack: () => void;
+  onViewTaskDetails: (task: any) => void;
 }
 
 export default function TechnicianInfo({
   technician,
   onBack,
+  onViewTaskDetails,
 }: AllTechniciansProps) {
   const [loading, setLoading] = useState(false);
   const [tasks, setTasks] = useState<TaskType[]>([]);
@@ -337,6 +339,9 @@ export default function TechnicianInfo({
             columns={columns}
             rowClassName="cursor-pointer"
             pagination={{ pageSize: 10 }}
+            onRow={(record) => ({
+              onClick: () => onViewTaskDetails(record),
+            })}
           />
         ) : (
           <p className="text-gray-500">No tasks assigned.</p>
