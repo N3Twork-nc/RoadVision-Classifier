@@ -1,6 +1,5 @@
 import { useState } from "react";
 import AppLayout from "../../../components/Common/AppLayout";
-import defaultAvatar from "../../../assets/img/defaultAvatar.png";
 import mask from "../../../assets/img/mask.png";
 import Account from "../../../components/Profile/Account";
 import EditProfile from "../../../components/Profile/EditProfile";
@@ -12,7 +11,6 @@ import { accountState } from "../../../atoms/authState";
 export default function Profile() {
   const userRecoilStateValue = useRecoilValue(accountState);
   const [activeTab, setActiveTab] = useState(0);
-  const avatar = userRecoilStateValue.avatar;
   // All Tabs
   const tabs = [
     { label: "Account", component: <Account /> },
@@ -32,7 +30,7 @@ export default function Profile() {
           />
           <div className="absolute bg-white rounded-full top-[40%] w-36 h-36 flex justify-center items-center">
             <img
-              src={avatar || defaultAvatar}
+              src={userRecoilStateValue.avatar}
               alt="Avatar"
               className="w-[95%] h-[95%] object-cover rounded-full"
             />
