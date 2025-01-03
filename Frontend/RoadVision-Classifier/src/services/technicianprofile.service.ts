@@ -14,4 +14,16 @@ export default {
       throw error;
     }
   },
+
+  getAllRoad: async (ward_id: number) => {
+    const url = `/datasvc/api/getInfoRoads`;
+    const requestUrl = `${url}?ward_id=${ward_id}`;
+    try {
+      const response = await axiosRequest.get(requestUrl);
+      return response;
+    } catch (error) {
+      console.error("Error fetching all tasks:", error);
+      throw error;
+    }
+  },
 };
