@@ -49,4 +49,17 @@ export default {
       throw error;
     }
   },
+
+  getReport: async ({ user_id }: { user_id: any }) => {
+    const token = getAccessToken();
+    const url = `/datasvc/api/getReportTask`;
+    const requestUrl = `${url}?road_id=${user_id}&token=${token}`;
+    try {
+      const taskInfo = await axiosRequest.get(requestUrl);
+      return taskInfo;
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      throw error;
+    }
+  },
 };

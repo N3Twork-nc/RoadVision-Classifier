@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { wardIdState } from "../../../atoms/technicianTask/tasksState";
 import technicianService from "../../../services/technicianprofile.service";
-import { Table, Tag, Breadcrumb, Input, Modal } from "antd";
-import { AiOutlinePlus } from "react-icons/ai";
+import { Table, Tag, Breadcrumb, Input, Modal, message, Select } from "antd";
+const { Option } = Select;
+import { AiOutlineEdit, AiOutlinePlus } from "react-icons/ai";
 import manageStatisticInfoService from "../../../services/manageStatisticInfo.service";
+import manageAlltechnicianService from "../../../services/manageAlltechnician.service";
 const api_url = import.meta.env.VITE_BASE_URL;
 
 interface TaskManagementComponentProps {
@@ -21,9 +23,11 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredDataSource, setFilteredDataSource] = useState<any[]>([]);
+  const [selectedStatus, setSelectedStatus] = useState<string>("Not start");
 
   // Modal states
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalReportVisible, setIsModalReportVisible] = useState(false);
   const [selectedRoadId, setSelectedRoadId] = useState<string | null>(null);
   const [report, setReport] = useState({
     cost: "",
@@ -48,6 +52,7 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
             level: roadData.level,
             road_image: roadData.filepath,
             task_deadline: roadData.created_at,
+            status: roadData.status,
           };
         });
 
@@ -79,6 +84,30 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
     fetchTasksAndRoads();
   }, [wardId]);
 
+  // UPDATE ROAD STATUS
+  const handleUpdateRoadStatus = async (roadId: string, status: string) => {
+    try {
+      const response = await manageAlltechnicianService.updateStatusRoad(
+        roadId,
+        status
+      );
+      if (
+        response.status.toString() === "Done" ||
+        response.status.toString() === "In progress" ||
+        response.status.toString() === "Not start"
+      ) {
+        message.success("Road status updated successfully");
+      } else {
+        message.error("Error updating road status");
+      }
+      fetchTasksAndRoads();
+    } catch (error) {
+      console.error("Error updating road status:", error);
+    }
+  };
+  const handleStatusChange = (value: string) => {
+    setSelectedStatus(value);
+  };
   const getLevelColor = (level: string) => {
     switch (level) {
       case "Very poor":
@@ -148,6 +177,32 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
       },
     },
     {
+      title: (
+        <span
+          style={{ color: "#23038C", fontWeight: "bold", fontSize: "16px" }}
+        >
+          Status
+        </span>
+      ),
+      dataIndex: "status",
+      key: "status",
+      width: 100,
+      align: "center" as "center",
+      render: (text: string) => (
+        <Tag
+          style={{
+            fontSize: "14px",
+            fontWeight: "bold",
+            padding: "5px 10px",
+            textTransform: "capitalize",
+          }}
+          color={getLevelColor(text)}
+        >
+          {text}
+        </Tag>
+      ),
+    },
+    {
       title: "Report",
       align: "center" as "center",
       render: (_text: any, record: any) => (
@@ -155,7 +210,7 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
           className="text-green-500"
           onClick={() => {
             setSelectedRoadId(record.road_id);
-            setIsModalVisible(true);
+            setIsModalReportVisible(true);
           }}
         >
           <AiOutlinePlus className="w-5 h-5" />
@@ -163,10 +218,44 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
       ),
       width: 80,
     },
+    {
+      title: (
+        <span
+          style={{ color: "#23038C", fontWeight: "bold", fontSize: "16px" }}
+        >
+          Action
+        </span>
+      ),
+      key: "action",
+      width: 50,
+      align: "center" as "center",
+      render: (_: any, record: any) => (
+        <div className="flex justify-center items-center gap-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (record.level !== "Good" || record.status !== "Done") {
+                setIsModalVisible(true);
+                setSelectedRoadId(record.road_id);
+              }
+            }}
+            className={`${
+              record.level === "Good" && record.status === "Done"
+                ? "text-gray-400 cursor-not-allowed"
+                : "text-red-500"
+            }`}
+            disabled={record.level === "Good" && record.status === "Done"}
+          >
+            <AiOutlineEdit className="w-5 h-5" />
+          </button>
+          {editStatusRoad}
+        </div>
+      ),
+    },
   ];
 
   const handleModalCancel = () => {
-    setIsModalVisible(false);
+    setIsModalReportVisible(false);
     setReport({
       cost: "",
       totalCost: "",
@@ -192,12 +281,12 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
     try {
       await manageStatisticInfoService.uploadReport(
         selectedRoadId,
-        "active",
+        selectedStatus,
         requestBody
       );
       console.log("Report submitted successfully:", requestBody);
 
-      setIsModalVisible(false);
+      setIsModalReportVisible(false);
       setReport({
         cost: "",
         totalCost: "",
@@ -210,6 +299,35 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
       console.error("Error submitting report:", error);
     }
   };
+
+  const editStatusRoad = (
+    <Modal
+      visible={isModalVisible}
+      onCancel={() => setIsModalVisible(false)}
+      onOk={() => {
+        if (selectedRoadId && selectedStatus) {
+          handleUpdateRoadStatus(selectedRoadId, selectedStatus);
+        }
+        setIsModalVisible(false);
+      }}
+    >
+      <h1 className="font-bold text-xl mb-4">Update road status</h1>
+      <div className="flex flex-col gap-2">
+        <label className="font-semibold mt-2">Select state</label>
+        <Select
+          placeholder="Select status"
+          onChange={handleStatusChange}
+          value={selectedStatus}
+          style={{ width: "100%" }}
+        >
+          <Option value="Not start">Not start</Option>
+          <Option value="In progress">In progress</Option>
+          <Option value="Done">Done</Option>
+        </Select>
+      </div>
+    </Modal>
+  );
+
   return (
     <div className="w-full min-h-screen bg-[#F9F9F9] flex flex-col gap-5 justify-start items-center overflow-y-auto">
       <Breadcrumb
@@ -238,7 +356,7 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
       {/* Modal for report */}
       <Modal
         title="Write Report"
-        visible={isModalVisible}
+        visible={isModalReportVisible}
         onCancel={handleModalCancel}
         onOk={handleModalOk}
         okText="Submit"
