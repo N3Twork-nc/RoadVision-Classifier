@@ -42,7 +42,7 @@ class RoadService:
             threading.Thread(target=RouteMap,args=([roadSchema.ward_id],)).start()
             img=roadSchema.file
             producer=KafkaProducer(
-                bootstrap_servers='192.168.120.26:9092',
+                bootstrap_servers='kafka:9092',
                 value_serializer=lambda v: json.dumps(v).encode('utf-8')
             )
             message={

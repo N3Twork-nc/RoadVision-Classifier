@@ -1,10 +1,14 @@
 import requests
 from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 reusable_oauth2 = HTTPBearer(scheme_name='Authorization')
 
 
-API_AUTHORIZATION_URL = "http://192.168.120.26/auth/api/authorization"
+API_AUTHORIZATION_URL = f"http://{os.getenv('SERVER_AUTH')}/auth/api/authorization"
 
 def validate_token(token=Depends(reusable_oauth2)):
     headers = {"Authorization": f"Bearer {token.credentials}"}
