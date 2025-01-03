@@ -191,6 +191,7 @@ pipeline {
                 }
                 // Deploy the Docker compose
                 dir('Deployment/frontend') {
+                    sh 'export VITE_BASE_URL="https://exotic-strong-viper.ngrok-free.app"'
                     sh 'docker compose  down'
                     sh 'docker compose up -d'
                 }
