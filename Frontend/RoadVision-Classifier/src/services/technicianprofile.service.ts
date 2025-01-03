@@ -3,7 +3,7 @@ import { getAccessToken } from "../utils/auth.util";
 
 export default {
   getAllTask: async ({}) => {
-    const url = `/user/api/getTask`;
+    const url = `/datasvc/api/getTask`;
     const token = getAccessToken();
     const requestUrl = `${url}?token=${token}`;
     try {
@@ -26,4 +26,5 @@ export default {
       throw error;
     }
   },
+  
 };

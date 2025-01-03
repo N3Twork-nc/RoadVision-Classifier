@@ -41,6 +41,7 @@ const DashboardComponent: React.FC = () => {
     try {
       const response = await manageStatisticInfoService.getStatistic({ during, number });
       const formattedData = processData(response);
+      console.log("formattedData", formattedData);
       setData(formattedData);
     } catch (error) {
       console.error("Error fetching statistics:", error);
