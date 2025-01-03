@@ -239,6 +239,11 @@ class User(BaseModel):
                 JOIN "ward" w ON r.ward_id = w.id
                 JOIN "district" d ON w.district_id = d.id
                 JOIN "province" p ON d.province_id = p.id
+                WHERE NOT EXISTS (
+                    SELECT 1 
+                    FROM "assignment" a 
+                    WHERE a.ward_id = w.id
+                )
             """
             ward_results = db.execute(query, fetch='all')
 
@@ -251,7 +256,7 @@ class User(BaseModel):
                     locations[province_name] = {}
                 if district_name not in locations[province_name]:
                     locations[province_name][district_name] = set()
-                locations[province_name][district_name].add(ward_name)  
+                locations[province_name][district_name].add(ward_name)
 
             formatted_locations = {
                 province: {
@@ -266,6 +271,7 @@ class User(BaseModel):
             return {}
         finally:
             db.close()
+
 
 class Task(BaseModel):
     username: str
@@ -391,6 +397,22 @@ class Task(BaseModel):
         except Exception as e:
             print(f"Error getting tasks: {e}")
             return []
+        finally:
+            db.close()
+
+    def delete_task(self, task_id: int) -> bool:
+        db = Postgresql()
+        try:
+            db.execute(
+                f'DELETE FROM "assignment" WHERE id = {task_id}',
+                fetch=None
+            )
+            db.commit()
+            print(f"Task with id '{task_id}' deleted successfully.")
+            return True
+        except Exception as e:
+            print(f"Error deleting task: {e}")
+            return False
         finally:
             db.close()
 
