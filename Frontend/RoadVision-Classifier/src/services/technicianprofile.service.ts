@@ -7,7 +7,7 @@ export default {
     const token = getAccessToken();
     const requestUrl = `${url}?token=${token}`;
     try {
-      const response = await axiosRequest.post(requestUrl);
+      const response = await axiosRequest.get(requestUrl);
       return response;
     } catch (error) {
       console.error("Error fetching all tasks:", error);

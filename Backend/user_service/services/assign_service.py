@@ -164,3 +164,45 @@ class AssignService:
                 message="An error occurred while retrieving tasks",
                 status_code=500
             )
+        
+    @staticmethod
+    def delete_task(user_info: dict, task_id: int):
+        username = user_info.get("username")
+        role = user_info.get("role")
+
+        if role != "admin":
+            raise HTTPException(
+                status_code=403,
+                detail="You do not have permission to delete tasks"
+            )
+
+        try:
+            task = Task(username=username)
+            success = task.delete_task(task_id)
+
+            if not success:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Failed to delete task"
+                )
+
+            return format_response(
+                status="Success",
+                data=None,
+                message="Task deleted successfully",
+                status_code=200
+            )
+        except HTTPException as e:
+            return format_response(
+                status="Error",
+                data=None,
+                message=e.detail,
+                status_code=e.status_code
+            )
+        except Exception as e:
+            return format_response(
+                status="Error",
+                data=None,
+                message="An error occurred while deleting task",
+                status_code=500
+            )
