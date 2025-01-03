@@ -60,7 +60,6 @@ export default {
     const requestUrl = `${url}?token=${token}`;
     try {
       const validWard = await axiosRequest.get(requestUrl);
-      console.log("validWard", validWard);
       return validWard;
     } catch (error) {}
   },

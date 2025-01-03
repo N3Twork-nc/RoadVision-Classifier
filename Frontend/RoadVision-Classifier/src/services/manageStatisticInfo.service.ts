@@ -13,9 +13,10 @@ export default {
       throw error;
     }
   },
+  
   getTask: async ({user_id} : {user_id: any}) => {
     const token = getAccessToken();
-    const url = `/user/api/getTask`;
+    const url = `/datasvc/api/getTask`;
     const requestUrl = `${url}?user_id=${user_id}&token=${token}`;
     try {
       const taskInfo = await axiosRequest.get(requestUrl);

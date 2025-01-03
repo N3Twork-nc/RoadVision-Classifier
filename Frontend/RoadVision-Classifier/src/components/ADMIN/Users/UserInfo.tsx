@@ -19,17 +19,25 @@ interface AllUserProps {
   onBack: () => void;
   onViewRoadDetails: (road: any) => void;
 }
-const api_url =  import.meta.env.VITE_BASE_URL;
+const api_url = import.meta.env.VITE_BASE_URL;
 const columns = [
   {
-    title: "Road ID",
+    title: (
+      <span style={{ color: "#23038C", fontWeight: "bold", fontSize: "16px" }}>
+        ROAD ID
+      </span>
+    ),
     dataIndex: "road_id",
     key: "road_id",
     width: 100,
     align: "center" as "center",
   },
   {
-    title: "Image",
+    title: (
+      <span style={{ color: "#23038C", fontWeight: "bold", fontSize: "16px" }}>
+        IMAGE
+      </span>
+    ),
     dataIndex: "road_image",
     key: "road_image",
     render: (text: string) => (
@@ -40,9 +48,14 @@ const columns = [
       />
     ),
     align: "center" as "center",
+    width: 200,
   },
   {
-    title: "Type",
+    title: (
+      <span style={{ color: "#23038C", fontWeight: "bold", fontSize: "16px" }}>
+        TYPE
+      </span>
+    ),
     dataIndex: "road_type",
     key: "road_type",
     align: "center" as "center",
@@ -57,19 +70,33 @@ const columns = [
     },
   },
   {
-    title: "Date Uploaded",
+    title: (
+      <span style={{ color: "#23038C", fontWeight: "bold", fontSize: "16px" }}>
+        DATE UPLOAD
+      </span>
+    ),
     dataIndex: "road_time",
     key: "road_time",
     align: "center" as "center",
+    width: 200
   },
   {
-    title: "Location",
+    title: (
+      <span style={{ color: "#23038C", fontWeight: "bold", fontSize: "16px" }}>
+        LOCATION
+      </span>
+    ),
     dataIndex: "road_location",
     key: "road_location",
     align: "center" as "center",
+    width: 300
   },
   {
-    title: "Action",
+    title: (
+      <span style={{ color: "#23038C", fontWeight: "bold", fontSize: "16px" }}>
+        ACTION
+      </span>
+    ),
     align: "center" as "center",
     render: () => (
       <div>
@@ -141,7 +168,7 @@ export default function UserInfo({
           },
           {
             title: user.username || "User Info",
-            className: "text-[#23038C]"
+            className: "text-[#23038C]",
           },
         ]}
       />
@@ -176,7 +203,7 @@ export default function UserInfo({
           onRow={(record) => ({
             onClick: () => {
               if (onViewRoadDetails) {
-                onViewRoadDetails(record); 
+                onViewRoadDetails(record);
               } else {
                 console.error("onViewRoadDetails is not defined");
               }
