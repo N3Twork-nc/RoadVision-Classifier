@@ -64,7 +64,7 @@ class AssignService:
             )
         
     @staticmethod
-    def update_status_service(user_info: dict, status: str, road_id: int = None, ward_id: int = None):
+    def update_status_service(user_info: dict, status: str, road_id: int = None, ward_id: int = None, report=None):
         role = user_info.get("role")
         username = user_info.get("username")
 
@@ -82,7 +82,7 @@ class AssignService:
 
         try:
             task = Task(username=username)
-            success = task.update_status(status, road_id, ward_id)
+            success = task.update_status(status, road_id, ward_id, report)
 
             if not success:
                 raise HTTPException(
