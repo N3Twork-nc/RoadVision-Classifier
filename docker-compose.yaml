@@ -31,8 +31,7 @@ services:
       MONGO_INITDB_DATABASE: ${POSTGRESQL_DB}
     volumes:
       - ./mongodb:/data/db
-    networks:
-      - app_network
+      
   zookeeper:
     image: "bitnami/zookeeper:latest"
     container_name: zookeeper
