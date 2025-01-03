@@ -2,6 +2,9 @@ from schemas import Task
 from datetime import datetime
 from .format_response import format_response
 from fastapi import HTTPException, status
+from Database import Postgresql
+import threading
+from .routemap_service import RouteMap
 
 class AssignService:
     @staticmethod
@@ -98,6 +101,10 @@ class AssignService:
                 data.update({"ward_id": ward_id})
             if road_id:
                 data.update({"road_id": road_id})
+                db=Postgresql()
+                ward_id = db.execute(f"SELECT ward_id FROM road WHERE id={road_id}")[0]
+                db.close()
+            threading.Thread(target=RouteMap,args=([ward_id],)).start()
 
             return format_response(
                 status="Success",
@@ -113,6 +120,7 @@ class AssignService:
                 status_code=e.status_code
             )
         except Exception as e:
+            print(f"Error updating status: {e}")
             return format_response(
                 status="Error",
                 data=None,
@@ -200,6 +208,7 @@ class AssignService:
                 status_code=e.status_code
             )
         except Exception as e:
+            print(e)
             return format_response(
                 status="Error",
                 data=None,
