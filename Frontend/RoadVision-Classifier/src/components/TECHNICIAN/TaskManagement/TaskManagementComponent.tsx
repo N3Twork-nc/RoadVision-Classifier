@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import { wardIdState } from "../../../atoms/technicianTask/tasksState";
 import technicianService from "../../../services/technicianprofile.service";
-import { Table, Tag, Breadcrumb, Input, Modal} from "antd";
+import { Table, Tag, Breadcrumb, Input, Modal } from "antd";
 import { AiOutlinePlus } from "react-icons/ai";
+const api_url = import.meta.env.VITE_BASE_URL;
 
 interface TaskManagementComponentProps {
   road: any;
@@ -121,18 +122,26 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
       width: 250,
       align: "center" as "center",
       render: (image: string) => {
-        const fullImageUrl = `http://192.168.120.26/${image}`;
+        const fullImageUrl = `${api_url}/${image}`;
         return (
-          <img
-            src={fullImageUrl}
-            alt="Road"
+          <div
             style={{
-              width: 150,
-              height: 100,
-              objectFit: "cover",
-              borderRadius: "8px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
             }}
-          />
+          >
+            <img
+              src={fullImageUrl}
+              alt="Road"
+              style={{
+                width: 150,
+                height: 100,
+                objectFit: "cover",
+                borderRadius: "8px",
+              }}
+            />
+          </div>
         );
       },
     },
@@ -213,22 +222,30 @@ const TaskManagementComponent: React.FC<TaskManagementComponentProps> = ({
           <Input
             placeholder="Tổng chi phí"
             value={report.totalCost}
-            onChange={(e) => setReport({ ...report, totalCost: e.target.value })}
+            onChange={(e) =>
+              setReport({ ...report, totalCost: e.target.value })
+            }
           />
           <Input
             placeholder="Phát sinh so với thực tế"
             value={report.deviation}
-            onChange={(e) => setReport({ ...report, deviation: e.target.value })}
+            onChange={(e) =>
+              setReport({ ...report, deviation: e.target.value })
+            }
           />
           <Input
             placeholder="Khó khăn gặp phải"
             value={report.difficulty}
-            onChange={(e) => setReport({ ...report, difficulty: e.target.value })}
+            onChange={(e) =>
+              setReport({ ...report, difficulty: e.target.value })
+            }
           />
           <Input
             placeholder="Đề xuất cải thiện (Nếu có)"
             value={report.improvement}
-            onChange={(e) => setReport({ ...report, improvement: e.target.value })}
+            onChange={(e) =>
+              setReport({ ...report, improvement: e.target.value })
+            }
           />
         </div>
       </Modal>

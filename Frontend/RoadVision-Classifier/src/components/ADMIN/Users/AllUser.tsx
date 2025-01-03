@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
-import { Table, Modal, Button, Form, Input } from "antd";
+import { Table, Modal, Button, Form, Input, message } from "antd";
 import manageAlluserService from "../../../services/manageAlluser.service";
 import { useRecoilState } from "recoil";
 import { userState } from "../../../atoms/admin/accountState";
 import { FaUser } from "react-icons/fa";
-import homeheader from "../../../assets/img/TECHNICIAN-header.png";
+import homeheader from "../../../assets/img/USER-header.png";
 import mask from "../../../assets/img/mask.png";
 
 interface DataType {
@@ -62,12 +62,12 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
     const payload = { ...values, permission_id: "3" };
     try {
       await manageAlluserService.addNewUser(payload);
-      alert("Add user successfully!");
+      message.success("Add user successfully!");
       fetchAllUsers();
       form.resetFields();
       setIsModalVisible(false);
     } catch (error) {
-      console.log("Thêm tài khoản thất bại!");
+      message.error("Fail to add new user!");
     }
   };
 
@@ -85,7 +85,7 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
       onOk: async () => {
         try {
           await manageAlluserService.deleteUser(username);
-          alert("Delete user successfully!");
+          message.success("Delete user successfully!");
           fetchAllUsers();
         } catch (error) {
           console.log("Xóa tài khoản thất bại!");
@@ -96,38 +96,74 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
 
   const columns = [
     {
-      title: "User ID",
+      title: (
+        <span
+          style={{ color: "#23038C", fontWeight: "bold", fontSize: "16px" }}
+        >
+          USER ID
+        </span>
+      ),
       dataIndex: "user_id",
       key: "user_id",
       align: "center" as "center",
     },
     {
-      title: "Username",
+      title: (
+        <span
+          style={{ color: "#23038C", fontWeight: "bold", fontSize: "16px" }}
+        >
+          USER NAME
+        </span>
+      ),
       dataIndex: "username",
       key: "username",
       align: "center" as "center",
     },
     {
-      title: "Fullname",
+      title: (
+        <span
+          style={{ color: "#23038C", fontWeight: "bold", fontSize: "16px" }}
+        >
+          FULL NAME
+        </span>
+      ),
       dataIndex: "fullname",
       key: "fullname",
       align: "center" as "center",
     },
     {
-      title: "Join Date",
+      title: (
+        <span
+          style={{ color: "#23038C", fontWeight: "bold", fontSize: "16px" }}
+        >
+          JOIN DATE
+        </span>
+      ),
       dataIndex: "joindate",
       key: "joindate",
       align: "center" as "center",
     },
     {
-      title: "Contribution",
+      title: (
+        <span
+          style={{ color: "#23038C", fontWeight: "bold", fontSize: "16px" }}
+        >
+          CONTRIBUTION
+        </span>
+      ),
       dataIndex: "contribution",
       key: "contribution",
       align: "center" as "center",
       render: (contribution: number) => `${contribution} image(s)`,
     },
     {
-      title: "Action",
+      title: (
+        <span
+          style={{ color: "#23038C", fontWeight: "bold", fontSize: "16px" }}
+        >
+          ACTION
+        </span>
+      ),
       key: "action",
       align: "center" as "center",
       render: (_: any, record: DataType) => (
@@ -215,7 +251,7 @@ export default function AllUser({ onViewUserInfo }: AllUserProps) {
             name="email"
             label="Email"
             rules={[
-              { required: false, message: "Please input email!" },
+              { required: true, message: "Please input email!" },
               { type: "email", message: "Invalid email format!" },
             ]}
           >

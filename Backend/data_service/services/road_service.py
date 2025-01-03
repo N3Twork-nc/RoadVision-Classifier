@@ -23,6 +23,7 @@ def get_location(lat, lon):
             district = location_part[-4]
             ward = location_part[-5]
             location=", ".join(location_part[:-2])
+            print(location, [ward, district, province])
             return location,[ward, district, province]
         else:
             return None, []
@@ -58,10 +59,10 @@ class RoadService:
 
 
     @staticmethod
-    def getlistRoad(user_id=None,id_road=None,ward_id=None):
+    def getlistRoad(user_id=None,id_road=None,ward_id=None,all=False):
         try:
             db=Postgresql()
-            roads=db.execute(f"SELECT id, user_id,latitude,longitude,level,image_path,created_at,location FROM road where level <> 'Good' and level <> 'Classifying' and status <> 'Done' and ({not id_road} or id={id_road if id_road else -1}) and ({not user_id} or user_id='{user_id if user_id else -1}') and ({not ward_id} or ward_id='{ward_id if ward_id else -1}') ",fetch='all')
+            roads=db.execute(f"SELECT id, user_id,latitude,longitude,level,image_path,created_at,location,ward_id,status FROM road where ((level <> 'Good' and level <> 'Classifying') or {all}) and status <> 'Done' and ({not id_road} or id={id_road if id_road else -1}) and ({not user_id} or user_id='{user_id if user_id else -1}') and ({not ward_id} or ward_id='{ward_id if ward_id else -1}') ",fetch='all')
             db.close()
             road_schemas = [
                 RoadSchema(
@@ -72,9 +73,11 @@ class RoadService:
                     level=level,
                     filepath=filepath,
                     created_at=created_at,
-                    location=location
+                    location=location,
+                    ward_id=ward_id,
+                    status=status
                 )
-                for id, user_id, latitude, longitude, level, filepath, created_at,location in roads
+                for id, user_id, latitude, longitude, level, filepath, created_at,location,ward_id,status in roads
             ]
             data=[road.reformat().json() for road in road_schemas]
             return JSONResponse(content={

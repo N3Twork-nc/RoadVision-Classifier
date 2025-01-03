@@ -8,6 +8,8 @@ import { useRecoilValue } from "recoil";
 import { accountState } from "../../atoms/authState";
 import { checkObjectAtLeastOneField } from "../../utils/check.util";
 import { generateImageDomain } from "../../utils/genrate.util";
+import { message } from "antd";
+
 import { Upload, Button } from "antd";
 import {
   UploadOutlined,
@@ -60,7 +62,7 @@ const MapPrivate: React.FC = () => {
           console.error("Error accessing camera:", error);
         });
     } else {
-      alert("Camera is not supported on this device.");
+      message.error("Camera is not supported on this device.");
     }
   };
 
@@ -169,18 +171,18 @@ const MapPrivate: React.FC = () => {
                 window.location.reload();
               } catch (error) {
                 console.error("Error uploading image:", error);
-                alert("An error occurred during the upload. Please try again.");
+                message.error("An error occurred during the upload. Please try again.");
               }
             },
             (error) => {
               console.error("Error getting location:", error);
-              alert(
+              message.error(
                 "Could not get current location. Please enable location services."
               );
             }
           );
         } else {
-          alert("Geolocation is not supported by this browser.");
+          message.error("Geolocation is not supported by this browser.");
         }
         setIsCameraActive(false);
         handleCloseCamera();
