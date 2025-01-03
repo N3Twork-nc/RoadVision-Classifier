@@ -11,7 +11,6 @@ import threading
 
 current_file_path = os.path.abspath(__file__)
 
-# Hàm lấy thông tin quận/huyện từ tọa độ
 def get_location(lat, lon):
     try:
         geolocator = Nominatim(user_agent='n3twork@gmail.com')

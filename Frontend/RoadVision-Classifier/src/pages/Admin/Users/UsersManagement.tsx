@@ -7,7 +7,9 @@ import { useRecoilState } from "recoil";
 import { userState } from "../../../atoms/admin/accountState";
 
 const UsersManagement: React.FC = () => {
-  const [currentView, setCurrentView] = useState<"allUsers" | "userInfo" | "roadDetails">("allUsers");
+  const [currentView, setCurrentView] = useState<
+    "allUsers" | "userInfo" | "roadDetails"
+  >("allUsers");
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [currentRoad, setCurrentRoad] = useState<any>(null);
   const [userinf, setUser] = useRecoilState(userState);
@@ -15,7 +17,7 @@ const UsersManagement: React.FC = () => {
   // VIEW USER INFO
   const handleViewUserInfo = (user: any) => {
     setSelectedUser(user);
-    setUser(user); 
+    setUser(user);
     setCurrentView("userInfo");
   };
 
@@ -25,7 +27,7 @@ const UsersManagement: React.FC = () => {
 
   // VIEW ROAD DETAILS
   const handleViewRoadDetails = (road: any) => {
-    setCurrentRoad(road); 
+    setCurrentRoad(road);
     setCurrentView("roadDetails");
   };
 
@@ -35,23 +37,24 @@ const UsersManagement: React.FC = () => {
 
   return (
     <AppLayout>
-      <div className="p-4 bg-gray-50">
+      <div className="w-full min-h-screen bg-[#F9F9F9] flex flex-col p-5 gap-5 justify-start items-center overflow-y-auto">
+        
         {currentView === "allUsers" && (
           <AllUser onViewUserInfo={handleViewUserInfo} />
         )}
         {currentView === "userInfo" && (
           <UserInfo
-            user={selectedUser} 
+            user={selectedUser}
             onBack={handleBackToAllUsers}
-            onViewRoadDetails={handleViewRoadDetails} 
+            onViewRoadDetails={handleViewRoadDetails}
           />
         )}
         {currentView === "roadDetails" && (
           <RoadDetails
-            user={userinf} 
-            road={currentRoad} 
-            onBackToUsers={handleBackToAllUsers} 
-            onBackToUserInfo={handleBackToUserInfo} 
+            user={userinf}
+            road={currentRoad}
+            onBackToUsers={handleBackToAllUsers}
+            onBackToUserInfo={handleBackToUserInfo}
           />
         )}
       </div>

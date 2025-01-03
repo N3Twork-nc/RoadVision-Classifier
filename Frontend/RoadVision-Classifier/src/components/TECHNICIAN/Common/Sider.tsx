@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { FaHome, FaTasks,  } from "react-icons/fa";
+import { FaMap, FaTasks } from "react-icons/fa";
 import PropTypes from "prop-types";
 
 const Sider: React.FC = () => {
@@ -39,7 +39,8 @@ const Sider: React.FC = () => {
         <h1 className="text-2xl font-bold text-[#23038C]">RoadVision</h1>
       </div>
       <nav className="flex-1 px-4 py-6 space-y-4">
-        <NavLink to="/dashboard-technician" icon={FaHome} text="Dashboard" />
+        <NavLink to="/map" icon={FaMap} text="Map" />
+        {/* <NavLink to="/dashboard-technician" icon={FaHome} text="Dashboard" /> */}
         <NavLink to="/task-management" icon={FaTasks} text="Tasks Management" />
       </nav>
     </aside>

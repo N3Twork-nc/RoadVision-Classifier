@@ -180,65 +180,105 @@ class User(BaseModel):
         db = Postgresql()
         try:
             query = '''
-                SELECT u.user_id, u.fullname, a.username, a.created, s.deadline, s.status, w.name, d.name, p.name
+                SELECT u.user_id, u.fullname, a.username, a.created
                 FROM "user" u
                 JOIN "account" a ON u.user_id = a.id
                 JOIN "role" r ON r.user_id = a.id
-                LEFT JOIN "assignment" s ON s.user_id = a.id
-                LEFT JOIN "ward" w ON s.ward_id = w.id
-                LEFT JOIN "district" d ON w.district_id = d.id
-                LEFT JOIN "province" p ON d.province_id = p.id
                 WHERE r.permission_id = 2
             '''
-            
+
             user_results = db.execute(query, fetch='all')
 
             if not user_results:
                 return {"data": []}
 
-            grouped_users = {}
+            users_data = []
+
             for row in user_results:
-                user_id = row[0]
-                fullname = row[1]
-                username = row[2]
+                task_done_query = f'''
+                    SELECT COUNT(*)
+                    FROM "assignment"
+                    WHERE user_id = {row[0]} AND status = 'Done'
+                '''
+                task_done = db.execute(task_done_query, fetch='one')[0]
+
+                all_task_query = f'''
+                    SELECT COUNT(*)
+                    FROM "assignment"
+                    WHERE user_id = {row[0]}
+                '''
+                all_task = db.execute(all_task_query, fetch='one')[0]
+
+                created = row[3].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[3], datetime) else row[3]
                 avatar = f"/user/api/getAvatar?username={row[2]}"
-                created = row[3].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[3], datetime) else None
-                deadline = row[4].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[4], datetime) else None
+                
+                users_data.append({
+                    "user_id": row[0],
+                    "fullname": row[1],
+                    "username": row[2],
+                    "created": created,
+                    "avatar": avatar,
+                    "task_done": task_done,
+                    "all_task": all_task
+                })
 
-                if user_id not in grouped_users:
-                    grouped_users[user_id] = {
-                        "user_id": user_id,
-                        "fullname": fullname,
-                        "username": username,
-                        "avatar": avatar,
-                        "created": created,
-                        "tasks": []
-                    }
-
-                if deadline:
-                    grouped_users[user_id]["tasks"].append({
-                        "deadline": deadline,
-                        "status": row[5],
-                        "ward_name": row[6],
-                        "district_name": row[7],
-                        "province_name": row[8]
-                    })
-
-            users_data = list(grouped_users.values())
-            
             return {"data": users_data}
+
         except Exception as e:
             print(f"Error getting users: {e}")
             return {"data": []}
         finally:
             db.close()
 
+    def get_valid_wards(self) -> dict:
+        db = Postgresql()
+        try:
+            query = """
+                SELECT w.name, d.name, p.name
+                FROM "road" r
+                JOIN "ward" w ON r.ward_id = w.id
+                JOIN "district" d ON w.district_id = d.id
+                JOIN "province" p ON d.province_id = p.id
+                WHERE NOT EXISTS (
+                    SELECT 1 
+                    FROM "assignment" a 
+                    WHERE a.ward_id = w.id
+                )
+            """
+            ward_results = db.execute(query, fetch='all')
+
+            if not ward_results:
+                return {}
+
+            locations = {}
+            for ward_name, district_name, province_name in ward_results:
+                if province_name not in locations:
+                    locations[province_name] = {}
+                if district_name not in locations[province_name]:
+                    locations[province_name][district_name] = set()
+                locations[province_name][district_name].add(ward_name)
+
+            formatted_locations = {
+                province: {
+                    district: list(wards) for district, wards in districts.items()
+                }
+                for province, districts in locations.items()
+            }
+
+            return formatted_locations
+        except Exception as e:
+            print(f"Error getting valid wards: {e}")
+            return {}
+        finally:
+            db.close()
+
+
 class Task(BaseModel):
     username: str
     province_name: str = None
     district_name: str = None
     ward_name: str = None
-    deadline: datetime = None  # Định dạng: 'YYYY-MM-DD HH:MM:SS'
+    deadline: datetime = None 
 
     def assign_task(self) -> Tuple[bool, str, str, str, str]:
         db = Postgresql()
@@ -258,7 +298,7 @@ class Task(BaseModel):
                 'permission_id',
                 f"user_id = {user_id}"
             )
-            if not role_result or role_result[0] != 2:  # 2 là vai trò 'technical'
+            if not role_result or role_result[0] != 2: 
                 print(f"User not found or does not have 'technical' role.")
                 return False, None, None, None, None
 
@@ -303,8 +343,80 @@ class Task(BaseModel):
         finally:
             db.close()
 
+    def get_task(self, role: str, user_id: int = None) -> list:
+        db = Postgresql()
+        try:
+            query = f'''
+                SELECT s.id, s.deadline, s.status, w.name, d.name, p.name, w.id, d.id, p.id
+                FROM "assignment" s
+                JOIN "ward" w ON s.ward_id = w.id
+                JOIN "district" d ON w.district_id = d.id
+                JOIN "province" p ON d.province_id = p.id
+                JOIN "account" a ON s.user_id = a.id
+            '''
+            
+            if role == "admin" and user_id is not None:
+                query += f"WHERE s.user_id = {user_id}"
+            else:
+                query += f"WHERE s.user_id = (SELECT id FROM account WHERE username = '{self.username}')"
 
-    def update_status(self, status: str, user_id: int = None, road_id: int = None, ward_id: int = None) -> bool:
+            task_results = db.execute(query, fetch='all')
+
+            tasks = []
+            for row in task_results:
+                road_done_query = f'''
+                    SELECT COUNT(*)
+                    FROM "road"
+                    WHERE ward_id = {row[6]} AND status = 'Done'
+                '''
+                road_count = db.execute(road_done_query, fetch='one')[0]
+
+                all_road_query = f'''
+                    SELECT COUNT(*)
+                    FROM "road"
+                    WHERE ward_id = {row[6]}
+                '''
+                all_road_count = db.execute(all_road_query, fetch='one')[0]
+
+                deadline = row[1].strftime('%Y-%m-%d %H:%M:%S') if isinstance(row[1], datetime) else None
+                location = f"{row[3]}, {row[4]}, {row[5]}"
+
+                tasks.append({
+                    "task_id": row[0],
+                    "deadline": deadline,
+                    "status": row[2],
+                    "location": location,
+                    "ward_id": row[6],
+                    "district_id": row[7],
+                    "province_id": row[8],
+                    "road_done": road_count,
+                    "all_road": all_road_count
+                })
+
+            return tasks
+        except Exception as e:
+            print(f"Error getting tasks: {e}")
+            return []
+        finally:
+            db.close()
+
+    def delete_task(self, task_id: int) -> bool:
+        db = Postgresql()
+        try:
+            db.execute(
+                f'DELETE FROM "assignment" WHERE id = {task_id}',
+                fetch=None
+            )
+            db.commit()
+            print(f"Task with id '{task_id}' deleted successfully.")
+            return True
+        except Exception as e:
+            print(f"Error deleting task: {e}")
+            return False
+        finally:
+            db.close()
+
+    def update_status(self, status: str, road_id: int = None, ward_id: int = None) -> bool:
         db = Postgresql()
         try:
             user_result = db.select(
@@ -327,7 +439,7 @@ class Task(BaseModel):
                 return False
             user_role = role_result[0]
 
-            if user_id and ward_id:
+            if ward_id:
                 if user_role != 1:  
                     print(f"User '{self.username}' is not an admin.")
                     return False
@@ -335,10 +447,10 @@ class Task(BaseModel):
                 assignment_result = db.select(
                     '"assignment"',
                     'id',
-                    f"user_id = {user_id} AND ward_id = {ward_id}"
+                    f"ward_id = {ward_id}"
                 )
                 if not assignment_result:
-                    print(f"No assignment found for user_id '{user_id}' and ward_id '{ward_id}'.")
+                    print(f"No assignment found.")
                     return False
 
                 updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -346,27 +458,36 @@ class Task(BaseModel):
                 db.update(
                     '"assignment"',
                     f"status = '{status}', updated_at = '{updated_at}'",
-                    f"user_id = {user_id} AND ward_id = {ward_id}"
+                    f"ward_id = {ward_id}"
                 )
                 db.commit()
-                print(f"Assignment status updated to '{status}' for user_id '{user_id}' successfully.")
+                print(f"Assignment status updated successfully.")
                 return True
 
             if road_id:
-                if user_role not in [1, 2]:  # Admin or technical
+                if user_role not in [1, 2]:  
                     print(f"User '{self.username}' is not authorized to update road status.")
                     return False
 
                 updated_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-                db.update(
-                    '"road"',
-                    f"status = '{status}', update_at = '{updated_at}'",
-                    f"id = {road_id}"
-                )
+                if status == 'Done':
+                    db.update(
+                        '"road"',
+                        f"status = '{status}', update_at = '{updated_at}', level = 'Good'",
+                        f"id = {road_id}"
+                    )
+                else:
+                    db.update(
+                        '"road"',
+                        f"status = '{status}', update_at = '{updated_at}'",
+                        f"id = {road_id}"
+                    )
+
                 db.commit()
                 print(f"Road status updated to '{status}' for road_id '{road_id}' successfully.")
                 return True
+
 
             print("Invalid parameters for updating status.")
             return False

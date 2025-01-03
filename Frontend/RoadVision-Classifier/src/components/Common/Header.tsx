@@ -2,15 +2,14 @@ import React, { useEffect } from "react";
 import { DownOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Dropdown, Space } from "antd";
-import search from "../../assets/img/search.png";
 import notification from "../../assets/img/notification.png";
-import { useRecoilState, useRecoilValue, } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import { accountState } from "../../atoms/authState";
 import { Link } from "react-router-dom";
 import { PageEnum } from "../../defination/enums/page.enum";
 import { handleLogOut } from "../../utils/auth.util";
 import defaultAvatar from "../../assets/img/defaultAvatar.png";
-const api_url =  import.meta.env.VITE_BASE_URL;
+const api_url = import.meta.env.VITE_BASE_URL;
 
 const Header: React.FC = () => {
   const userRecoilStateValue = useRecoilValue(accountState);
@@ -36,7 +35,7 @@ const Header: React.FC = () => {
   useEffect(() => {
     const fetchAvatar = async () => {
       try {
-        const avatarUrl = `${api_url}/user/api/getAvatar?username=${userRecoilStateValue.username}`;;
+        const avatarUrl = `${api_url}/user/api/getAvatar?username=${userRecoilStateValue.username}`;
         setUserRecoilState((prevState) => ({
           ...prevState,
           avatar: avatarUrl,
@@ -48,17 +47,10 @@ const Header: React.FC = () => {
 
     fetchAvatar();
   }, [setUserRecoilState]);
-  
+
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-[#F9F9F9]">
-      <div className="flex items-center space-x-4 w-96 px-4 py-2 bg-slate-100 border rounded-3xl focus-within:ring focus-within:ring-blue-300">
-        <input
-          type="text"
-          placeholder="Search your..."
-          className="flex-1 bg-slate-100 outline-none"
-        />
-        <img className="w-5 h-5" src={search} />
-      </div>
+      <div className="flex items-center space-x-4 w-96 px-4 py-2"></div>
 
       <div className="flex items-center space-x-4">
         {/* notification */}
