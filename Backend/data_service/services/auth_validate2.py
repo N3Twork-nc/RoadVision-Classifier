@@ -23,6 +23,7 @@ def validate_token(token: str):
                 detail=response.json().get("message", "Token validation failed")
             )
     except requests.RequestException as e:
+        print(e)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Unable to connect to authorization service"
