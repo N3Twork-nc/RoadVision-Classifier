@@ -241,7 +241,7 @@ class AssignService:
 
             return format_response(
                 status="Success",
-                data=tasks,
+                data=report_results,
                 message="Get report task successfully",
                 status_code=200
             )
