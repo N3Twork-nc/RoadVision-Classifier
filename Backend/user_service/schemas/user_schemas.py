@@ -374,7 +374,7 @@ class Task(BaseModel):
                 all_road_query = f'''
                     SELECT COUNT(*)
                     FROM "road"
-                    WHERE ward_id = {row[6]}
+                    WHERE ward_id = {row[6]} and ((level != 'Good' AND level != 'Classifying') or (level = 'Good' AND status = 'Done'))
                 '''
                 all_road_count = db.execute(all_road_query, fetch='one')[0]
 
