@@ -35,7 +35,7 @@ const Header: React.FC = () => {
   useEffect(() => {
     const fetchAvatar = async () => {
       try {
-        const avatarUrl = `${api_url}/user/api/getAvatar?username=${userRecoilStateValue.username}`;
+        const avatarUrl = `${api_url}user/api/getAvatar?username=${userRecoilStateValue.username}`;
         setUserRecoilState((prevState) => ({
           ...prevState,
           avatar: avatarUrl,
