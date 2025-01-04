@@ -525,7 +525,7 @@ const MapPrivate: React.FC = () => {
           _______________________________________________________________
         </span>
 
-        <div className="buttonContainer">
+        <div className="buttonContainer flex flex-col">
           <button className="uploadButton" onClick={openUploadModal}>
             Upload current image
           </button>
