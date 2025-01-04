@@ -3,7 +3,6 @@ import AppLayout from "../../../components/Common/AppLayout";
 import mask from "../../../assets/img/mask.png";
 import Account from "../../../components/Profile/Account";
 import EditProfile from "../../../components/Profile/EditProfile";
-import History from "../../../components/Profile/History";
 import ChangePassword from "../../../components/Profile/ChangePassword";
 import { useRecoilValue } from "recoil";
 import { accountState } from "../../../atoms/authState";
@@ -16,7 +15,7 @@ export default function Profile() {
     { label: "Account", component: <Account /> },
     { label: "Edit Profile", component: <EditProfile /> },
     { label: "Change Password", component: <ChangePassword /> },
-    { label: "History", component: <History /> },
+
   ];
 
   return (
