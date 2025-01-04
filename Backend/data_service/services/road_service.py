@@ -58,10 +58,18 @@ class RoadService:
 
 
     @staticmethod
-    def getlistRoad(user_id=None,id_road=None,ward_id=None,all=False):
+    def getlistRoad(user_id=None,id_road=None,ward_id=None,all=False,getDone=False):
         try:
             db=Postgresql()
-            roads=db.execute(f"SELECT id, user_id,latitude,longitude,level,image_path,created_at,location,ward_id,status FROM road where (((level <> 'Good' AND level <> 'Classifying') OR (level = 'Good' AND status = 'Done')) or {all}) and ({not id_road} or id={id_road if id_road else -1}) and ({not user_id} or user_id='{user_id if user_id else -1}') and ({not ward_id} or ward_id='{ward_id if ward_id else -1}') ",fetch='all')
+            query=f'''
+            SELECT id, user_id,latitude,longitude,level,image_path,created_at,location,ward_id,status 
+            FROM road 
+            where ((level <> 'Good' and level <> 'Classifing') or {all} or ({getDone} and status='Done')) and 
+            ({not id_road} or id={id_road if id_road else -1}) and
+            ({not user_id} or user_id='{user_id if user_id else -1}') and 
+            ({not ward_id} or ward_id='{ward_id if ward_id else -1}') 
+            '''
+            roads=db.execute(query,fetch='all')           
             db.close()
             road_schemas = [
                 RoadSchema(

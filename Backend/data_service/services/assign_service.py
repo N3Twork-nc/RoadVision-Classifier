@@ -2,6 +2,9 @@ from schemas import Task
 from datetime import datetime
 from .format_response import format_response
 from fastapi import HTTPException, status
+from Database import Postgresql
+import threading
+from .routemap_service import RouteMap
 
 class AssignService:
     @staticmethod
@@ -64,7 +67,7 @@ class AssignService:
             )
         
     @staticmethod
-    def update_status_service(user_info: dict, status: str, road_id: int = None, ward_id: int = None):
+    def update_status_service(user_info: dict, status: str, road_id: int = None, ward_id: int = None, report=None):
         role = user_info.get("role")
         username = user_info.get("username")
 
@@ -82,7 +85,7 @@ class AssignService:
 
         try:
             task = Task(username=username)
-            success = task.update_status(status, road_id, ward_id)
+            success = task.update_status(status, road_id, ward_id, report)
 
             if not success:
                 raise HTTPException(
@@ -98,6 +101,11 @@ class AssignService:
                 data.update({"ward_id": ward_id})
             if road_id:
                 data.update({"road_id": road_id})
+                db=Postgresql()
+                ward_id = db.execute(f"SELECT ward_id FROM road WHERE id={road_id}")[0]
+                db.close()
+            print(ward_id)
+            threading.Thread(target=RouteMap,args=([ward_id],)).start()
 
             return format_response(
                 status="Success",
@@ -113,6 +121,7 @@ class AssignService:
                 status_code=e.status_code
             )
         except Exception as e:
+            print(f"Error updating status: {e}")
             return format_response(
                 status="Error",
                 data=None,
@@ -200,9 +209,54 @@ class AssignService:
                 status_code=e.status_code
             )
         except Exception as e:
+            print(e)
             return format_response(
                 status="Error",
                 data=None,
                 message="An error occurred while deleting task",
+                status_code=500
+            )
+    @staticmethod
+    def get_report_task(user_info: dict, road_id: int = None):
+        username = user_info.get("username")
+        role = user_info.get("role")
+
+        if role not in ["technical", "admin"]:
+            raise HTTPException(
+                status_code=403,
+                detail="You do not have permission to access tasks"
+            )
+
+        try:
+            task = Task(username=username)
+            report_results = task.get_report_task(road_id=road_id)
+
+            if not  report_results:
+                return format_response(
+                    status="Success",
+                    data=[],
+                    message="No tasks found",
+                    status_code=200
+                )
+
+            return format_response(
+                status="Success",
+                data=report_results,
+                message="Get report task successfully",
+                status_code=200
+            )
+        except HTTPException as e:
+            return format_response(
+                status="Error",
+                data=None,
+                message=e.detail,
+                status_code=e.status_code
+            )
+        except Exception as e:
+            print(f"Error getting tasks: {e}")
+            return format_response(
+                status="Error",
+                data=None,
+                message="An error occurred while retrieving tasks",
                 status_code=500
             )
