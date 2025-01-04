@@ -1,0 +1,19 @@
+Thành viên nhóm:
+- Nguyễn Cao Thi - 21522613
+- Nguyễn Trà Bảo Ngân - 21522371
+- Thái Nhật Thư - 21522648
+- Lê Huỳnh Anh Thư - 21521490
+
+Source code: https://github.com/N3Twork-nc/RoadVision-Classifier.git
+
+Cách setup sản phẩm:
+- Clone mã nguồn từ github (hoặc lấy file zip)
+git clone https://github.com/N3Twork-nc/RoadVision-Classifier.git
+- copy file .env.example ra file .env (chỉnh sửa nếu cần thiết)
+cp .env.example .env
+- Chạy sản phẩm docker compose (tải docker nếu chưa cài đặt)
+docker compose up -d
+- Kiểm tra các container bằng lệnh
+docker compose ps
+- Nếu các container đã hoạt động bình thường trình cập vào trang web: http://localhost để sử dụng sản phẩm
+. Sản phẩm đã có một số dữ liệu có sẵn, có thể sử dụng tài khoản admin là username: caothi123 và password: 123456 để đăng nhập. 
