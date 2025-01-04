@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
 import dataService from "../../services/data.service";
 import { accountState } from "../../atoms/authState";
-const api_url = import.meta.env.VITE_BASE_URL;
+const api_url = "https://exotic-strong-viper.ngrok-free.app";
 
 interface DataType {
   time: string;

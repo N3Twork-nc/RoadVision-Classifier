@@ -19,7 +19,7 @@ interface DataType {
 interface AllUserProps {
   onViewUserInfo: (user: DataType) => void;
 }
-const api_url = import.meta.env.VITE_BASE_URL;
+const api_url = "https://exotic-strong-viper.ngrok-free.app";
 
 export default function AllUser({ onViewUserInfo }: AllUserProps) {
   const [dataSource, setDataSource] = useState<DataType[]>([]);
