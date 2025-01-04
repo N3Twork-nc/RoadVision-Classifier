@@ -125,7 +125,7 @@ const Map: React.FC = () => {
                 iconSize: [30, 30],
                 iconAnchor: [15, 30],
               });
-              const fullImageUrl = `${api_url}${filepath}`;
+              const fullImageUrl = `${api_url}/${filepath}`;
               console.log("fullImageUrl:", fullImageUrl);
               try {
                 const marker = L.marker([latitude, longitude], {

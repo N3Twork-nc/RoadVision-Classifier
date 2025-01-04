@@ -113,7 +113,7 @@ export default function History() {
       key: "image",
       align: "center" as "center",
       render: (image: string) => {
-        const fullImageUrl = `${api_url}${image}`;
+        const fullImageUrl = `${api_url}/${image}`;
         return (
           <img
             src={fullImageUrl}

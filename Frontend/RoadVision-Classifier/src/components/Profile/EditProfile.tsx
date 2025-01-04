@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Select, DatePicker } from "antd";
+import { Select, DatePicker, message } from "antd";
 import { countryList } from "./country";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
@@ -92,16 +92,11 @@ export default function EditProfile() {
         phonenumber: phoneNumberAsString,
         location: address,
         state: selectedCountry,
-        // Include avatar in save data if needed
       };
 
-      const response = await userProfileService.editProfile(updatedProfileData);
+      await userProfileService.editProfile(updatedProfileData);
 
-      if (response.status.toString() === "Success") {
-        alert("Profile updated successfully!");
-      } else {
-        alert("An error occurred while updating your profile.");
-      }
+      message.success("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);
     }
