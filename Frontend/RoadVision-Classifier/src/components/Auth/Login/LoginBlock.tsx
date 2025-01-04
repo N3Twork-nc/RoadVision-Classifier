@@ -71,6 +71,7 @@ const SignInBlock = () => {
 
       if (info && token) {
         const user_avatar = `${api_url}/user/api/getAvatar?username=${info.username}`;
+        console.log("user_avatar", user_avatar);
         info.avatar = user_avatar; 
         console.log(info);
         saveAccessToken(token); // Save token for future API calls
