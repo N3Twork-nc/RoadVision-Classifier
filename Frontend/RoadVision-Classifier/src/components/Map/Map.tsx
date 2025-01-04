@@ -37,7 +37,7 @@ const Map: React.FC = () => {
   const [endMarker, setEndMarker] = useState<L.Marker | null>(null);
   const [path, setPath] = useState<[number, number][][]>([]);
   const [isBadRoutesVisible, setIsBadRoutesVisible] = useState(false);
-  const api_url = import.meta.env.VITE_BASE_URL;
+  const api_url = "https://exotic-strong-viper.ngrok-free.app";
   const handleToggleBadRoutes = () => {
     if (routingControl) {
       routingControl.remove();

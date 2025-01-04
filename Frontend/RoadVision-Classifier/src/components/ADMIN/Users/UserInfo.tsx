@@ -20,7 +20,7 @@ interface AllUserProps {
   onBack: () => void;
   onViewRoadDetails: (road: any) => void;
 }
-const api_url = import.meta.env.VITE_BASE_URL;
+const api_url = "https://exotic-strong-viper.ngrok-free.app";
 
 export default function UserInfo({
   user,
