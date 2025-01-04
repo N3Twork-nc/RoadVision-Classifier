@@ -50,23 +50,4 @@
       </tr>
 </table>
 
-<h2>Giới thiệu đồ án</h2>
-
-
-### **Công nghệ sử dụng**
-<p align="center">
-   
-</p>
-
----
-<h2>Hướng dẫn cài đặt</h2>
-
-
-### **Các bước cài đặt**
-
-1. **Clone Repository:**  
-   ```bash
-
-2. **Cài đặt và chạy:**
-    ```bash
 
