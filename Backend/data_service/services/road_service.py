@@ -11,7 +11,6 @@ import threading
 
 current_file_path = os.path.abspath(__file__)
 
-# Hàm lấy thông tin quận/huyện từ tọa độ
 def get_location(lat, lon):
     try:
         geolocator = Nominatim(user_agent='n3twork@gmail.com')
@@ -43,7 +42,7 @@ class RoadService:
             threading.Thread(target=RouteMap,args=([roadSchema.ward_id],)).start()
             img=roadSchema.file
             producer=KafkaProducer(
-                bootstrap_servers='192.168.120.26:9092',
+                bootstrap_servers='kafka:9092',
                 value_serializer=lambda v: json.dumps(v).encode('utf-8')
             )
             message={
@@ -59,10 +58,18 @@ class RoadService:
 
 
     @staticmethod
-    def getlistRoad(user_id=None,id_road=None,ward_id=None,all=False):
+    def getlistRoad(user_id=None,id_road=None,ward_id=None,all=False,getDone=False):
         try:
             db=Postgresql()
-            roads=db.execute(f"SELECT id, user_id,latitude,longitude,level,image_path,created_at,location,ward_id,status FROM road where ((level <> 'Good' and level <> 'Classifying') or {all}) and status <> 'Done' and ({not id_road} or id={id_road if id_road else -1}) and ({not user_id} or user_id='{user_id if user_id else -1}') and ({not ward_id} or ward_id='{ward_id if ward_id else -1}') ",fetch='all')
+            query=f'''
+            SELECT id, user_id,latitude,longitude,level,image_path,created_at,location,ward_id,status 
+            FROM road 
+            where ((level <> 'Good' and level <> 'Classifing') or {all} or ({getDone} and status='Done')) and 
+            ({not id_road} or id={id_road if id_road else -1}) and
+            ({not user_id} or user_id='{user_id if user_id else -1}') and 
+            ({not ward_id} or ward_id='{ward_id if ward_id else -1}') 
+            '''
+            roads=db.execute(query,fetch='all')           
             db.close()
             road_schemas = [
                 RoadSchema(

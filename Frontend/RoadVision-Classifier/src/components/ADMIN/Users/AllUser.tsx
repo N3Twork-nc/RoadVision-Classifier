@@ -5,7 +5,7 @@ import manageAlluserService from "../../../services/manageAlluser.service";
 import { useRecoilState } from "recoil";
 import { userState } from "../../../atoms/admin/accountState";
 import { FaUser } from "react-icons/fa";
-import homeheader from "../../../assets/img/TECHNICIAN-header.png";
+import homeheader from "../../../assets/img/USER-header.png";
 import mask from "../../../assets/img/mask.png";
 
 interface DataType {

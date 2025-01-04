@@ -2,6 +2,9 @@ from schemas import Task
 from datetime import datetime
 from .format_response import format_response
 from fastapi import HTTPException, status
+from Database import Postgresql
+import threading
+from .routemap_service import RouteMap
 
 class AssignService:
     @staticmethod
@@ -64,7 +67,7 @@ class AssignService:
             )
         
     @staticmethod
-    def update_status_service(user_info: dict, status: str, user_id: int = None, road_id: int = None, ward_id: int = None):
+    def update_status_service(user_info: dict, status: str, road_id: int = None, ward_id: int = None, report=None):
         role = user_info.get("role")
         username = user_info.get("username")
 
@@ -74,7 +77,7 @@ class AssignService:
                 detail="You do not have permission to update road status"
             )
 
-        if user_id and ward_id and role != "admin":
+        if ward_id and role != "admin":
             raise HTTPException(
                 status_code=403,
                 detail="You do not have permission to update assignment status"
@@ -82,7 +85,7 @@ class AssignService:
 
         try:
             task = Task(username=username)
-            success = task.update_status(status, user_id, road_id, ward_id)
+            success = task.update_status(status, road_id, ward_id, report)
 
             if not success:
                 raise HTTPException(
@@ -94,10 +97,15 @@ class AssignService:
                 "status": status,
                 "updated_at": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             }
-            if user_id and ward_id:
-                data.update({"user_id": user_id, "ward_id": ward_id})
+            if ward_id:
+                data.update({"ward_id": ward_id})
             if road_id:
                 data.update({"road_id": road_id})
+                db=Postgresql()
+                ward_id = db.execute(f"SELECT ward_id FROM road WHERE id={road_id}")[0]
+                db.close()
+            print(ward_id)
+            threading.Thread(target=RouteMap,args=([ward_id],)).start()
 
             return format_response(
                 status="Success",
@@ -113,6 +121,7 @@ class AssignService:
                 status_code=e.status_code
             )
         except Exception as e:
+            print(f"Error updating status: {e}")
             return format_response(
                 status="Error",
                 data=None,
@@ -147,6 +156,93 @@ class AssignService:
                 status="Success",
                 data=tasks,
                 message="Tasks retrieved successfully",
+                status_code=200
+            )
+        except HTTPException as e:
+            return format_response(
+                status="Error",
+                data=None,
+                message=e.detail,
+                status_code=e.status_code
+            )
+        except Exception as e:
+            print(f"Error getting tasks: {e}")
+            return format_response(
+                status="Error",
+                data=None,
+                message="An error occurred while retrieving tasks",
+                status_code=500
+            )
+        
+    @staticmethod
+    def delete_task(user_info: dict, task_id: int):
+        username = user_info.get("username")
+        role = user_info.get("role")
+
+        if role != "admin":
+            raise HTTPException(
+                status_code=403,
+                detail="You do not have permission to delete tasks"
+            )
+
+        try:
+            task = Task(username=username)
+            success = task.delete_task(task_id)
+
+            if not success:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Failed to delete task"
+                )
+
+            return format_response(
+                status="Success",
+                data=None,
+                message="Task deleted successfully",
+                status_code=200
+            )
+        except HTTPException as e:
+            return format_response(
+                status="Error",
+                data=None,
+                message=e.detail,
+                status_code=e.status_code
+            )
+        except Exception as e:
+            print(e)
+            return format_response(
+                status="Error",
+                data=None,
+                message="An error occurred while deleting task",
+                status_code=500
+            )
+    @staticmethod
+    def get_report_task(user_info: dict, road_id: int = None):
+        username = user_info.get("username")
+        role = user_info.get("role")
+
+        if role not in ["technical", "admin"]:
+            raise HTTPException(
+                status_code=403,
+                detail="You do not have permission to access tasks"
+            )
+
+        try:
+            task = Task(username=username)
+            report_results = task.get_report_task(road_id=road_id)
+
+            if not tasks:
+                return format_response(
+                    status="Success",
+                    data=[],
+                    message="No tasks found",
+                    status_code=200
+                )
+
+            return format_response(
+                status="Success",
+                data=tasks,
+                message="Get report task successfully",
                 status_code=200
             )
         except HTTPException as e:
