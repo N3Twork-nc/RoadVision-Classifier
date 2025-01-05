@@ -29,7 +29,10 @@ class RouteMap():
         try:
             for i in range(len(self.coordinates)):
                 coords_np = np.array(self.coordinates[i])
-                if len(coords_np) <= 1: continue
+                if len(coords_np) <= 1: 
+                    mongo=MongoDB()
+                    mongo.update('route_map', {'_id': self.areas[i]},{'$set': {'routes': {}}})
+                    continue
                 coords_np =np.unique(coords_np, axis=0)
                 db = DBSCAN(eps=0.00045, min_samples=2).fit(coords_np)
                 labels = db.labels_

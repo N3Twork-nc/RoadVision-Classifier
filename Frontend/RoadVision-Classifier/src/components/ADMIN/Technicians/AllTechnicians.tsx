@@ -135,18 +135,7 @@ export default function AllTechnicians({
       key: "username",
       align: "center" as "center",
     },
-    {
-      title: (
-        <span
-          style={{ color: "#23038C", fontWeight: "bold", fontSize: "16px" }}
-        >
-          FULL NAME
-        </span>
-      ),
-      dataIndex: "fullname",
-      key: "fullname",
-      align: "center" as "center",
-    },
+    
     {
       title: (
         <span

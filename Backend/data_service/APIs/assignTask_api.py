@@ -21,3 +21,6 @@ def get_task(user_info: dict = Depends(validate_token), user_id: int = None):
 @app.delete('/api/deleteTask')
 def delete_task(user_info: dict = Depends(validate_token), task_id: int = None):
     return AssignService.delete_task(user_info, task_id)
+@app.get('/api/getReportTask')
+def get_report_task(user_info: dict = Depends(validate_token), road_id: int = None):
+    return AssignService.get_report_task(user_info, road_id)

@@ -6,7 +6,7 @@ import technicianService from "../../../services/technicianprofile.service";
 import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import manageAlltechnicianService from "../../../services/manageAlltechnician.service";
 import { message } from "antd";
-const api_url = import.meta.env.VITE_BASE_URL;
+const api_url = "https://exotic-strong-viper.ngrok-free.app"
 
 interface AllTaskDetailProps {
   task: any;

@@ -118,9 +118,7 @@ export default function TechnicianInfo({
     try {
       const response = await dataService.getValidWards({});
       setLocations(response || []);
-    } catch (error) {
-
-    }
+    } catch (error) {}
   };
   useEffect(() => {
     fetchValidWards();
